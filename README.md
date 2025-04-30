@@ -1,5 +1,7 @@
 # MB - Mad Balls
 
+test
+
 ## Maven
 
 Kurzübersicht nützlicher Maven-Befehle. Weitere Informationen finden sich im Tutorial:
