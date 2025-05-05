@@ -21,11 +21,12 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class tutorialSimulation extends Application{
     private GraphicsContext g;
-    private Entity e1, e2;
+    private static Entity e1, e2;
 
     private Parent createContent() {
         
@@ -41,11 +42,16 @@ public class tutorialSimulation extends Application{
         e1 = new Entity(createBox(200,100,40,40));
         e2 = new Entity(createBox(200, 200, 50, 50));
 
+        e1.getBody().setUserData(e1);
+        e2.getBody().setUserData(e2);
+
         render();
 
         return root;
 
     }
+
+    
 
     private void render() {
         g.clearRect(0, 0, 600, 600);
@@ -59,9 +65,18 @@ public class tutorialSimulation extends Application{
         world.setContactListener(new ContactListener() {
             
             @Override
-            public void beginContact(Contact contact){
-                System.out.println("Kollision erkannt!");
+            public void beginContact(Contact contact) {
+                Object a = contact.getFixtureA().getBody().getUserData();
+                Object b = contact.getFixtureB().getBody().getUserData();
+        
+                if (a instanceof Entity && a == tutorialSimulation.e2) {
+                    ((Entity) a).setColor(Color.RED);
+                }
+                if (b instanceof Entity && b == tutorialSimulation.e2) {
+                    ((Entity) b).setColor(Color.RED);
+                }
             }
+
             @Override
             public void endContact(Contact contact) {};
             @Override
