@@ -9,7 +9,7 @@ public class Entity {
 
     Body body;
     float w, h;
-    Color col = Color.BEIGE;
+    Color col = Color.BLACK ;
 
 
     public Entity(Body body) {

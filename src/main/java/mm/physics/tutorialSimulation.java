@@ -66,6 +66,9 @@ public class tutorialSimulation extends Application{
             
             @Override
             public void beginContact(Contact contact) {
+
+
+                System.out.println("Kollision erkannt");
                 Object a = contact.getFixtureA().getBody().getUserData();
                 Object b = contact.getFixtureB().getBody().getUserData();
         
