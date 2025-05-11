@@ -1,0 +1,35 @@
+MadBalls – Features
+•	Title Screen
+  o	Start Knopf
+  o	Sandbox
+  o	Puzzles
+    	Levelauswahl (Thumbnails, Beschreibung)
+  o	Options
+    	(Lauter/Leise)
+    	Texturepacks
+•	InGame
+  o	„ESC“ – Menü
+    	Quit
+    	Save Level (Export)
+    	Optional: Options
+  o	General InGame Features
+    	Editor <-> Simulator Wechsel
+    	Gelöstes/gebautes Level speichern
+    	Mehrere Objekte (Ball, Wall, etc.)
+    	Start/Stop (Simulator)
+  o Puzzle
+    	Teils vorgebaut (3 Level) !?
+    	Siegesbedingung
+    	Einschränkungszonen
+  o	Sandbox – Sim
+    	Leere Welt – selbst bauen
+    	Import Level
+    	Puzzle Features placeable
+  o	Editor
+    	Inventarsystem
+    	Drag & Drop
+    	Edit Objects
+    	Undo/Redo
+  o	Grafik
+    	Object png
+    	Background
