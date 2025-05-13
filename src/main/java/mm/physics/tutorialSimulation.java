@@ -81,7 +81,18 @@ public class tutorialSimulation extends Application{
             }
 
             @Override
-            public void endContact(Contact contact) {};
+            public void endContact(Contact contact) {
+
+                Object a = contact.getFixtureA().getBody().getUserData();
+                Object b = contact.getFixtureB().getBody().getUserData();
+        
+                if (a instanceof Entity && a == tutorialSimulation.e2) {
+                    ((Entity) a).setColor(Color.BLACK);
+                }
+                if (b instanceof Entity && b == tutorialSimulation.e2) {
+                    ((Entity) b).setColor(Color.BLACK);
+                }
+            };
             @Override
             public void preSolve(Contact contact, Manifold oldManifold) {};
             @Override

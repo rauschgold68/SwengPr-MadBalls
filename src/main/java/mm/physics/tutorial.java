@@ -53,35 +53,35 @@ public class tutorial {
         // -------------------
         // 2. Dynamischen Körper erstellen
         // -------------------
-        BodyDef dybodyDef = new BodyDef();
+        BodyDef dybodyDef = new BodyDef();                  // Beschreibt wie sich der Körper verhalten soll.
         dybodyDef.type = BodyType.DYNAMIC;
         dybodyDef.position.set(0.0f, 4.0f);
 
         Body dynamicBody = welt.createBody(dybodyDef);
         
-        PolygonShape dynamicBox = new PolygonShape();
+        PolygonShape dynamicBox = new PolygonShape();       // Beschreibt was für eine Form der Körper hat.
         dynamicBox.setAsBox(1.0f , 1.0f);
 
-        FixtureDef fixuterDef = new FixtureDef();
+        FixtureDef fixuterDef = new FixtureDef();           // Beschreibt wie sich der Körper physikalisch verhält.
         fixuterDef.shape = dynamicBox;
         fixuterDef.density = 1.0f;
         fixuterDef.friction = 0.3f;
 
-        dynamicBody.createFixture(fixuterDef);
+        dynamicBody.createFixture(fixuterDef);              // Weißt dem Körper die physikalischen Eigenschaften zu.
 
         // -------------------
         // 3. Simulation durchführen.
         // -------------------
         for (int i = 0; i < 90; ++i){
 
-            welt.step(timeStep, velocityIterations, positionIterations);
+            welt.step(timeStep, velocityIterations, positionIterations);        // Welt wird fortgeführt.
             Vec2 position = dynamicBody.getPosition();
             float angle = dynamicBody.getAngle();
 
             System.out.printf("%4.2f %4.2f %4.2f%n", position.x, position.y, Math.toDegrees(angle));
         }
 
-        while (dynamicBody != null) {
+        while (dynamicBody != null) {                                           // Simulation beedndet, die Körper werden wieder entfernt.
             Body next = dynamicBody.getNext();
             welt.destroyBody(dynamicBody);
             dynamicBody = next;
