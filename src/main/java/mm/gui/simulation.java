@@ -91,7 +91,9 @@ public class simulation extends Application {
         circFixtureDef.restitution = 0.4f;
         circle.createFixture(circFixtureDef);
 
-        // Create static ground
+        /*
+        * Create a static ground and walls
+        */        
         BodyDef groundDef = new BodyDef();
         groundDef.type = BodyType.STATIC;
         groundDef.position.set(400 / SCALE, 590 / SCALE);
@@ -107,12 +109,27 @@ public class simulation extends Application {
         groundRect.setTranslateY(580);
         root.getChildren().add(groundRect);
 
+        BodyDef leftWall = new BodyDef();
+        leftWall.type = BodyType.STATIC;
+        leftWall.position.set(0 / SCALE, 0 / SCALE);
+        Body leftWallBody = world.createBody(leftWall);
+
+        PolygonShape leftW = new PolygonShape();
+        leftW.setAsBox(10 / SCALE, 600 /SCALE);
+        leftWallBody.createFixture(leftW, 0.0f);
+
+        Rectangle leftRec = new Rectangle(10, 600, Color.BLACK);
+        leftRec.setTranslateY(0);
+        leftRec.setTranslateX(0);
+        root.getChildren().add(leftRec);
+
+
         /*
          * Create a triangle to have a collision.
         */
 
         BodyDef triangleDef = new BodyDef();
-        triangleDef.position.set(250 / SCALE, 530 / SCALE);
+        triangleDef.position.set(500 / SCALE, 530 / SCALE);
         Body trinagleBody = world.createBody(triangleDef);
 
         PolygonShape triangleShape = new PolygonShape();
@@ -128,9 +145,9 @@ public class simulation extends Application {
 
         Polygon triangleVisual = new Polygon();
         triangleVisual.getPoints().setAll(
-            250.0 - 2 * SCALE, 530.0 + SCALE,  // bottom left
-            250.0 + 2 * SCALE, 530.0 + SCALE,  // bottom right
-            250.0,         530.0 - 1.5 * SCALE // top center
+            500.0 - 2 * SCALE, 530.0 + SCALE,  // bottom left
+            500.0 + 2 * SCALE, 530.0 + SCALE,  // bottom right
+            500.0,         530.0 - 1.5 * SCALE // top center
         );
         triangleVisual.setFill(Color.DARKRED);
 
