@@ -172,24 +172,6 @@ public class Gui extends Application {
         StackPane root = new StackPane();
         root.getChildren().addAll(backgroundLayer, buttonLayer, overlayBackgroundPuzzle, overlayBackgroundOptions);
 
-        // === Skalierung des Root-Nodes bei größeren Displays ===
-        double baseWidth = 1920;
-        double baseHeight = 1080;
-
-        // Bildschirmgröße holen
-        javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getBounds();
-        double screenWidth = screenBounds.getWidth();
-        double screenHeight = screenBounds.getHeight();
-
-        // Skalierungsfaktor berechnen
-        double scaleX = screenWidth / baseWidth;
-        double scaleY = screenHeight / baseHeight;
-        double scale = Math.min(scaleX, scaleY); // gleichmäßig skalieren, kein Verzerren
-
-        // Skalierung anwenden
-        root.setScaleX(scale);
-        root.setScaleY(scale);
-
         Scene scene = new Scene(root, 1920, 1080);
         scene.getStylesheets().add(getClass().getResource("titleScreen.css").toExternalForm());
 
