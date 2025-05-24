@@ -1,7 +1,7 @@
 package mm;
 
 import mm.gui.Gui;
-import mm.model.Example;
+import mm.model.level.Level;
 
 /**
  * The common starting point of the GUI.
@@ -12,9 +12,9 @@ public class Main {
      * @param args The command line arguments passed to the application.
      */
     public static void main(String[] args) {
-        Example example = new Example(0);
-        System.out.println("Starting...");
+        
+        /*System.out.println("Starting...");
         Gui.main(args);
-        System.out.println("Exiting...");
+        System.out.println("Exiting...");*/
     }
 }
