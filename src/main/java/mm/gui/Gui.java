@@ -175,10 +175,10 @@ public class Gui extends Application {
         Scene scene = new Scene(root, 1920, 1080);
         scene.getStylesheets().add(getClass().getResource("titleScreen.css").toExternalForm());
 
-        primaryStage.setScene(scene);
         primaryStage.setMaxWidth(1920);
         primaryStage.setMaxHeight(1080);
         primaryStage.setResizable(false);
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 
