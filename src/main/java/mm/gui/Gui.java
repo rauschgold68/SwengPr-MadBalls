@@ -172,7 +172,7 @@ public class Gui extends Application {
         StackPane root = new StackPane();
         root.getChildren().addAll(backgroundLayer, buttonLayer, overlayBackgroundPuzzle, overlayBackgroundOptions);
 
-        Scene scene = new Scene(root, 1980, 1080);
+        Scene scene = new Scene(root, 1920, 1080);
         scene.getStylesheets().add(getClass().getResource("titleScreen.css").toExternalForm());
 
         primaryStage.setScene(scene);
