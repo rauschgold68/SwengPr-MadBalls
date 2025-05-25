@@ -16,6 +16,8 @@ public class Level {
      */
     private List<InventoryObject> inventory;
 
+    public Level() {}
+    
     /**
      * Getter for levelObjects
      * @return List of placed GameObjects

@@ -1,5 +1,5 @@
 {
-    "level": [
+    "levelObjects": [
         {
             "name": "goal",
             "type": "goalBox",
@@ -43,7 +43,7 @@
             }
         }
     ],
-    "inventar": [
+    "inventory": [
         {
             "type": "box",
             "count": 1,

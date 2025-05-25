@@ -5,7 +5,12 @@ module mm {
     requires javafx.controls;
     requires transitive javafx.graphics;
     requires jbox2d.library;
+    requires com.fasterxml.jackson.annotation;
+    requires com.fasterxml.jackson.core;
+    requires com.fasterxml.jackson.databind;
     
     exports mm.gui;
     exports mm.physics;
+    
+    opens mm.model.level to com.fasterxml.jackson.databind;
 }
