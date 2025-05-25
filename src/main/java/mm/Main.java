@@ -5,8 +5,9 @@ import java.io.File;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import mm.gui.Gui;
-import mm.model.level.GameObject;
-import mm.model.level.Level;
+import mm.model.objects.GameObject;
+import mm.model.objects.Level;
+import mm.model.objects.LevelReader;
 
 /**
  * The common starting point of the GUI.
@@ -17,14 +18,13 @@ public class Main {
      * @param args The command line arguments passed to the application.
      */
     public static void main(String[] args) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            Level testLevel = mapper.readValue(new File("src/main/java/mm/model/level/Standart_Level.JSON"), Level.class);
-        } catch (Exception e) {
-            System.err.println(e +"occured in line:" +  22);
-        }
-        
+        String filePath = "src/main/java/mm/model/level/";
+        String fileName = "Standart_Level.JSON";
+        LevelReader reader = new LevelReader(filePath, fileName);
 
+        Level level = reader.readFile();
+
+        
         /*System.out.println("Starting...");
         Gui.main(args);
         System.out.println("Exiting...");*/

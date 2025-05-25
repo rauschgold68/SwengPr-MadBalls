@@ -1,4 +1,4 @@
-package mm.model.level;
+package mm.model.objects;
 /**
  * POJO
  * The Physics info for Object for jBox2d 

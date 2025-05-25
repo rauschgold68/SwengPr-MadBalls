@@ -1,4 +1,4 @@
-package mm.model.level;
+package mm.model.objects;
 /**
  * POJO
  * The Size for javafx
