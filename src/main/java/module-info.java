@@ -12,6 +12,6 @@ module mm {
 
     exports mm.gui;
     exports mm.physics;
-    
+
     opens mm.model.objects to com.fasterxml.jackson.databind;
 }
