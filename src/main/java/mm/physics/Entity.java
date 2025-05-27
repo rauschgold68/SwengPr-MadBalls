@@ -34,3 +34,4 @@ public class Entity {
         g.fillRect(x - w / 2, y - h / 2, w, h);
     }
 }
+

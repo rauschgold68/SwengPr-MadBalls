@@ -9,6 +9,7 @@ public class tutorial {
     public static void main(String[] args) {
 
         float timeStep = 1.0f / 60.0f;
+
         int velocityIterations = 6;
         int positionIterations = 2;
 
@@ -89,3 +90,4 @@ public class tutorial {
 
     }
 }
+
