@@ -40,7 +40,7 @@ public class GameObject {
     /**
      *  The radius of circle shape if needed 
      */
-    private int radius;
+    private Float radius;
 
 
     public GameObject() {}
@@ -56,7 +56,7 @@ public class GameObject {
      * @param physics the jBox2d physics Info
      * @param radius the radius of circle shape as in jbox2d
      */
-    public GameObject(String name, String type, Position position, Size size, String colour, Physics physics, int radius) {
+    public GameObject(String name, String type, Position position, Size size, String colour, Physics physics, Float radius) {
         this.name = name; 
         this.type = type;
         this.position = position;
@@ -87,7 +87,7 @@ public class GameObject {
     public Physics getPhysics() {return this.physics;}
     public void setPhysics(Physics newPhysics) {this.physics = newPhysics;}
 
-    public int getRadius() {return this.radius;}
-    public void setRadius(int newRadius) {this.radius = newRadius;}
+    public Float getRadius() {return this.radius;}
+    public void setRadius(Float newRadius) {this.radius = newRadius;}
 
 }
