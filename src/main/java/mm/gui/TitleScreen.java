@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -15,196 +16,251 @@ import javafx.stage.Stage;
 
 public class TitleScreen extends Application {
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("MadBalls©");
+        @Override
+        public void start(Stage primaryStage) {
+                primaryStage.setTitle("MadBalls©");
 
-        // === Buttons ===
-        Button btnPuzzle = new Button("Puzzles");
-        Button btnSandbox = new Button("Sandbox");
-        Button btnOptions = new Button("Options");
-        Button btnQuit = new Button("Quit");
+                // === Buttons ===
+                Button btnPuzzle = new Button("Puzzles");
+                Button btnSandbox = new Button("Sandbox");
+                Button btnOptions = new Button("Options");
+                Button btnQuit = new Button("Quit");
 
-        btnPuzzle.setRotate(-7);
-        btnSandbox.setRotate(0);
-        btnOptions.setRotate(5);
-        btnQuit.setRotate(-3);
+                btnPuzzle.setRotate(-7);
+                btnSandbox.setRotate(0);
+                btnOptions.setRotate(5);
+                btnQuit.setRotate(-3);
 
-        // === Buttons mit Pins kombinieren ===
-        HBox topRow = new HBox(60,
-                btnWithPin(btnPuzzle, Color.RED),
-                btnWithPin(btnSandbox, Color.BLUE),
-                btnWithPin(btnOptions, Color.GREEN));
-        topRow.setAlignment(Pos.CENTER);
+                // === Buttons mit Pins kombinieren ===
+                HBox topRow = new HBox(60,
+                                btnWithPin(btnPuzzle, Color.RED),
+                                btnWithPin(btnSandbox, Color.BLUE),
+                                btnWithPin(btnOptions, Color.GREEN));
+                topRow.setAlignment(Pos.CENTER);
 
-        HBox bottomRow = new HBox(btnWithPin(btnQuit, Color.YELLOW));
-        bottomRow.setAlignment(Pos.BASELINE_RIGHT);
+                HBox bottomRow = new HBox(btnWithPin(btnQuit, Color.YELLOW));
+                bottomRow.setAlignment(Pos.BASELINE_RIGHT);
 
-        VBox buttonLayer = new VBox(40, topRow, bottomRow);
-        buttonLayer.setAlignment(Pos.CENTER);
+                VBox buttonLayer = new VBox(40, topRow, bottomRow);
+                buttonLayer.setAlignment(Pos.CENTER);
 
-        // === Bilder laden ===
-        Image backgroundLogo = new Image(getClass().getResourceAsStream("/pictures/MadBallsLogo.jpeg"));
-        Image backgroundBoard = new Image(getClass().getResourceAsStream("/pictures/MB_TitleScreenBoard.jpeg"));
+                // === Bilder laden ===
+                Image backgroundLogo = new Image(getClass().getResourceAsStream("/pictures/MadBallsLogo.jpeg"));
+                Image backgroundBoard = new Image(getClass().getResourceAsStream("/pictures/MB_TitleScreenBoard.jpeg"));
 
-        // === logoBox ===
-        HBox logoBox = new HBox();
-        logoBox.setPrefSize(800, 400);
-        logoBox.setAlignment(Pos.CENTER);
+                // === logoBox ===
+                HBox logoBox = new HBox();
+                logoBox.setPrefSize(800, 400);
+                logoBox.setAlignment(Pos.CENTER);
 
-        BackgroundImage logoBg = new BackgroundImage(
-                backgroundLogo,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                new BackgroundSize(100, 100, true, true, true, false));
-        logoBox.setBackground(new Background(logoBg));
+                BackgroundImage logoBg = new BackgroundImage(
+                                backgroundLogo,
+                                BackgroundRepeat.NO_REPEAT,
+                                BackgroundRepeat.NO_REPEAT,
+                                BackgroundPosition.CENTER,
+                                new BackgroundSize(100, 100, true, true, true, false));
+                logoBox.setBackground(new Background(logoBg));
 
-        // === boardBox ===
-        HBox boardBox = new HBox(buttonLayer);
-        boardBox.setPrefSize(600, 400);
-        boardBox.setAlignment(Pos.CENTER);
-        boardBox.setPadding(new Insets(0, 0, 20, 0));
+                // === boardBox ===
+                HBox boardBox = new HBox(buttonLayer);
+                boardBox.setPrefSize(600, 400);
+                boardBox.setAlignment(Pos.CENTER);
+                boardBox.setPadding(new Insets(0, 0, 20, 0));
 
-        BackgroundImage boardBg = new BackgroundImage(
-                backgroundBoard,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                new BackgroundSize(100, 100, true, true, true, false));
-        boardBox.setBackground(new Background(boardBg));
+                BackgroundImage boardBg = new BackgroundImage(
+                                backgroundBoard,
+                                BackgroundRepeat.NO_REPEAT,
+                                BackgroundRepeat.NO_REPEAT,
+                                BackgroundPosition.CENTER,
+                                new BackgroundSize(100, 100, true, true, true, false));
+                boardBox.setBackground(new Background(boardBg));
 
-        VBox logoANDBoard = new VBox(logoBox, boardBox);
-        logoANDBoard.setPadding(new Insets(0, 0, 30, 0));
+                VBox logoANDBoard = new VBox(logoBox, boardBox);
+                logoANDBoard.setPadding(new Insets(0, 0, 30, 0));
 
-        // === Overlay: Optionen ===
-        StackPane overlayBackgroundOptions = new StackPane();
-        overlayBackgroundOptions.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
-        overlayBackgroundOptions.setVisible(false);
+                // === Overlay: Optionen ===
+                StackPane overlayBackgroundOptions = new StackPane();
+                overlayBackgroundOptions.setVisible(false);
 
-        Pane optionsWindow = new Pane();
-        optionsWindow.setMaxSize(600, 400);
-        optionsWindow.setMinSize(600, 400);
-        optionsWindow.setStyle("-fx-background-color: rgba(46, 36, 87, 0.94); -fx-background-radius: 12;");
+                Image levelSelect = new Image(getClass().getResourceAsStream("/pictures/levelSelect.png"));
+                BackgroundImage levelSelectBg = new BackgroundImage(
+                                levelSelect,
+                                BackgroundRepeat.NO_REPEAT,
+                                BackgroundRepeat.NO_REPEAT,
+                                BackgroundPosition.CENTER,
+                                new BackgroundSize(1920, 1080, true, true, true, true));
+                overlayBackgroundOptions.setBackground(new Background(levelSelectBg));
 
-        Label lblTitleAudio = new Label("Audio Options");
-        lblTitleAudio.setStyle("-fx-text-fill: white; -fx-font-size: 20px;");
-        lblTitleAudio.setLayoutX(230);
-        lblTitleAudio.setLayoutY(30);
+                VBox optionsWindow = new VBox(25);
+                optionsWindow.setMaxSize(720, 480);
+                optionsWindow.setMinSize(720, 480);
+                optionsWindow.setPadding(new Insets(30));
+                optionsWindow.setAlignment(Pos.TOP_CENTER);
+                optionsWindow.setBackground(new Background(new BackgroundFill(
+                                Color.rgb(10, 10, 20, 0.7), new CornerRadii(20), Insets.EMPTY))); // Stil vom Game
 
-        Label lblMusic = new Label("Musik-Lautstärke:");
-        lblMusic.setStyle("-fx-text-fill: white;");
-        lblMusic.setLayoutX(80);
-        lblMusic.setLayoutY(80);
+                HBox topBar = new HBox();
+                topBar.setPrefWidth(720);
+                topBar.setPadding(new Insets(0, 0, 10, 0));
+                topBar.setAlignment(Pos.CENTER_LEFT);
 
-        Slider sliderMusic = new Slider(0, 100, 50);
-        sliderMusic.setLayoutX(200);
-        sliderMusic.setLayoutY(80);
-        sliderMusic.setPrefWidth(300);
+                Label lblTitleAudio = new Label("Options");
+                lblTitleAudio.setStyle("-fx-text-fill: white; -fx-font-size: 20px;");
+                Region spacer = new Region();
+                HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Label lblSound = new Label("Soundeffekte:");
-        lblSound.setStyle("-fx-text-fill: white;");
-        lblSound.setLayoutX(80);
-        lblSound.setLayoutY(130);
+                Button btnCloseOptions = new Button("X");
+                btnCloseOptions.getStyleClass().add("close-btn");
+                btnCloseOptions.setOnAction(e -> overlayBackgroundOptions.setVisible(false));
+                topBar.getChildren().addAll(lblTitleAudio, spacer, btnCloseOptions);
 
-        Slider sliderSound = new Slider(0, 100, 50);
-        sliderSound.setLayoutX(200);
-        sliderSound.setLayoutY(130);
-        sliderSound.setPrefWidth(300);
+                Label lblMusic = new Label("Musik-Lautstärke:");
+                lblMusic.setStyle("-fx-text-fill: white;");
+                Slider sliderMusic = new Slider(0, 100, 50);
+                sliderMusic.setPrefWidth(300);
+                HBox musicRow = new HBox(20, lblMusic, sliderMusic);
+                musicRow.setAlignment(Pos.CENTER_LEFT);
 
-        Label lblTitleGraphics = new Label("Grafik");
-        lblTitleGraphics.setStyle("-fx-text-fill: white; -fx-font-size: 20px;");
-        lblTitleGraphics.setLayoutX(260);
-        lblTitleGraphics.setLayoutY(190);
+                Label lblSound = new Label("Soundeffekte:");
+                lblSound.setStyle("-fx-text-fill: white;");
+                Slider sliderSound = new Slider(0, 100, 50);
+                sliderSound.setPrefWidth(300);
+                HBox soundRow = new HBox(20, lblSound, sliderSound);
+                soundRow.setAlignment(Pos.CENTER_LEFT);
 
-        Label lblTexturePack = new Label("Texture Pack:");
-        lblTexturePack.setStyle("-fx-text-fill: white;");
-        lblTexturePack.setLayoutX(80);
-        lblTexturePack.setLayoutY(230);
+                Label lblTexturePack = new Label("Texture Pack:");
+                lblTexturePack.setStyle("-fx-text-fill: white;");
+                Button btnUploadTexture = new Button("Upload...");
+                HBox textureRow = new HBox(20, lblTexturePack, btnUploadTexture);
+                textureRow.setAlignment(Pos.CENTER_LEFT);
 
-        Button btnUploadTexture = new Button("Upload...");
-        btnUploadTexture.setLayoutX(200);
-        btnUploadTexture.setLayoutY(225);
+                optionsWindow.getChildren().addAll(topBar, musicRow, soundRow, textureRow);
+                overlayBackgroundOptions.getChildren().add(optionsWindow);
+                StackPane.setAlignment(optionsWindow, Pos.CENTER);
 
-        Button btnCloseOptions = new Button("X");
-        btnCloseOptions.setLayoutX(560);
-        btnCloseOptions.setLayoutY(10);
-        btnCloseOptions.setOnAction(e -> overlayBackgroundOptions.setVisible(false));
+                // === Overlay: Puzzle / Level-Selector ===
+                StackPane overlayBackgroundPuzzle = new StackPane();
+                overlayBackgroundPuzzle.setVisible(false);
 
-        optionsWindow.getChildren().addAll(
-                lblTitleAudio, lblMusic, sliderMusic, lblSound, sliderSound,
-                lblTitleGraphics, lblTexturePack, btnUploadTexture,
-                btnCloseOptions);
+                Image levelSelectImage = new Image(getClass().getResourceAsStream("/pictures/levelSelect.png"));
+                BackgroundImage puzzleBg = new BackgroundImage(
+                                levelSelectImage,
+                                BackgroundRepeat.NO_REPEAT,
+                                BackgroundRepeat.NO_REPEAT,
+                                BackgroundPosition.CENTER,
+                                new BackgroundSize(1920, 1080, true, true, true, true));
+                overlayBackgroundPuzzle.setBackground(new Background(puzzleBg));
 
-        overlayBackgroundOptions.getChildren().add(optionsWindow);
-        StackPane.setAlignment(optionsWindow, Pos.CENTER);
+                Label puzzleTitle = new Label("Level Selection");
+                puzzleTitle.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
+                puzzleTitle.setPadding(new Insets(30, 0, 0, 0));
 
-        // === Overlay: Puzzle ===
-        StackPane overlayBackgroundPuzzle = new StackPane();
-        overlayBackgroundPuzzle.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
-        overlayBackgroundPuzzle.setVisible(false);
+                VBox levelCard1 = createLevelCard("Level 1", "Leichtes Einsteigerlevel",
+                                "/pictures/levelSelectBoard.jpeg");
+                VBox levelCard2 = createLevelCard("Level 2", "Knifflige Mechanik", "/pictures/levelSelectBoard.jpeg");
+                VBox levelCard3 = createLevelCard("Level 3", "Nur für Profis", "/pictures/levelSelectBoard.jpeg");
 
-        Pane puzzleWindow = new Pane();
-        puzzleWindow.setMaxSize(720, 480);
-        puzzleWindow.setMinSize(720, 480);
-        puzzleWindow.setStyle("-fx-background-color: rgba(46, 36, 87, 0.94); -fx-background-radius: 12;");
+                HBox cardRow = new HBox(40, levelCard1, levelCard2, levelCard3);
+                cardRow.setAlignment(Pos.CENTER);
+                cardRow.setPadding(new Insets(20, 0, 0, 0));
 
-        Label lblTitlePuzzle = new Label("Puzzle Picker");
-        lblTitlePuzzle.setStyle("-fx-text-fill: white; -fx-font-size: 20px;");
-        lblTitlePuzzle.setLayoutX(230);
-        lblTitlePuzzle.setLayoutY(30);
+                Button btnClosePuzzle = new Button("X");
+                btnClosePuzzle.getStyleClass().add("close-btn");
+                btnClosePuzzle.setOnAction(e -> overlayBackgroundPuzzle.setVisible(false));
+                StackPane.setAlignment(btnClosePuzzle, Pos.TOP_RIGHT);
+                StackPane.setMargin(btnClosePuzzle, new Insets(20));
 
-        Button btnClosePuzzle = new Button("X");
-        btnClosePuzzle.setLayoutX(560);
-        btnClosePuzzle.setLayoutY(10);
-        btnClosePuzzle.setOnAction(e -> overlayBackgroundPuzzle.setVisible(false));
+                VBox cardWrapper = new VBox(puzzleTitle, cardRow);
+                cardWrapper.setAlignment(Pos.TOP_CENTER);
+                cardWrapper.setPadding(new Insets(60, 0, 70, 0));
 
-        puzzleWindow.getChildren().addAll(lblTitlePuzzle, btnClosePuzzle);
-        overlayBackgroundPuzzle.getChildren().add(puzzleWindow);
-        StackPane.setAlignment(puzzleWindow, Pos.CENTER);
+                overlayBackgroundPuzzle.getChildren().addAll(cardWrapper, btnClosePuzzle);
 
-        // === Button Styles + Events ===
-        btnPuzzle.getStyleClass().add("btnTS");
-        btnSandbox.getStyleClass().add("btnTS");
-        btnOptions.getStyleClass().add("btnTS");
-        btnQuit.getStyleClass().add("btnTS");
+                // === Button Styles + Events ===
+                btnPuzzle.getStyleClass().add("btnTS");
+                btnSandbox.getStyleClass().add("btnTS");
+                btnOptions.getStyleClass().add("btnTS");
+                btnQuit.getStyleClass().add("btnTS");
 
-        btnPuzzle.setOnAction(e -> overlayBackgroundPuzzle.setVisible(true));
-        btnSandbox.setOnAction(e -> System.out.println("Starting Sandbox Mode"));
-        btnOptions.setOnAction(e -> overlayBackgroundOptions.setVisible(true));
-        btnQuit.setOnAction(e -> System.exit(0));
+                btnPuzzle.setOnAction(e -> overlayBackgroundPuzzle.setVisible(true));
+                btnSandbox.setOnAction(e -> System.out.println("Starting Sandbox Mode"));
+                btnOptions.setOnAction(e -> overlayBackgroundOptions.setVisible(true));
+                btnQuit.setOnAction(e -> System.exit(0));
 
-        // === Root-Layout ===
-        StackPane root = new StackPane();
-        root.setStyle("-fx-background-color: #0e1722;");
-        root.getChildren().addAll(logoANDBoard, overlayBackgroundPuzzle,
-                overlayBackgroundOptions);
+                // === Root-Layout ===
+                StackPane root = new StackPane();
+                root.setStyle("-fx-background-color: #0e1722;");
+                root.getChildren().addAll(logoANDBoard, overlayBackgroundPuzzle, overlayBackgroundOptions);
 
-        Scene scene = new Scene(root, 1920, 1080);
-        scene.getStylesheets().add(getClass().getResource("/styling/titleScreen.css").toExternalForm());
+                Scene scene = new Scene(root, 1920, 1080);
+                scene.getStylesheets().add(getClass().getResource("/styling/titleScreen.css").toExternalForm());
 
-        primaryStage.setScene(scene);
-        primaryStage.setMaxWidth(1920);
-        primaryStage.setMaxHeight(1080);
-        primaryStage.show();
-    }
+                scene.setOnKeyPressed(event -> {
+                        switch (event.getCode()) {
+                                case ESCAPE:
+                                        if (overlayBackgroundOptions.isVisible()) {
+                                                overlayBackgroundOptions.setVisible(false);
+                                        } else if (overlayBackgroundPuzzle.isVisible()) {
+                                                overlayBackgroundPuzzle.setVisible(false);
+                                        }
+                                        break;
+                                default:
+                                        break;
+                        }
+                });
 
-    private Circle createPin(Color color) {
-        Circle pin = new Circle(6);
-        pin.setFill(color);
-        pin.setStroke(Color.BLACK);
-        pin.setStrokeWidth(1.5);
-        return pin;
-    }
+                primaryStage.setScene(scene);
 
-    private StackPane btnWithPin(Button btn, Color pinColor) {
-        Circle pin = createPin(pinColor);
-        StackPane stack = new StackPane(btn, pin);
-        StackPane.setAlignment(pin, Pos.TOP_CENTER);
-        return stack;
-    }
+                primaryStage.setScene(scene);
+                primaryStage.setMaxWidth(1920);
+                primaryStage.setMaxHeight(1080);
+                primaryStage.show();
+        }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+        private Circle createPin(Color color) {
+                Circle pin = new Circle(6);
+                pin.setFill(color);
+                pin.setStroke(Color.BLACK);
+                pin.setStrokeWidth(1.5);
+                return pin;
+        }
+
+        private StackPane btnWithPin(Button btn, Color pinColor) {
+                Circle pin = createPin(pinColor);
+                StackPane stack = new StackPane(btn, pin);
+                StackPane.setAlignment(pin, Pos.TOP_CENTER);
+                return stack;
+        }
+
+        private VBox createLevelCard(String levelName, String description, String imagePath) {
+                ImageView thumbnail = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
+                thumbnail.setFitWidth(260);
+                thumbnail.setFitHeight(160);
+
+                Label lblName = new Label(levelName);
+                lblName.setStyle("-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;");
+
+                Label lblDesc = new Label(description);
+                lblDesc.setWrapText(true);
+                lblDesc.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
+
+                VBox card = new VBox(14, thumbnail, lblName, lblDesc);
+                card.setAlignment(Pos.TOP_CENTER);
+                card.setPadding(new Insets(20));
+                card.setMaxWidth(280);
+                card.setMinHeight(320);
+                card.setBackground(new Background(
+                                new BackgroundFill(Color.rgb(30, 30, 50, 0.8), new CornerRadii(16), Insets.EMPTY)));
+                card.getStyleClass().add("level-card");
+
+                card.setOnMouseClicked(e -> {
+                        System.out.println("Starting level: " + levelName);
+                });
+
+                return card;
+        }
+
+        public static void main(String[] args) {
+                launch(args);
+        }
 }
