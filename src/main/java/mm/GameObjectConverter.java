@@ -48,7 +48,7 @@ public class GameObjectConverter {
             body.createFixture(fixture);
 
         } else if ("circle".equalsIgnoreCase(type)) {
-            float radius = obj.getRadius();
+            float radius = obj.getSize().getRadius();
             float x = obj.getPosition().getX();
             float y = obj.getPosition().getY();
 

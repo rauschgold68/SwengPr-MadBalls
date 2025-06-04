@@ -12,4 +12,5 @@ public class Position {
 
     public float getY() {return this.y;}
     public void setY(float newY) {this.y = newY;}
+
 }
