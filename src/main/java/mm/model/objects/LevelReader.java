@@ -2,29 +2,26 @@ package mm.model.objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
+import java.io.InputStream;
 
 public class LevelReader {
     private ObjectMapper mapper;
-    private File inputFile;
+    private InputStream inputStream;
 
-    public LevelReader(String filePath, String fileName) {
+    // Constructor for classpath resource
+    public LevelReader(InputStream inputStream) {
         mapper = new ObjectMapper();
-        inputFile = new File(filePath+fileName);
+        this.inputStream = inputStream;
     }
 
-    public ObjectMapper getMapper() {return this.mapper;}
-    //no setMapper necessary for now
-
-    public File getFile() {return this.inputFile;}
-    public void setFile(String filePath, String fileName) {this.inputFile = new File(filePath+fileName);}
+    public ObjectMapper getMapper() { return this.mapper; }
 
     public Level readFile() {
         try {
-            Level level = mapper.readValue(inputFile, Level.class);
+            Level level = mapper.readValue(inputStream, Level.class);
             return level;
         } catch (Exception e) {
-            System.err.println("Error: " + e + " occured while trying to read File. Returning null.");
+            System.err.println("Error: " + e + " occurred while trying to read resource. Returning null.");
             return null;
         }
     }

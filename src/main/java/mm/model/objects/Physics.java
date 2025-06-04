@@ -10,13 +10,13 @@ public class Physics {
     private float restitution;
     private String shape;
 
-    public String getbodyType() {return this.bodyType;}
+    public String getBodyType() {return this.bodyType;}
     public void setBodyType(String newBodyType) {this.bodyType = newBodyType;}
 
     public float getDensity() {return this.density;}
     public void setDensity(float newDensity) {this.density = newDensity;}
     
-    public float getfriction() {return this.friction;}
+    public float getFriction() {return this.friction;}
     public void setFriction(float newFriction) {this.friction = newFriction;}
     
     public float getRestitution() {return this.restitution;}
@@ -24,4 +24,14 @@ public class Physics {
     
     public String getShape() {return this.shape;}
     public void setShape(String newShape) {this.shape = newShape;}
+
+    public boolean isDynamic(){
+        if (getBodyType().equalsIgnoreCase("DYNAMIC")) return true;
+        else return false;
+    }
+
+    public boolean isStatic(){
+        if (getBodyType().equalsIgnoreCase("STATIC")) return true;
+        else return false;
+    }
 }

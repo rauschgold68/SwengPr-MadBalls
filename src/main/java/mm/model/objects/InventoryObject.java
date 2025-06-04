@@ -10,6 +10,7 @@ public class InventoryObject {
     private String sprite;
     private String colour;
     private Physics physics;
+    private Float radius;
 
     public InventoryObject() {}
 
@@ -24,13 +25,15 @@ public class InventoryObject {
      * @param size in (width, height)
      * @param colour the colour
      * @param physics the jBox2d physics Info
+     * @param radius radius of circle shape placeable
      */
-    public InventoryObject(String type, int count, Size size, String colour, Physics physics) {
+    public InventoryObject(String type, int count, Size size, String colour, Physics physics, Float radius) {
         this.type = type;
         this.count = count;
         this.size = size;
         this.colour = colour;
         this.physics = physics;
+        this.radius = radius;
     }
 
     public String getType() {return this.type;}
@@ -50,5 +53,8 @@ public class InventoryObject {
 
     public Physics getPhysics() {return this.physics;}
     public void setPhysics(Physics newPhysics) {this.physics = newPhysics;}
+
+    public Float getRadius() {return this.radius;}
+    public void setRadius(Float newRadius) {this.radius = newRadius;}
 
 }
