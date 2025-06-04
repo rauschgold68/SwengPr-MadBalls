@@ -1,11 +1,11 @@
 package mm;
 
-import java.util.List;
-import java.util.ArrayList;
 import mm.model.objects.*;
 
 import javafx.scene.shape.*;
 import javafx.scene.paint.Color;
+import org.jbox2d.dynamics.*;
+
 
 public class FxToGameObject {
     private static int nextname; 
@@ -16,48 +16,56 @@ public class FxToGameObject {
         String name;
         Position position = new Position();
         Size size = new Size();
-        String color;
+        String colour;
         String type;
-        Physics physics;
+        Physics physics = new Physics();
 
         Shape shape = pair.visual;
-        //name = type + nextname;
-        nextname++;
 
         Color tmp = (Color) shape.getFill();
-        assert(tmp != null);
+        colour = (tmp != null) ? tmp.toString():"BLACK";
 
         if (shape instanceof Rectangle) {
-        type = "Rectangle";
-        javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) shape;
-        float x = (float) rect.getTranslateX();
-        float y = (float) rect.getTranslateY();
-        float width = (float) rect.getWidth();
-        float height = (float) rect.getHeight();
+            type = "Rectangle";
+            name = type + Integer.toString(nextname++);
+            javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) shape;
+            float x = (float) rect.getTranslateX();
+            float y = (float) rect.getTranslateY();
+            float width = (float) rect.getWidth();
+            float height = (float) rect.getHeight();
 
-        position.setX(x);
-        position.setY(y);
+            position.setX(x);
+            position.setY(y);
 
-        size.setHeight(height);
-        size.setWidth(width);
+            size.setHeight(height);
+            size.setWidth(width);
 
-    } else if (shape instanceof Circle) {
-        type = "Circle";
-        javafx.scene.shape.Circle circle = (javafx.scene.shape.Circle) shape;
-        float x = (float) circle.getTranslateX();
-        float y = (float) circle.getTranslateY();
-        float r = (float) circle.getRadius();
+        } else if (shape instanceof Circle) {
+            type = "Circle";
+            name = type + Integer.toString(nextname++);
+            javafx.scene.shape.Circle circle = (javafx.scene.shape.Circle) shape;
+            float x = (float) circle.getTranslateX();
+            float y = (float) circle.getTranslateY();
+            float r = (float) circle.getRadius();
 
-        position.setX(x);
-        position.setY(y);
-        //size = new Size(r * 2, r * 2); // Durchmesser als "size"
-        //radius = r;
-    } else {
-        throw new IllegalArgumentException("Shape-Typ nicht unterstützt: " + shape.getClass());
-    }
+            position.setX(x);
+            position.setY(y);
+            size.setHeight(0);
+            size.setWidth(0);
+            size.setRadius(r);
 
+        } else {
+            throw new IllegalArgumentException("Shape-Typ nicht unterstützt: " + shape.getClass());
+        }
 
-        //gameObject = new GameObject(name, type, position, size, colour, physics, radius)
+        physics.setShape(pair.body.getType().toString());
+        Fixture fixture = pair.body.getFixtureList();
+        physics.setDensity(fixture.getDensity());
+        physics.setRestitution(fixture.getRestitution());
+        physics.setFriction(fixture.getFriction());
+        
+
+        gameObject = new GameObject(name, type, position, size, colour, physics);
         return gameObject;
     }
 }

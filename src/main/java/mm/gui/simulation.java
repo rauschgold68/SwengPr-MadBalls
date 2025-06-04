@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import mm.FxToGameObject;
 import mm.GameObjectConverter;
 import mm.ObjectImporter;
 import mm.PhysicsVisualPair;
@@ -36,7 +37,11 @@ public class simulation extends Application {
         btnReset.setTranslateX(120);
         btnReset.setTranslateY(10);
 
-        root.getChildren().addAll(btnStart, btnReset);
+        Button btnExport = new Button("Export Level");
+        btnExport.setTranslateX(680);
+        btnExport.setTranslateY(10);
+
+        root.getChildren().addAll(btnStart, btnReset, btnExport);
 
         setupSimulation();
 
@@ -44,6 +49,10 @@ public class simulation extends Application {
         btnReset.setOnAction(e -> {
             timer.stop();
             setupSimulation();
+        });
+        btnExport.setOnAction(e -> {
+            timer.stop();
+            exportLevel();
         });
 
         primaryStage.setTitle("JavaFX + JBox2D Physics Demo");
@@ -72,6 +81,15 @@ public class simulation extends Application {
 
         // Create a new timer with the new world and pairs
         timer = new ResettableAnimationTimer(world, pairs);
+    }
+
+    private void exportLevel() {
+        ArrayList<GameObject> gameObjects = new ArrayList<>();
+        for (PhysicsVisualPair pair : pairs) {
+                GameObject obj = FxToGameObject.convertBack(pair);
+                gameObjects.add(obj);
+        }
+        System.out.println("export done!");
     }
 
     public static void main(String[] args) {
