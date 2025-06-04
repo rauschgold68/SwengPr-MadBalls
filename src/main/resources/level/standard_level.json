@@ -5,8 +5,7 @@
       "type": "rectangle",
       "position": {
         "x": 200,
-        "y": 200,
-        "rotate": 0
+        "y": 200
       },
       "size": {
         "width": 100,
@@ -28,8 +27,7 @@
       "type": "rectangle",
       "position": {
         "x": 100,
-        "y": 100,
-        "rotate": 0
+        "y": 100
       },
       "size": {
         "width": 100,
@@ -51,8 +49,7 @@
       "type": "rectangle",
       "position": {
         "x": 225,
-        "y": 425,
-        "rotate": 0
+        "y": 425
       },
       "size": {
         "width": 300,
