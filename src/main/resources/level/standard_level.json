@@ -5,11 +5,13 @@
       "type": "rectangle",
       "position": {
         "x": 200,
-        "y": 200
+        "y": 200,
+        "rotate": 0
       },
       "size": {
         "width": 100,
-        "height": 100
+        "height": 100,
+        "radius": 0
       },
       "sprite": null,
       "colour": "BLACK",
@@ -26,11 +28,13 @@
       "type": "rectangle",
       "position": {
         "x": 100,
-        "y": 100
+        "y": 100,
+        "rotate": 0
       },
       "size": {
         "width": 100,
-        "height": 100
+        "height": 100, 
+        "radius": 0
       },
       "sprite": null,
       "colour": "BLACK",
@@ -47,11 +51,13 @@
       "type": "rectangle",
       "position": {
         "x": 225,
-        "y": 425
+        "y": 425,
+        "rotate": 0
       },
       "size": {
         "width": 300,
-        "height": 20
+        "height": 20,
+        "radius": 0
       },
       "sprite": null,
       "colour": "BLACK",
@@ -70,7 +76,8 @@
       "count": 1,
       "size": {
         "width": 1.0,
-        "height": 1.0
+        "height": 1.0,
+        "radius": 0
       },
       "sprite": null,
       "colour": "BLACK",
@@ -79,6 +86,7 @@
         "density": 1.0,
         "friction": 1.0,
         "restitution": 1.0,
+        
         "shape": "box"
       }
     },
@@ -86,8 +94,9 @@
       "type": "circle",
       "count": 1,
       "size": {
-        "width": 1.0,
-        "height": 1.0
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 1.0
       },
       "sprite": null,
       "colour": "BLACK",
@@ -104,7 +113,8 @@
       "count": 1,
       "size": {
         "width": 1.0,
-        "height": 1.0
+        "height": 1.0,
+        "radius": 0
       },
       "sprite": null,
       "colour": "BLACK",
