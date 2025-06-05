@@ -196,7 +196,7 @@ public class TitleScreen {
                 root.setStyle("-fx-background-color: #0e1722;");
                 root.getChildren().addAll(logoANDBoard, overlayBackgroundPuzzle, overlayBackgroundOptions);
 
-                Scene scene = new Scene(root, 1920, 1080);
+                Scene scene = new Scene(root);
                 scene.getStylesheets().add(getClass().getResource("/styling/titleScreen.css").toExternalForm());
 
                 scene.setOnKeyPressed(event -> {

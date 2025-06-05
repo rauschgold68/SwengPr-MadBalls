@@ -19,6 +19,11 @@ public class Main extends Application {
         Scene titleScene = titleScreen.createTitleScene(primaryStage);
         primaryStage.setTitle("MadBalls©");
         primaryStage.setScene(titleScene);
+
+        primaryStage.setWidth(1920);
+        primaryStage.setHeight(1080);
+        primaryStage.setResizable(false);
+
         primaryStage.show();
     }
 
