@@ -1,9 +1,12 @@
 package mm.gui;
 
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -30,15 +33,16 @@ public class simulation {
     private HBox bottomBar;
 
     public Scene getScene(Stage primaryStage) {
-        BorderPane root = new BorderPane();
-        root.setId("root-pane");
+        // main layout container
+        BorderPane mainPane = new BorderPane();
+        mainPane.setId("root-pane");
 
-        // Simulation area
+        // simulation area
         simSpace = new Pane();
         simSpace.getStyleClass().add("sim-space");
-        root.setCenter(simSpace);
+        mainPane.setCenter(simSpace);
 
-        // Sidebar
+        // sidebar with menu buttons
         VBox sideBar = new VBox();
         sideBar.getStyleClass().add("side-bar");
         sideBar.setPrefWidth(200);
@@ -54,40 +58,40 @@ public class simulation {
         StackPane menuSquare = new StackPane();
         menuSquare.getStyleClass().add("menu-square");
 
-        // Grid with round buttons and icons
         GridPane grid = new GridPane();
         grid.getStyleClass().add("menu-grid");
 
-        for (int row = 0; row < 2; row++) {
+        // overlay pane for settings (initially hidden)
+        StackPane overlaySettings = createQuickMenuOverlay(primaryStage);
+        overlaySettings.setVisible(false);
+
+        // populate grid with buttons/icons
+        for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 Button btn = new Button();
                 btn.getStyleClass().add("menu-button");
-
                 FontIcon icon = null;
 
                 if (row == 0 && col == 0) {
-                    icon = new FontIcon(FontAwesomeSolid.PLAY); // Play
+                    icon = new FontIcon(FontAwesomeSolid.PLAY);
                     btn.setOnAction(e -> timer.start());
+
                 } else if (row == 0 && col == 1) {
-                    icon = new FontIcon(FontAwesomeSolid.STOP); // Stop
+                    icon = new FontIcon(FontAwesomeSolid.STOP);
                     btn.setOnAction(e -> {
                         timer.stop();
                         setupSimulation();
                     });
+
                 } else if (row == 0 && col == 2) {
-                    icon = new FontIcon(FontAwesomeSolid.COGS); // Settings
+                    icon = new FontIcon(FontAwesomeSolid.COGS);
                     btn.setOnAction(e -> {
-                        TitleScreen titleScreen = new TitleScreen();
-                        Scene titleScene = titleScreen.createTitleScene(primaryStage);
-                        primaryStage.setScene(titleScene);
+                        overlaySettings.setVisible(true);
+                        timer.stop();
                     });
-                } else if (row == 1 && col == 0) {
-                    icon = new FontIcon(FontAwesomeSolid.FILE_EXPORT); // Export
-                } else if (row == 1 && col == 1) {
-                    icon = new FontIcon(FontAwesomeSolid.PAUSE); // Pause
-                    btn.setOnAction(e -> timer.stop());
+
                 } else if (row == 1 && col == 2) {
-                    icon = new FontIcon(FontAwesomeSolid.SAVE); // Save
+                    icon = new FontIcon(FontAwesomeSolid.SAVE);
                     btn.setOnAction(e -> {
                         timer.stop();
                         setupSimulation();
@@ -108,41 +112,100 @@ public class simulation {
         menuSquare.getChildren().add(grid);
         squareContainer.getChildren().add(menuSquare);
         sideBar.getChildren().addAll(inventoryBox, squareContainer);
-        root.setRight(sideBar);
+        mainPane.setRight(sideBar);
 
-        // create bottom bar
+        // bottom bar
         bottomBar = new HBox();
         bottomBar.getStyleClass().add("bottom-bar");
         bottomBar.setPrefHeight(150);
-        root.setBottom(bottomBar);
+        mainPane.setBottom(bottomBar);
 
-        // initialize simulation
         setupSimulation();
 
-        // bind root size to stage
-        root.prefWidthProperty().bind(primaryStage.widthProperty());
-        root.prefHeightProperty().bind(primaryStage.heightProperty());
+        // root stack to layer overlay on top of mainPane
+        StackPane rootStack = new StackPane();
+        rootStack.getChildren().addAll(mainPane, overlaySettings);
+        rootStack.prefWidthProperty().bind(primaryStage.widthProperty());
+        rootStack.prefHeightProperty().bind(primaryStage.heightProperty());
 
-        Scene scene = new Scene(root);
-
-        // load CSS stylesheet
+        Scene scene = new Scene(rootStack);
         scene.getStylesheets().add(
                 getClass().getResource("/styling/simulation.css").toExternalForm());
 
-        // force CSS and layout pass
+        // toggle overlay with ESC
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                overlaySettings.setVisible(!overlaySettings.isVisible());
+                event.consume();
+            }
+        });
+
         Platform.runLater(() -> {
-            root.applyCss();
-            root.layout();
+            rootStack.applyCss();
+            rootStack.layout();
         });
 
         return scene;
     }
 
+    private StackPane createQuickMenuOverlay(Stage ownerStage) {
+        // semi-transparent background
+        StackPane overlay = new StackPane();
+        overlay.setStyle("-fx-background-color: rgba(30, 30, 50, 0.7);");
+        overlay.setPickOnBounds(true);
+
+        // settings window container
+        VBox window = new VBox(20);
+        window.setAlignment(Pos.TOP_CENTER);
+        window.setPadding(new Insets(15));
+        window.setMaxWidth(300);
+        window.setMaxHeight(180);
+        window.setBackground(new Background(new BackgroundFill(
+                Color.rgb(10, 10, 20, 0.9), new CornerRadii(10), Insets.EMPTY)));
+
+        // top row with close button aligned to right
+        HBox topRow = new HBox();
+        Button btnClose = new Button("✕");
+        btnClose.setStyle(
+                "-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;");
+        btnClose.setOnAction(e -> {
+            overlay.setVisible(false);
+            timer.start();
+        });
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        topRow.getChildren().addAll(spacer, btnClose);
+
+        // "Back to Title Screen" button
+        Button btnBack = new Button("Back to Title Screen");
+        btnBack.getStyleClass().add("menu-button");
+        btnBack.setMaxWidth(Double.MAX_VALUE);
+        btnBack.setOnAction(e -> {
+            overlay.setVisible(false);
+            TitleScreen titleScreen = new TitleScreen();
+            Scene titleScene = titleScreen.createTitleScene(ownerStage);
+            ownerStage.setScene(titleScene);
+        });
+        btnBack.setPrefHeight(40);
+
+        // "Quit Game" button
+        Button btnQuit = new Button("Quit Game");
+        btnQuit.getStyleClass().add("menu-button");
+        btnQuit.setMaxWidth(Double.MAX_VALUE);
+        btnQuit.setOnAction(e -> Platform.exit());
+        btnQuit.setPrefHeight(40);
+
+        window.getChildren().addAll(topRow, btnBack, btnQuit);
+
+        overlay.getChildren().add(window);
+        StackPane.setAlignment(window, Pos.CENTER);
+
+        return overlay;
+    }
+
     private void setupSimulation() {
-        // clear all nodes except buttons
         simSpace.getChildren().removeIf(node -> !(node instanceof Button));
 
-        // create new physics world
         world = new World(new Vec2(0.0f, 9.8f));
         pairs = new ArrayList<>();
 
@@ -157,12 +220,10 @@ public class simulation {
             }
         }
 
-        // create new timer for simulation
         timer = new ResettableAnimationTimer(world, pairs);
     }
 
     private void exportLevel() {
-        // convert physics visuals back to game objects
         ArrayList<GameObject> gameObjects = new ArrayList<>();
         for (PhysicsVisualPair pair : pairs) {
             GameObject obj = FxToGameObject.convertBack(pair);

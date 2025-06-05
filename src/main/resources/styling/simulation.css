@@ -70,27 +70,6 @@
   -fx-padding: 10;
 }
 
-/* Round buttons inside menu square */
-.menu-button {
-  -fx-pref-width: 24px;
-  -fx-pref-height: 24px;
-  -fx-background-color: #2a3b4c;
-  -fx-background-radius: 12;
-  -fx-border-color: #0e1722;
-  -fx-border-width: 1;
-  -fx-border-radius: 12;
-  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 1, 0, 0, 1);
-}
-
-.menu-button:hover {
-  -fx-background-color: #3b4c5d;
-}
-
-.menu-button:pressed {
-  -fx-translate-y: 1;
-  -fx-effect: none;
-}
-
 /* Bottom bar styling */
 .bottom-bar {
   -fx-background-color: #0e1722;
@@ -118,4 +97,44 @@
 .bottom-bar .button:pressed {
   -fx-translate-y: 1;
   -fx-effect: none;
+}
+
+.menu-button {
+  -fx-padding: 8;
+  -fx-background-color: linear-gradient(to bottom, #3a4b5c 0%, #22313f 100%);
+  -fx-background-radius: 12;
+  -fx-border-color: #0e1722;
+  -fx-border-width: 1;
+  -fx-border-radius: 12;
+  -fx-text-fill: white;
+  -fx-pref-width: 40;
+  -fx-pref-height: 40;
+  -fx-font-size: 14px;
+  /* subtle drop shadow for lifted 3D look */
+  -fx-effect: dropshadow(
+    gaussian,
+    rgba(0, 0, 0, 0.4),
+    4,
+    /* radius */ 0,
+    /* spread */ 0,
+    /* offsetX */ 2 /* offsetY */
+  );
+}
+
+.menu-button:hover {
+  -fx-background-color: linear-gradient(to bottom, #4a5b6c 0%, #334150 100%);
+}
+
+.menu-button:pressed {
+  -fx-translate-y: 1;
+  -fx-background-color: linear-gradient(to bottom, #1a2b3c 0%, #11202a 100%);
+  /* inner shadow to simulate button being pushed in */
+  -fx-effect: innershadow(
+    two-pass-box,
+    rgba(0, 0, 0, 0.6),
+    4,
+    /* radius */ 0,
+    /* choke */ 0,
+    /* offsetX */ 1 /* offsetY */
+  );
 }
