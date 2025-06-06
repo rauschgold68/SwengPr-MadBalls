@@ -30,6 +30,10 @@ public class Physics {
         else return false;
     }
 
+    public void setDynamic(){
+        this.bodyType = "DYNAMIC";
+    }
+
     public boolean isStatic(){
         if (getBodyType().equalsIgnoreCase("STATIC")) return true;
         else return false;

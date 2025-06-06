@@ -14,7 +14,7 @@ public class FxToGameObject {
         GameObject gameObject = null;
 
         String name;
-        Position position = new Position();
+        Position position = new Position(0,0);
         Size size = new Size();
         String colour;
         String type;

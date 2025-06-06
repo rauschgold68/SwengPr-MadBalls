@@ -7,6 +7,16 @@ public class Position {
     private float x;
     private float y;
 
+    public Position(float x, float y){
+        this.x = x;
+        this.y = y;
+    }
+
+    public Position(){
+        this.x = 0;
+        this.y = 0;
+    }
+
     public float getX() {return this.x;}
     public void setX(float newX) {this.x = newX;}
 
