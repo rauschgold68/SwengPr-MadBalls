@@ -13,7 +13,7 @@
         "radius": 0
       },
       "sprite": null,
-      "colour": "BLACK",
+      "colour": "GREEN",
       "physics": {
         "bodyType": "DYNAMIC",
         "density": 1.0,
@@ -31,7 +31,7 @@
       },
       "size": {
         "width": 100,
-        "height": 100, 
+        "height": 100,
         "radius": 0
       },
       "sprite": null,
@@ -83,7 +83,7 @@
         "density": 1.0,
         "friction": 1.0,
         "restitution": 1.0,
-        
+
         "shape": "box"
       }
     },

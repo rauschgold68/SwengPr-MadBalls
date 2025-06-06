@@ -24,7 +24,7 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import java.util.ArrayList;
 import java.util.List;
 
-public class simulation {
+public class Simulation {
 
     private World world;
     private List<PhysicsVisualPair> pairs;

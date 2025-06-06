@@ -26,7 +26,7 @@ public class GameObjectConverter {
             float y = obj.getPosition().getY();
 
             // JavaFX visual
-            Rectangle rect = new Rectangle(width, height, Color.CORNFLOWERBLUE);
+            Rectangle rect = new Rectangle(width, height, Color.valueOf(obj.getColour()) );
             rect.setTranslateX(x);
             rect.setTranslateY(y);
             visual = rect;
@@ -53,7 +53,7 @@ public class GameObjectConverter {
             float y = obj.getPosition().getY();
 
             // JavaFX visual
-            Circle circ = new Circle(radius, Color.STEELBLUE);
+            Circle circ = new Circle(radius, Color.valueOf(obj.getColour()));
             circ.setTranslateX(x);
             circ.setTranslateY(y);
             visual = circ;
