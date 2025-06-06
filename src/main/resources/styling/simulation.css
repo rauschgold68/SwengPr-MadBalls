@@ -1,0 +1,140 @@
+/* Root container */
+#root-pane {
+  -fx-background-color: transparent;
+}
+
+/* Simulation area background */
+.sim-space {
+  -fx-background-color: white;
+}
+
+/* Buttons inside simulation area */
+.sim-space-button {
+  -fx-text-fill: #0e1722;
+  -fx-background-color: #d1d1d1;
+  -fx-border-color: #a0a0a0;
+  -fx-border-width: 1;
+  -fx-background-radius: 4;
+  -fx-border-radius: 4;
+  -fx-font-size: 14px;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 2, 0, 0, 1);
+}
+
+.sim-space-button:hover {
+  -fx-background-color: #e0e0e0;
+}
+
+.sim-space-button:pressed {
+  -fx-translate-y: 1;
+  -fx-effect: none;
+}
+
+/* Sidebar container */
+.side-bar {
+  -fx-background-color: #0e1722;
+  -fx-padding: 10 0 10 0;
+}
+
+/* Inventory box, stretches above menu square */
+.inventory-box {
+  -fx-background-color: #1b2736;
+  -fx-border-color: #0e1722;
+  -fx-border-width: 2;
+  -fx-background-radius: 8;
+  -fx-border-radius: 8;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
+}
+
+/* Container to center menu square */
+.square-container {
+  -fx-alignment: center;
+  -fx-padding: 10 0 10 0;
+}
+
+/* Menu square styling */
+.menu-square {
+  -fx-background-color: #1b2736;
+  -fx-border-color: #0e1722;
+  -fx-border-width: 2;
+  -fx-background-radius: 8;
+  -fx-border-radius: 8;
+  -fx-pref-width: 120px;
+  -fx-pref-height: 120px;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
+}
+
+/* Grid layout inside menu square */
+.menu-grid {
+  -fx-hgap: 10;
+  -fx-vgap: 10;
+  -fx-padding: 10;
+}
+
+/* Bottom bar styling */
+.bottom-bar {
+  -fx-background-color: #0e1722;
+  -fx-pref-height: 150px;
+  -fx-border-color: #1b2736;
+  -fx-border-width: 2 0 0 0; /* top border only */
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, -2);
+}
+
+/* Buttons or elements inside bottom bar */
+.bottom-bar .button {
+  -fx-text-fill: #ffffff;
+  -fx-background-color: #1e2a3a;
+  -fx-border-color: #0e1722;
+  -fx-border-width: 1;
+  -fx-background-radius: 4;
+  -fx-border-radius: 4;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 2, 0, 0, 1);
+}
+
+.bottom-bar .button:hover {
+  -fx-background-color: #2b3b4b;
+}
+
+.bottom-bar .button:pressed {
+  -fx-translate-y: 1;
+  -fx-effect: none;
+}
+
+.menu-button {
+  -fx-padding: 8;
+  -fx-background-color: linear-gradient(to bottom, #3a4b5c 0%, #22313f 100%);
+  -fx-background-radius: 12;
+  -fx-border-color: #0e1722;
+  -fx-border-width: 1;
+  -fx-border-radius: 12;
+  -fx-text-fill: white;
+  -fx-pref-width: 40;
+  -fx-pref-height: 40;
+  -fx-font-size: 14px;
+  /* subtle drop shadow for lifted 3D look */
+  -fx-effect: dropshadow(
+    gaussian,
+    rgba(0, 0, 0, 0.4),
+    4,
+    /* radius */ 0,
+    /* spread */ 0,
+    /* offsetX */ 2 /* offsetY */
+  );
+}
+
+.menu-button:hover {
+  -fx-background-color: linear-gradient(to bottom, #4a5b6c 0%, #334150 100%);
+}
+
+.menu-button:pressed {
+  -fx-translate-y: 1;
+  -fx-background-color: linear-gradient(to bottom, #1a2b3c 0%, #11202a 100%);
+  /* inner shadow to simulate button being pushed in */
+  -fx-effect: innershadow(
+    two-pass-box,
+    rgba(0, 0, 0, 0.6),
+    4,
+    /* radius */ 0,
+    /* choke */ 0,
+    /* offsetX */ 1 /* offsetY */
+  );
+}

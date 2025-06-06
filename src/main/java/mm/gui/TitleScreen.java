@@ -1,6 +1,7 @@
 package mm.gui;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -14,11 +15,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
-public class TitleScreen extends Application {
+public class TitleScreen {
 
-        @Override
-        public void start(Stage primaryStage) {
-                primaryStage.setTitle("MadBalls©");
+        public Scene createTitleScene(Stage primaryStage) {
 
                 // === Buttons ===
                 Button btnPuzzle = new Button("Puzzles");
@@ -183,7 +182,12 @@ public class TitleScreen extends Application {
                 btnQuit.getStyleClass().add("btnTS");
 
                 btnPuzzle.setOnAction(e -> overlayBackgroundPuzzle.setVisible(true));
-                btnSandbox.setOnAction(e -> System.out.println("Starting Sandbox Mode"));
+                btnSandbox.setOnAction(e -> {
+                        simulation sim = new simulation();
+                        Scene simScene = sim.getScene(primaryStage);
+                        primaryStage.setScene(simScene);
+                });
+
                 btnOptions.setOnAction(e -> overlayBackgroundOptions.setVisible(true));
                 btnQuit.setOnAction(e -> System.exit(0));
 
@@ -192,7 +196,7 @@ public class TitleScreen extends Application {
                 root.setStyle("-fx-background-color: #0e1722;");
                 root.getChildren().addAll(logoANDBoard, overlayBackgroundPuzzle, overlayBackgroundOptions);
 
-                Scene scene = new Scene(root, 1920, 1080);
+                Scene scene = new Scene(root);
                 scene.getStylesheets().add(getClass().getResource("/styling/titleScreen.css").toExternalForm());
 
                 scene.setOnKeyPressed(event -> {
@@ -209,12 +213,13 @@ public class TitleScreen extends Application {
                         }
                 });
 
-                primaryStage.setScene(scene);
+                // force CSS and layout pass
+                Platform.runLater(() -> {
+                        root.applyCss();
+                        root.layout();
+                });
 
-                primaryStage.setScene(scene);
-                primaryStage.setMaxWidth(1920);
-                primaryStage.setMaxHeight(1080);
-                primaryStage.show();
+                return scene;
         }
 
         private Circle createPin(Color color) {
@@ -258,9 +263,5 @@ public class TitleScreen extends Application {
                 });
 
                 return card;
-        }
-
-        public static void main(String[] args) {
-                launch(args);
         }
 }
