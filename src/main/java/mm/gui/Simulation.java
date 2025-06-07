@@ -103,9 +103,13 @@ public class Simulation {
                     double x = event.getX();
                     double y = event.getY();
 
+                    // Center the object around the mouse
+                    float offsetX = (float) (newObj.getSize().getWidth() / 2.0);
+                    float offsetY = (float) (newObj.getSize().getHeight() / 2.0);
+
                     GameObject simObj = new GameObject(
                         newObj.getName(), newObj.getType(),
-                        new Position((float) x, (float) y),
+                        new Position((float) x - offsetX, (float) y - offsetY),
                         newObj.getSize(), newObj.getColour(), newObj.getPhysics()
                     );
 
@@ -356,6 +360,11 @@ public class Simulation {
                     ClipboardContent content = new ClipboardContent();
                     content.putString(obj.getName()); // Use unique name
                     db.setContent(content);
+
+                    // Create a snapshot of the visual for drag view
+                    javafx.scene.image.WritableImage snapshot = pair.visual.snapshot(null, null);
+                    db.setDragView(snapshot, snapshot.getWidth() / 2, snapshot.getHeight() / 2); // Centered
+
                     event.consume();
                 });
 
