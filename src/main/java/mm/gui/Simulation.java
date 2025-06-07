@@ -27,17 +27,36 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main simulation GUI class for the MadBalls game.
+ * <p>
+ * Handles the simulation area, inventory, sidebar, and menu overlays.
+ * Responsible for setting up the simulation, inventory, and exporting levels.
+ * </p>
+ */
 public class Simulation {
 
+    /** The physics world for the simulation */
     private World world;
+    /** List of pairs of physics objects and their visuals */
     private List<PhysicsVisualPair> pairs;
+    /** The pane where simulation objects are displayed */
     private Pane simSpace;
+    /** Animation timer for the simulation */
     private ResettableAnimationTimer timer;
+    /** The bottom bar of the UI */
     private HBox bottomBar;
+    /** The inventory box container */
     private StackPane inventoryBox;
+    /** The VBox containing inventory items */
     private VBox inventoryItemBox;
-    // test comment
 
+    /**
+     * Creates and returns the main simulation scene.
+     *
+     * @param primaryStage the primary stage of the application
+     * @return the constructed Scene
+     */
     public Scene getScene(Stage primaryStage) {
         // main layout container
         BorderPane mainPane = new BorderPane();
@@ -159,6 +178,12 @@ public class Simulation {
         return scene;
     }
 
+    /**
+     * Creates the quick menu overlay for settings, back to title, and quit.
+     *
+     * @param ownerStage the owner stage for the overlay
+     * @return the StackPane overlay
+     */
     private StackPane createQuickMenuOverlay(Stage ownerStage) {
         // semi-transparent background
         StackPane overlay = new StackPane();
@@ -214,6 +239,10 @@ public class Simulation {
         return overlay;
     }
 
+    /**
+     * Sets up the simulation area by loading GameObjects and initializing the physics world.
+     * Adds visual representations of objects to the simulation pane.
+     */
     private void setupSimulation() {
         simSpace.getChildren().removeIf(node -> !(node instanceof Button));
 
@@ -234,6 +263,10 @@ public class Simulation {
         timer = new ResettableAnimationTimer(world, pairs);
     }
 
+    /**
+     * Sets up the inventory area by loading InventoryObjects and initializing the physics world.
+     * Adds visual representations of inventory items to the inventory pane.
+     */
     private void setupInventory() {
         world = new World(new Vec2(0.0f, 9.8f));
         pairs = new ArrayList<>();
@@ -254,6 +287,10 @@ public class Simulation {
 
     }
 
+    /**
+     * Exports the current level by converting all PhysicsVisualPairs to GameObjects.
+     * Prints a confirmation message to the console.
+     */
     private void exportLevel() {
         ArrayList<GameObject> gameObjects = new ArrayList<>();
         for (PhysicsVisualPair pair : pairs) {

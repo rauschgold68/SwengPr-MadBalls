@@ -10,9 +10,26 @@ import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.dynamics.*;
 
+/**
+ * Utility class for converting GameObject instances into their corresponding
+ * JavaFX visual representations and Box2D physics bodies for use in the simulation.
+ */
 public class GameObjectConverter {
+    /** Scale factor for converting between game units and physics world units */
     private static final float SCALE = 50.0f;
 
+    /**
+     * Converts a GameObject to a PhysicsVisualPair, which contains both the JavaFX visual
+     * representation and the Box2D physics body.
+     * <p>
+     * Supports rectangle and circle shapes. The created visual and body are configured
+     * according to the GameObject's properties.
+     * </p>
+     *
+     * @param obj   The game object to be converted
+     * @param world The Box2D world where the body is created
+     * @return      A PhysicsVisualPair containing the visual and physics body
+     */
     public static PhysicsVisualPair convert(GameObject obj, World world) {
         Physics physics = obj.getPhysics();
         String type = obj.getType(); // e.g., "rectangle", "circle"

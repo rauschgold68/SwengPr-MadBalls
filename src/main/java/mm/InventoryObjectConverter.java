@@ -15,18 +15,25 @@ import javafx.scene.shape.Shape;
 import mm.model.objects.InventoryObject;
 import mm.model.objects.Physics;
 
-
-/*
- * Converts all objects under the inventory category from .json - File
+/**
+ * Utility class for converting InventoryObject instances into their corresponding
+ * JavaFX visual representations and Box2D physics bodies for use in the inventory system.
  */
 public class InventoryObjectConverter {
+    /** Scale factor for converting between game units and physics world units */
     private static final float SCALE = 50.0f;
     
     /**
-     * Convert InventoryObjects to Objects in inventory during the game.
-     * They should be limitless depending on the game mode. Shown in inventoryBox
-     * @param obj The individual inventory object to be converted
-     * @param world Environment where the bodys are created from 
+     * Converts an InventoryObject to a PhysicsVisualPair, which contains both the JavaFX visual
+     * representation and the Box2D physics body.
+     * <p>
+     * Supports rectangle and circle shapes. The created visual and body are configured
+     * according to the InventoryObject's properties.
+     * </p>
+     *
+     * @param obj   The individual inventory object to be converted
+     * @param world The Box2D world where the body is created
+     * @return      A PhysicsVisualPair containing the visual and physics body
      */
     public static PhysicsVisualPair convert(InventoryObject obj, World world){
 
@@ -56,7 +63,7 @@ public class InventoryObjectConverter {
             fixture.restitution = physics.getRestitution();
             body.createFixture(fixture);
 
-        }else if ("circle".equalsIgnoreCase(type)){
+        } else if ("circle".equalsIgnoreCase(type)) {
             float radius = obj.getSize().getRadius();
             Circle circ = new Circle(radius, Color.valueOf(obj.getColour()));
             visual = circ;
