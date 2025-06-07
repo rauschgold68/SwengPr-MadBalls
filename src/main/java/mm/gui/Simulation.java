@@ -5,8 +5,11 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -18,6 +21,7 @@ import mm.PhysicsVisualPair;
 import mm.core.physics.ResettableAnimationTimer;
 import mm.model.objects.GameObject;
 import mm.model.objects.InventoryObject;
+import mm.model.objects.Position;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
@@ -50,6 +54,8 @@ public class Simulation {
     private StackPane inventoryBox;
     /** The VBox containing inventory items */
     private VBox inventoryItemBox;
+    /** The storage for dropped items while playing */
+    private final List<GameObject> droppedObjects = new ArrayList<>();
 
     /**
      * Creates and returns the main simulation scene.
@@ -66,6 +72,58 @@ public class Simulation {
         simSpace = new Pane();
         simSpace.getStyleClass().add("sim-space");
         mainPane.setCenter(simSpace);
+
+        //Drag inventory objects and place them
+        simSpace.setOnDragOver(event -> {
+            if (event.getGestureSource() != simSpace && event.getDragboard().hasString()) {
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            }
+            event.consume();
+        });
+
+        simSpace.setOnDragDropped(event -> {
+
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+
+            if (db.hasString()){
+                String name = db.getString(); // Use name instead of type
+                ObjectImporter importer = new ObjectImporter();
+                List<InventoryObject> inventoryObjects = importer.getInventoryObjects();
+                InventoryObject template = inventoryObjects.stream()
+                    .filter(obj -> obj.getName().equals(name)) // Match by name
+                    .findFirst().orElse(null);
+
+                if (template != null){
+                    InventoryObject newObj = new InventoryObject(
+                        template.getName(), template.getType(), template.getCount(),
+                        template.getSize(), template.getColour(), template.getPhysics(),
+                        template.getRadius()
+                    );
+                    double x = event.getX();
+                    double y = event.getY();
+
+                    GameObject simObj = new GameObject(
+                        newObj.getName(), newObj.getType(),
+                        new Position((float) x, (float) y),
+                        newObj.getSize(), newObj.getColour(), newObj.getPhysics()
+                    );
+
+                    // Add the objects that are dropped to be displayed again
+                    droppedObjects.add(simObj);
+
+                    PhysicsVisualPair pair = GameObjectConverter.convert(simObj, world);
+                    if (pair.visual != null) {
+                        simSpace.getChildren().add(pair.visual);
+                        pairs.add(pair);
+                    }
+                    success = true;
+                }
+            }
+            event.setDropCompleted(success);
+            event.consume();
+        });
+
 
         // sidebar with menu buttons
         VBox sideBar = new VBox();
@@ -252,7 +310,17 @@ public class Simulation {
         ObjectImporter importer = new ObjectImporter();
         List<GameObject> gameObjects = importer.getGameObjects();
 
+        // Add level objects
         for (GameObject obj : gameObjects) {
+            PhysicsVisualPair pair = GameObjectConverter.convert(obj, world);
+            if (pair.visual != null) {
+                simSpace.getChildren().add(pair.visual);
+                pairs.add(pair);
+            }
+        }
+
+        // Add dropped objects
+        for (GameObject obj : droppedObjects) {
             PhysicsVisualPair pair = GameObjectConverter.convert(obj, world);
             if (pair.visual != null) {
                 simSpace.getChildren().add(pair.visual);
@@ -265,11 +333,10 @@ public class Simulation {
 
     /**
      * Sets up the inventory area by loading InventoryObjects and initializing the physics world.
-     * Adds visual representations of inventory items to the inventory pane.
+     * Adds visual representations of inventory items to the inventory pane. 
+     * Making them able to be dropped into the simSpace.
      */
     private void setupInventory() {
-        world = new World(new Vec2(0.0f, 9.8f));
-        pairs = new ArrayList<>();
 
         ObjectImporter importer = new ObjectImporter();
         List<InventoryObject> inventoryObjects = importer.getInventoryObjects();
@@ -280,8 +347,17 @@ public class Simulation {
 
                 StackPane wrapper = new StackPane(pair.visual);
                 wrapper.setPrefSize(60, 60);
+
+
+                wrapper.setOnDragDetected(event -> {
+                    Dragboard db = wrapper.startDragAndDrop(TransferMode.COPY);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(obj.getName()); // Use unique name
+                    db.setContent(content);
+                    event.consume();
+                });
+
                 inventoryItemBox.getChildren().add(wrapper);
-                pairs.add(pair);
             }
         }
 
