@@ -149,5 +149,4 @@
 /* Change visual of inventory items when simulation is running */
 .inventory-item-disabled {
   -fx-opacity: 0.5;
-  -fx-effect: blur(5px);
 }
