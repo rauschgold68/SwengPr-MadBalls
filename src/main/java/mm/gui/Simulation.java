@@ -296,6 +296,8 @@ public class Simulation {
             TitleScreen titleScreen = new TitleScreen();
             Scene titleScene = titleScreen.createTitleScene(ownerStage);
             ownerStage.setScene(titleScene);
+            ownerStage.setWidth(1920);
+            ownerStage.setHeight(1080);
         });
         btnBack.setPrefHeight(40);
 
