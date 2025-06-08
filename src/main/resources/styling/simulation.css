@@ -139,8 +139,15 @@
   );
 }
 
+/* Align items in inventory HBox*/
 .inventoryItemBox {
   -fx-spacing: 15;
   -fx-alignment: center;
   -fx-padding: 5 10 5 10;
+}
+
+/* Change visual of inventory items when simulation is running */
+.inventory-item-disabled {
+  -fx-opacity: 0.5;
+  -fx-effect: blur(5px);
 }

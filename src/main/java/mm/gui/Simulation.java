@@ -56,6 +56,8 @@ public class Simulation {
     private VBox inventoryItemBox;
     /** The storage for dropped items while playing */
     private final List<GameObject> droppedObjects = new ArrayList<>();
+    /** The inventory objects to be manipulated */
+    private final List<StackPane> inventroyWrappers = new ArrayList<>();
 
     /**
      * Creates and returns the main simulation scene.
@@ -172,13 +174,17 @@ public class Simulation {
 
                 if (row == 0 && col == 0) {
                     icon = new FontIcon(FontAwesomeSolid.PLAY);
-                    btn.setOnAction(e -> timer.start());
+                    btn.setOnAction(e -> {
+                        timer.start(); 
+                        updateInventoryVisuals();
+                    });
 
                 } else if (row == 0 && col == 1) {
                     icon = new FontIcon(FontAwesomeSolid.STOP);
                     btn.setOnAction(e -> {
                         timer.stop();
                         setupSimulation();
+                        updateInventoryVisuals();
                     });
 
                 } else if (row == 0 && col == 2) {
@@ -360,6 +366,7 @@ public class Simulation {
 
                 StackPane wrapper = new StackPane(pair.visual);
                 wrapper.setPrefSize(60, 60);
+                inventroyWrappers.add(wrapper);
 
 
                 // In setupInventory, prevent drag start if simulation is running
@@ -397,5 +404,20 @@ public class Simulation {
             gameObjects.add(obj);
         }
         System.out.println("export done!");
+    }
+    /**
+     * Updates the inventory objects while simulating showing that their are not placeable.
+     */
+    private void updateInventoryVisuals() {
+        boolean disabled = timer != null && timer.isRunning();
+        for (StackPane wrapper : inventroyWrappers) {
+            if (disabled) {
+                if (!wrapper.getStyleClass().contains("inventory-item-disabled")) {
+                    wrapper.getStyleClass().add("inventory-item-disabled");
+                }
+            } else {
+                wrapper.getStyleClass().remove("inventory-item-disabled");
+            }
+        }
     }
 }
