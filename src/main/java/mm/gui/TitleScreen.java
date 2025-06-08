@@ -185,7 +185,6 @@ public class TitleScreen {
                         Simulation sim = new Simulation();
                         Scene simScene = sim.getScene(primaryStage);
                         primaryStage.setScene(simScene);
-                        primaryStage.sizeToScene();
                 });
 
                 btnOptions.setOnAction(e -> overlayBackgroundOptions.setVisible(true));
