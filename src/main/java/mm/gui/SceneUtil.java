@@ -11,6 +11,7 @@ public class SceneUtil {
 
         Platform.runLater(() -> {
             stage.getScene().getRoot().requestLayout();
+            stage.setWidth(stage.getWidth() + 0.0001);
         });
     }
 }

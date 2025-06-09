@@ -68,6 +68,9 @@ public class Simulation {
         // main layout container
         BorderPane mainPane = new BorderPane();
         mainPane.setId("root-pane");
+        mainPane.setPrefSize(1920, 1080);
+        mainPane.prefWidthProperty().bind(primaryStage.widthProperty());
+        mainPane.prefHeightProperty().bind(primaryStage.heightProperty());
 
         // simulation area
         simSpace = new Pane();

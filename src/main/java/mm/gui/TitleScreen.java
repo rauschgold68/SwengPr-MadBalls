@@ -194,6 +194,9 @@ public class TitleScreen {
                 StackPane root = new StackPane();
                 root.setStyle("-fx-background-color: #0e1722;");
                 root.getChildren().addAll(logoANDBoard, overlayBackgroundPuzzle, overlayBackgroundOptions);
+                root.setPrefSize(1920, 1080);
+                root.prefWidthProperty().bind(primaryStage.widthProperty());
+                root.prefHeightProperty().bind(primaryStage.heightProperty());
 
                 Scene scene = new Scene(root);
                 scene.getStylesheets().add(getClass().getResource("/styling/titleScreen.css").toExternalForm());
