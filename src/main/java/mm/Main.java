@@ -3,6 +3,7 @@ package mm;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import mm.gui.Simulation;
 import mm.gui.TitleScreen;
 import mm.model.objects.Level;
 
@@ -10,10 +11,16 @@ public class Main extends Application {
 
     public static Level loadedLevel;
 
+    public static Simulation simulation;
+    public static TitleScreen titleScreen;
+
     @Override
     public void start(Stage primaryStage) {
-        TitleScreen titleScreen = new TitleScreen();
+        titleScreen = new TitleScreen();
+        simulation = new Simulation();
+
         Scene titleScene = titleScreen.createTitleScene(primaryStage);
+
         primaryStage.setTitle("MadBalls©");
         primaryStage.setScene(titleScene);
 

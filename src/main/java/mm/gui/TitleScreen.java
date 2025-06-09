@@ -13,6 +13,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import mm.Main;
 
 public class TitleScreen {
 
@@ -182,10 +183,8 @@ public class TitleScreen {
 
                 btnPuzzle.setOnAction(e -> overlayBackgroundPuzzle.setVisible(true));
                 btnSandbox.setOnAction(e -> {
-                        Simulation sim = new Simulation();
-                        Scene simScene = sim.getScene(primaryStage);
-                        primaryStage.setScene(simScene);
-                        primaryStage.sizeToScene();
+                        Scene simScene = Main.simulation.getScene(primaryStage);
+                        SceneUtil.switchScene(primaryStage, simScene);
                 });
 
                 btnOptions.setOnAction(e -> overlayBackgroundOptions.setVisible(true));

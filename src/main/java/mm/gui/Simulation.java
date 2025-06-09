@@ -22,6 +22,7 @@ import mm.core.physics.ResettableAnimationTimer;
 import mm.model.objects.GameObject;
 import mm.model.objects.InventoryObject;
 import mm.model.objects.Position;
+import mm.Main;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
@@ -272,11 +273,8 @@ public class Simulation {
         btnBack.setMaxWidth(Double.MAX_VALUE);
         btnBack.setOnAction(e -> {
             overlay.setVisible(false);
-            TitleScreen titleScreen = new TitleScreen();
-            Scene titleScene = titleScreen.createTitleScene(ownerStage);
-            ownerStage.setScene(titleScene);
-            ownerStage.setWidth(1920);
-            ownerStage.setHeight(1080);
+            Scene titleScene = Main.titleScreen.createTitleScene(ownerStage);
+            SceneUtil.switchScene(ownerStage, titleScene);
         });
         btnBack.setPrefHeight(40);
 
