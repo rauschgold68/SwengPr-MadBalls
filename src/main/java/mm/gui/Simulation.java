@@ -230,6 +230,7 @@ public class Simulation {
 
         setupSimulation();
         setupInventory();
+        listenContact();
 
         // root stack to layer overlay on top of mainPane
         StackPane rootStack = new StackPane();
@@ -409,32 +410,35 @@ public class Simulation {
         }
         System.out.println("export done!");
     }
+    /**
+     * Looks for contacts between objects, references them by the name. Important for level json!
+     * Append if clause for diffrent winning conditions.
+     */
     private void listenContact() {
         world.setContactListener(new ContactListener() {
-            
-            
-
             @Override
             public void beginContact(Contact contact) {
-
                 Object a = contact.getFixtureA().getBody().getUserData();
                 Object b = contact.getFixtureB().getBody().getUserData();
 
+                // Replace "winbox" and "ball1" with your actual object names
+                if ((a != null && b != null) &&
+                    ((a.equals("winPlat") && b.equals("ball1")) ||
+                     (a.equals("ball1") && b.equals("winPlat")))) {
+                    System.out.println("WIN! ball1 hit the winPlat!");
+                }
             }
             @Override
-            public void endContact(Contact contact){
-
-            }
+            public void endContact(Contact contact) {}
             @Override
-            public void preSolve(Contact contact, Manifold oldManifold) {};
+            public void preSolve(Contact contact, Manifold oldManifold) {}
             @Override
-            public void postSolve(Contact contact, ContactImpulse impulse) {};
-
+            public void postSolve(Contact contact, ContactImpulse impulse) {}
         });
     }
     
     /**
-     * Updates the inventory objects while simulating showing that their are not placeable.
+     * Updates the inventory objects while simulating, showing that their are not placeable.
      */
     private void updateInventoryVisuals() {
         boolean disabled = timer != null && timer.isRunning();

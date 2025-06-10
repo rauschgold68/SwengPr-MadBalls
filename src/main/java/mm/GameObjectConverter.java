@@ -54,6 +54,9 @@ public class GameObjectConverter {
             def.position.set((x + width / 2) / SCALE, (y + height / 2) / SCALE);
             body = world.createBody(def);
 
+            // Unique name for collision detection later on.
+            body.setUserData(obj.getName());
+
             PolygonShape shape = new PolygonShape();
             shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
 
@@ -80,6 +83,9 @@ public class GameObjectConverter {
             def.type = physics.isDynamic() ? BodyType.DYNAMIC : BodyType.STATIC;
             def.position.set(x / SCALE, y / SCALE);
             body = world.createBody(def);
+
+            // Unique name for collision detection later on.
+            body.setUserData(obj.getName());
 
             CircleShape shape = new CircleShape();
             shape.setRadius(radius / SCALE);
