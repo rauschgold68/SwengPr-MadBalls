@@ -25,7 +25,22 @@
     {
       "name": "noPlaceZone",
       "type": "rectangle",
-      "position": { "x": 400, "y": 800 },
+      "position": { "x": 200, "y": 400 },
+      "size": { "width": 200, "height": 40, "radius": 0 },
+      "sprite": null,
+      "colour": "NOPLACEZONE",
+      "physics": {
+        "bodyType": "STATIC",
+        "density": 1.0,
+        "friction": 1.0,
+        "restitution": 0.0,
+        "shape": "rectangle"
+      }
+    },
+    {
+      "name": "winZone",
+      "type": "rectangle",
+      "position": { "x": 200, "y": 800 },
       "size": { "width": 200, "height": 40, "radius": 0 },
       "sprite": null,
       "colour": "WINZONE",

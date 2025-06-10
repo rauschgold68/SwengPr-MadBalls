@@ -12,6 +12,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import mm.FxToGameObject;
 import mm.GameObjectConverter;
@@ -62,6 +63,8 @@ public class Simulation {
     private final List<GameObject> droppedObjects = new ArrayList<>();
     /** The inventory objects to be manipulated */
     private final List<StackPane> inventroyWrappers = new ArrayList<>();
+    /** The noPlaceZones existing inside the simulation */
+    private final List<PhysicsVisualPair> noPlaceZones = new ArrayList<>();
 
     /**
      * Creates and returns the main simulation scene.
@@ -96,6 +99,24 @@ public class Simulation {
                 return;
             }
 
+            double x = event.getX();
+            double y = event.getY();
+
+            for (PhysicsVisualPair zone : noPlaceZones) {
+                if (zone.visual instanceof Rectangle) {
+                    Rectangle rect = (Rectangle) zone.visual;
+                    double zoneX = rect.getTranslateX();
+                    double zoneY = rect.getTranslateY();
+                    double zoneW = rect.getWidth();
+                    double zoneH = rect.getHeight();
+                    if (x >= zoneX && x <= zoneX + zoneW && y >= zoneY && y <= zoneY + zoneH) {
+                        event.setDropCompleted(false);
+                        event.consume();
+                        return;
+                    }
+                }
+            }
+
             Dragboard db = event.getDragboard();
             boolean success = false;
 
@@ -113,8 +134,6 @@ public class Simulation {
                         template.getSize(), template.getColour(), template.getPhysics(),
                         template.getRadius()
                     );
-                    double x = event.getX();
-                    double y = event.getY();
 
                     // Center the object around the mouse
                     float offsetX = (float) (newObj.getSize().getWidth() / 2.0);
@@ -341,6 +360,9 @@ public class Simulation {
                 simSpace.getChildren().add(pair.visual);
                 pairs.add(pair);
             }
+            if (obj.getName().equals("noPlaceZone")){
+                noPlaceZones.add(pair);
+            }
         }
 
         // Add dropped objects
@@ -349,6 +371,9 @@ public class Simulation {
             if (pair.visual != null) {
                 simSpace.getChildren().add(pair.visual);
                 pairs.add(pair);
+            }
+            if (obj.getName().equals("noPlaceZone")){
+                noPlaceZones.add(pair);
             }
         }
 

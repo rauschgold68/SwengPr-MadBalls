@@ -56,7 +56,7 @@ public class PatternCreator {
         int stripeWidth = 16;
         for (float i = -height; i < width; i += stripeWidth) {
             // green part of stripes
-            gc.setFill(Color.MEDIUMVIOLETRED);
+            gc.setFill(Color.RED);
             gc.fillPolygon(
                 new double[]{i, i + stripeWidth / 2.0, i + stripeWidth, i + stripeWidth / 2.0},
                 new double[]{0, 0, height, height},
