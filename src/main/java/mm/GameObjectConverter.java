@@ -4,6 +4,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import javafx.scene.transform.Rotate;
 import mm.model.objects.GameObject;
 import mm.model.objects.Physics;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -52,6 +53,7 @@ public class GameObjectConverter {
             BodyDef def = new BodyDef();
             def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
             def.position.set((x + width / 2) / SCALE, (y + height / 2) / SCALE);
+            def.angle = (float) Math.toRadians(obj.getAngle());
             body = world.createBody(def);
 
             PolygonShape shape = new PolygonShape();
@@ -79,6 +81,7 @@ public class GameObjectConverter {
             BodyDef def = new BodyDef();
             def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
             def.position.set(x / SCALE, y / SCALE);
+            def.angle = (float) Math.toRadians(obj.getAngle());
             body = world.createBody(def);
 
             CircleShape shape = new CircleShape();

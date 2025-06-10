@@ -1,6 +1,6 @@
 {
   "levelObjects": [],
-  "inventory": [
+  "inventoryObjects": [
     {
       "name": "box1",
       "type": "rectangle",

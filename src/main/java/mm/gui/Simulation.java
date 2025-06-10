@@ -106,9 +106,10 @@ public class Simulation {
                     double x = event.getX();
                     double y = event.getY();
 
+                    float angle = 0.0f;
                     GameObject simObj = new GameObject(
                         newObj.getName(), newObj.getType(),
-                        new Position((float) x, (float) y),
+                        new Position((float) x, (float) y), angle,
                         newObj.getSize(), newObj.getColour(), newObj.getPhysics()
                     );
 

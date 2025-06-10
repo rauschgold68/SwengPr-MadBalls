@@ -15,6 +15,7 @@ public class FxToGameObject {
 
         String name;
         Position position = new Position(0,0);
+        float angle = (float) Math.toDegrees(pair.body.getAngle());
         Size size = new Size();
         String colour;
         String type;
@@ -65,7 +66,7 @@ public class FxToGameObject {
         physics.setFriction(fixture.getFriction());
         
 
-        gameObject = new GameObject(name, type, position, size, colour, physics);
+        gameObject = new GameObject(name, type, position, angle, size, colour, physics);
         return gameObject;
     }
 }

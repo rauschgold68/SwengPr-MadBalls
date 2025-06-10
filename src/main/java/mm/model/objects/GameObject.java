@@ -16,6 +16,8 @@ public class GameObject {
     private String type;
     /** The position of the object in the level */
     private Position position;
+    /** The rotation of the object in level in Degrees */
+    private float angle;
     /** The size in (width, height) */
     private Size size;
     /** The sprite used for complex graphics */
@@ -39,14 +41,16 @@ public class GameObject {
      * @param name unique identifier for the object
      * @param type the JavaFX type
      * @param position the position where to place the object
+     * @param angle the initial rotation of the object in Degrees
      * @param size the size (width, height)
      * @param colour the colour of the object
      * @param physics the jBox2d physics information
      */
-    public GameObject(String name, String type, Position position, Size size, String colour, Physics physics) {
+    public GameObject(String name, String type, Position position, float angle, Size size, String colour, Physics physics) {
         this.name = name; 
         this.type = type;
         this.position = position;
+        this.angle = angle;
         this.size = size;
         this.colour = colour;
         this.physics = physics;
@@ -78,6 +82,18 @@ public class GameObject {
      */
     public void setPosition(Position newPosition) {this.position = newPosition;}
 
+    /**
+     * Gets angle of Object
+     * @return angle of object
+     */
+    public float getAngle() {return this.angle;}
+
+    /**
+     * Sets the angle of object
+     * @param newAngle the new angle to set  
+     */
+    public void setAngle(float newAngle) {this.angle = newAngle;}
+    
     /**
      * Returns the size of the object.
      * @return the size of the object
