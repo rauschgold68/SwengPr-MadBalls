@@ -230,7 +230,7 @@ public class Simulation {
 
         setupSimulation();
         setupInventory();
-        listenContact();
+        
 
         // root stack to layer overlay on top of mainPane
         StackPane rootStack = new StackPane();
@@ -353,6 +353,9 @@ public class Simulation {
         }
 
         timer = new ResettableAnimationTimer(world, pairs);
+
+        // Set contact listener for every possible world.
+        listenContact();
     }
 
     /**
@@ -422,10 +425,11 @@ public class Simulation {
                 Object b = contact.getFixtureB().getBody().getUserData();
 
                 // Replace "winbox" and "ball1" with your actual object names
-                if ((a != null && b != null) &&
-                    ((a.equals("winPlat") && b.equals("ball1")) ||
-                     (a.equals("ball1") && b.equals("winPlat")))) {
+                if ((a != null && b != null)){
+                    if ((a.equals("winPlat") && b.equals("ball1")) ||
+                     (a.equals("ball1") && b.equals("winPlat"))) {
                     System.out.println("WIN! ball1 hit the winPlat!");
+                    };
                 }
             }
             @Override

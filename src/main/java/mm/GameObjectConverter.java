@@ -74,6 +74,7 @@ public class GameObjectConverter {
 
             // JavaFX visual
             Circle circ = new Circle(radius, Color.valueOf(obj.getColour()));
+            
             circ.setTranslateX(x);
             circ.setTranslateY(y);
             visual = circ;
