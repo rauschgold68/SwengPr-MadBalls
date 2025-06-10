@@ -3,8 +3,28 @@
     "name" : "Rectangle0",
     "type" : "Rectangle",
     "position" : {
-      "x" : 1075.0,
-      "y" : 432.0
+      "x" : 727.0,
+      "y" : 521.0
+    },
+    "size" : {
+      "width" : 300.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "0x000000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "STATIC"
+    }
+  }, {
+    "name" : "Rectangle1",
+    "type" : "Rectangle",
+    "position" : {
+      "x" : 1081.0,
+      "y" : 348.0
     },
     "size" : {
       "width" : 100.0,
@@ -17,38 +37,34 @@
       "density" : 1.0,
       "friction" : 1.0,
       "restitution" : 1.0,
-      "shape" : "DYNAMIC",
-      "dynamic" : true,
-      "static" : false
+      "shape" : "DYNAMIC"
     }
   }, {
-    "name" : "Rectangle1",
+    "name" : "Rectangle2",
     "type" : "Rectangle",
     "position" : {
-      "x" : 1175.0,
-      "y" : 609.0
+      "x" : 796.0,
+      "y" : 287.0
     },
     "size" : {
-      "width" : 300.0,
-      "height" : 20.0,
+      "width" : 100.0,
+      "height" : 50.0,
       "radius" : 0.0
     },
     "sprite" : null,
-    "colour" : "0x000000ff",
+    "colour" : "0xff0000ff",
     "physics" : {
       "density" : 1.0,
       "friction" : 1.0,
       "restitution" : 1.0,
-      "shape" : "STATIC",
-      "dynamic" : false,
-      "static" : true
+      "shape" : "DYNAMIC"
     }
   }, {
-    "name" : "Circle2",
+    "name" : "Circle3",
     "type" : "Circle",
     "position" : {
-      "x" : 1176.0,
-      "y" : 556.0
+      "x" : 897.0,
+      "y" : 396.0
     },
     "size" : {
       "width" : 0.0,
@@ -61,16 +77,34 @@
       "density" : 1.0,
       "friction" : 1.0,
       "restitution" : 1.0,
-      "shape" : "DYNAMIC",
-      "dynamic" : true,
-      "static" : false
+      "shape" : "DYNAMIC"
     }
   }, {
-    "name" : "Rectangle3",
+    "name" : "Rectangle4",
     "type" : "Rectangle",
     "position" : {
-      "x" : 562.0,
-      "y" : 632.0
+      "x" : 644.0,
+      "y" : 321.0
+    },
+    "size" : {
+      "width" : 100.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "0x000000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "DYNAMIC"
+    }
+  }, {
+    "name" : "Rectangle5",
+    "type" : "Rectangle",
+    "position" : {
+      "x" : 654.0,
+      "y" : 672.0
     },
     "size" : {
       "width" : 300.0,
@@ -83,12 +117,10 @@
       "density" : 1.0,
       "friction" : 1.0,
       "restitution" : 1.0,
-      "shape" : "STATIC",
-      "dynamic" : false,
-      "static" : true
+      "shape" : "STATIC"
     }
   } ],
-  "inventoryObject" : [ {
+  "inventoryObjects" : [ {
     "name" : "box1",
     "type" : "rectangle",
     "count" : 1,
@@ -103,9 +135,7 @@
       "density" : 1.0,
       "friction" : 1.0,
       "restitution" : 1.0,
-      "shape" : "DYNAMIC",
-      "dynamic" : true,
-      "static" : false
+      "shape" : "DYNAMIC"
     },
     "radius" : 0.0
   }, {
@@ -123,9 +153,7 @@
       "density" : 1.0,
       "friction" : 1.0,
       "restitution" : 1.0,
-      "shape" : "DYNAMIC",
-      "dynamic" : true,
-      "static" : false
+      "shape" : "DYNAMIC"
     },
     "radius" : 0.0
   }, {
@@ -143,9 +171,7 @@
       "density" : 1.0,
       "friction" : 1.0,
       "restitution" : 1.0,
-      "shape" : "DYNAMIC",
-      "dynamic" : true,
-      "static" : false
+      "shape" : "DYNAMIC"
     },
     "radius" : 0.0
   }, {
@@ -163,9 +189,7 @@
       "density" : 1.0,
       "friction" : 1.0,
       "restitution" : 1.0,
-      "shape" : "STATIC",
-      "dynamic" : false,
-      "static" : true
+      "shape" : "STATIC"
     },
     "radius" : 0.0
   } ]

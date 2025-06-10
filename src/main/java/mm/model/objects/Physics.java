@@ -62,35 +62,4 @@ public class Physics {
      */
     public void setShape(String newShape) {this.shape = newShape;}
 
-    /**
-     * Checks if the body type is dynamic.
-     * @return true if the body type is DYNAMIC, false otherwise
-     */
-    public boolean isDynamic(){
-        if (getShape().equalsIgnoreCase("DYNAMIC")) return true;
-        else return false;
-    }
-
-    /**
-     * Sets the body type to DYNAMIC.
-     */
-    public void setDynamic(){
-        this.shape = "DYNAMIC";
-    }
-
-    /**
-     * Checks if the body type is static.
-     * @return true if the body type is STATIC, false otherwise
-     */
-    public boolean isStatic(){
-        if (getShape().equalsIgnoreCase("STATIC")) return true;
-        else return false;
-    }
-
-    /**
-     * Sets the body type to STATIC.
-     */
-    public void setStatic() {
-        this.shape = "STATIC";
-    }
 }

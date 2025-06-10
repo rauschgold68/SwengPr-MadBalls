@@ -50,7 +50,7 @@ public class InventoryObjectConverter {
             visual = rect;
 
             BodyDef def = new BodyDef();
-            def.type = physics.isDynamic() ? BodyType.DYNAMIC : BodyType.STATIC;
+            def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
             body = world.createBody(def);
 
             PolygonShape shape = new PolygonShape();
@@ -69,7 +69,7 @@ public class InventoryObjectConverter {
             visual = circ;
 
             BodyDef def = new BodyDef();
-            def.type = physics.isDynamic() ? BodyType.DYNAMIC : BodyType.STATIC;
+            def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
             body = world.createBody(def);
 
             CircleShape shape = new CircleShape();

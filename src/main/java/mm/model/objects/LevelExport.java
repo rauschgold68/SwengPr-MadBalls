@@ -22,7 +22,7 @@ public class LevelExport {
         }
         
         levelOut.setLevelObjects(gameObjects);
-        levelOut.setInventory(inventoryObjects);
+        levelOut.setInventoryObjects(inventoryObjects);
 
         ObjectMapper mapper = new ObjectMapper();
         try {

@@ -50,7 +50,7 @@ public class GameObjectConverter {
 
             // JBox2D body
             BodyDef def = new BodyDef();
-            def.type = physics.isDynamic() ? BodyType.DYNAMIC : BodyType.STATIC;
+            def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
             def.position.set((x + width / 2) / SCALE, (y + height / 2) / SCALE);
             body = world.createBody(def);
 
@@ -77,7 +77,7 @@ public class GameObjectConverter {
 
             // JBox2D body
             BodyDef def = new BodyDef();
-            def.type = physics.isDynamic() ? BodyType.DYNAMIC : BodyType.STATIC;
+            def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
             def.position.set(x / SCALE, y / SCALE);
             body = world.createBody(def);
 
