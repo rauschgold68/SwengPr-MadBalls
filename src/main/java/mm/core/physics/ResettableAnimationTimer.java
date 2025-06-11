@@ -11,10 +11,17 @@ public class ResettableAnimationTimer extends AnimationTimer {
     private long lastTime = 0;
     private World world;
     private List<PhysicsVisualPair> pairs;
+    private boolean running = false;
 
     public ResettableAnimationTimer(World world, List<PhysicsVisualPair> pairs) {
         this.world = world;
         this.pairs = pairs;
+    }
+
+    @Override
+    public void start(){
+        running = true;
+        super.start();
     }
 
     @Override
@@ -55,5 +62,9 @@ public class ResettableAnimationTimer extends AnimationTimer {
 
     public void reset() {
         lastTime = 0;
+    }
+
+    public boolean isRunning(){
+        return running;
     }
 }
