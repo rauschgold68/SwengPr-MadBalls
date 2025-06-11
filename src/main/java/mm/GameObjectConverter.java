@@ -105,7 +105,7 @@ public class GameObjectConverter {
 
                 // JBox2D body
                 BodyDef def = new BodyDef();
-                def.type = physics.isDynamic() ? BodyType.DYNAMIC : BodyType.STATIC;
+                def.type = physics.getShape().equalsIgnoreCase("Dynamic") ? BodyType.DYNAMIC : BodyType.STATIC;
                 def.position.set((x + width / 2) / SCALE, (y + height / 2) / SCALE);
                 def.angle = (float) Math.toRadians(obj.getAngle());
                 body = world.createBody(def);
@@ -154,7 +154,7 @@ public class GameObjectConverter {
             fixture.friction = physics.getFriction();
             fixture.restitution = physics.getRestitution();
             body.createFixture(fixture);
-        }Simulation adjustments and new objects for simulation
+        }
 
         return new PhysicsVisualPair(visual, body);
     }
