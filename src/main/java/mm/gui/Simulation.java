@@ -84,6 +84,7 @@ public class Simulation {
 
         //Drag inventory objects and place them
         // Only allow drag over if simulation is paused (not running)
+
         simSpace.setOnDragOver(event -> {
             if ((timer == null || !timer.isRunning()) && event.getGestureSource() != simSpace && event.getDragboard().hasString()) {
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
@@ -120,16 +121,17 @@ public class Simulation {
             Dragboard db = event.getDragboard();
             boolean success = false;
 
-            if (db.hasString()){
+            if (db.hasString()) {
                 String name = db.getString(); // Use name instead of type
                 ObjectImporter importer = new ObjectImporter();
                 List<InventoryObject> inventoryObjects = importer.getInventoryObjects();
                 InventoryObject template = inventoryObjects.stream()
-                    .filter(obj -> obj.getName().equals(name)) // Match by name
-                    .findFirst().orElse(null);
+                        .filter(obj -> obj.getName().equals(name)) // Match by name
+                        .findFirst().orElse(null);
 
-                if (template != null){
+                if (template != null) {
                     InventoryObject newObj = new InventoryObject(
+
                         template.getName(), template.getType(), template.getCount(),
                         template.getSize(), template.getColour(), template.getPhysics(),
                         template.getRadius()
@@ -144,6 +146,7 @@ public class Simulation {
                         new Position((float) x - offsetX, (float) y - offsetY),
                         newObj.getSize(), newObj.getColour(), newObj.getPhysics()
                     );
+
 
                     // Add the objects that are dropped to be displayed again
                     droppedObjects.add(simObj);
@@ -160,12 +163,11 @@ public class Simulation {
             event.consume();
         });
 
-
         // sidebar with menu buttons
         VBox sideBar = new VBox();
         sideBar.getStyleClass().add("side-bar");
         sideBar.setPrefWidth(200);
-        
+
         // Part of sidebar where items are displayed
         inventoryBox = new StackPane();
         inventoryBox.getStyleClass().add("inventory-box");
@@ -196,14 +198,16 @@ public class Simulation {
                 FontIcon icon = null;
 
                 if (row == 0 && col == 0) {
+
                     icon = new FontIcon(FontAwesomeSolid.PLAY);
                     btn.setOnAction(e -> {
                         timer.start(); 
                         updateInventoryVisuals();
                     });
 
+
                 } else if (row == 0 && col == 1) {
-                    icon = new FontIcon(FontAwesomeSolid.STOP);
+                    icon = new FontIcon(FontAwesomeSolid.STOP); // Stop
                     btn.setOnAction(e -> {
                         timer.stop();
                         setupSimulation();
@@ -211,10 +215,23 @@ public class Simulation {
                     });
 
                 } else if (row == 0 && col == 2) {
-                    icon = new FontIcon(FontAwesomeSolid.COGS);
+                    icon = new FontIcon(FontAwesomeSolid.COGS); // Quick settings
                     btn.setOnAction(e -> {
                         overlaySettings.setVisible(true);
                         timer.stop();
+                    });
+
+                } else if (row == 1 && col == 0) {
+                    icon = new FontIcon(FontAwesomeSolid.TRASH_ALT); // Delete all objects
+                    btn.setOnAction(e -> {
+                        System.out.println("delete all objects");
+                        timer.stop();
+                    });
+
+                } else if (row == 1 && col == 1) {
+                    icon = new FontIcon(FontAwesomeSolid.FOLDER_PLUS); // Import level
+                    btn.setOnAction(e -> {
+                        System.out.println("import level");
                     });
 
                 } else if (row == 1 && col == 2) {
@@ -305,7 +322,6 @@ public class Simulation {
                 "-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;");
         btnClose.setOnAction(e -> {
             overlay.setVisible(false);
-            timer.start();
         });
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -331,7 +347,7 @@ public class Simulation {
         btnQuit.setMaxWidth(Double.MAX_VALUE);
         btnQuit.setPrefHeight(40);
         btnQuit.setOnAction(e -> Platform.exit());
-        
+
         window.getChildren().addAll(topRow, btnBack, btnQuit);
 
         overlay.getChildren().add(window);
@@ -341,7 +357,8 @@ public class Simulation {
     }
 
     /**
-     * Sets up the simulation area by loading GameObjects and initializing the physics world.
+     * Sets up the simulation area by loading GameObjects and initializing the
+     * physics world.
      * Adds visual representations of objects to the simulation pane.
      */
     private void setupSimulation() {
@@ -384,8 +401,9 @@ public class Simulation {
     }
 
     /**
-     * Sets up the inventory area by loading InventoryObjects and initializing the physics world.
-     * Adds visual representations of inventory items to the inventory pane. 
+     * Sets up the inventory area by loading InventoryObjects and initializing the
+     * physics world.
+     * Adds visual representations of inventory items to the inventory pane.
      * Making them able to be dropped into the simSpace.
      */
     private void setupInventory() {
@@ -393,16 +411,16 @@ public class Simulation {
         ObjectImporter importer = new ObjectImporter();
         List<InventoryObject> inventoryObjects = importer.getInventoryObjects();
 
-        for (InventoryObject obj: inventoryObjects){
+        for (InventoryObject obj : inventoryObjects) {
             PhysicsVisualPair pair = InventoryObjectConverter.convert(obj, world);
-            if (pair.visual != null){
+            if (pair.visual != null) {
 
                 StackPane wrapper = new StackPane(pair.visual);
                 wrapper.setPrefSize(60, 60);
                 inventroyWrappers.add(wrapper);
 
-
                 // In setupInventory, prevent drag start if simulation is running
+
                 wrapper.setOnDragDetected(event -> {
                     if (timer != null && timer.isRunning()) {
                         event.consume();
@@ -427,7 +445,8 @@ public class Simulation {
     }
 
     /**
-     * Exports the current level by converting all PhysicsVisualPairs to GameObjects.
+     * Exports the current level by converting all PhysicsVisualPairs to
+     * GameObjects.
      * Prints a confirmation message to the console.
      */
     private void exportLevel() {
