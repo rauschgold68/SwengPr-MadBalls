@@ -13,6 +13,8 @@ public class InventoryObject {
     private String type;
     /** Number of this item in the inventory */
     private int count;
+    /** initial angle of object in degrees */
+    private float angle;
     /** Size of the object (width, height) */
     private Size size;
     /** Path or identifier for the object's sprite image */
@@ -40,15 +42,17 @@ public class InventoryObject {
      * @param name the name of the item
      * @param type the type/category of the item
      * @param count the count of this item
+     * @param angle the angle of object before placing 
      * @param size the size (width, height)
      * @param colour the colour of the item
      * @param physics the physics information (e.g., for jBox2d)
      * @param radius the radius for circular shapes
      */
-    public InventoryObject(String name, String type, int count, Size size, String colour, Physics physics, float radius) {
+    public InventoryObject(String name, String type, int count, float angle, Size size, String colour, Physics physics, float radius) {
         this.name = name;
         this.type = type;
         this.count = count;
+        this.angle = angle;
         this.size = size;
         this.colour = colour;
         this.physics = physics;
@@ -86,6 +90,17 @@ public class InventoryObject {
      */
     public void setCount(int newCount) {this.count = newCount;}
     
+    /**
+     * Gets the inital angle of the object 
+     * @return the angle of the object
+     */
+    public float getAngle() {return this.angle;}
+
+    /**
+     * Sets the angle of the placeable object
+     * @param newAngle the new angle of the object
+     */
+
     /**
      * Returns the size of the object.
      * @return the size of the object

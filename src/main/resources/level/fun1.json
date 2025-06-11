@@ -1,0 +1,265 @@
+{
+  "levelObjects" : [ {
+    "name" : "Rectangle0",
+    "type" : "Rectangle",
+    "position" : {
+      "x" : 996.0,
+      "y" : 853.0
+    },
+    "angle" : 0.0,
+    "size" : {
+      "width" : 300.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "0x000000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "STATIC"
+    }
+  }, {
+    "name" : "Rectangle1",
+    "type" : "Rectangle",
+    "position" : {
+      "x" : 1107.0,
+      "y" : 236.0
+    },
+    "angle" : 0.0,
+    "size" : {
+      "width" : 100.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "0x000000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "DYNAMIC"
+    }
+  }, {
+    "name" : "Rectangle2",
+    "type" : "Rectangle",
+    "position" : {
+      "x" : 997.0,
+      "y" : 11.0
+    },
+    "angle" : 0.0,
+    "size" : {
+      "width" : 300.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "0x000000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "STATIC"
+    }
+  }, {
+    "name" : "Circle3",
+    "type" : "Circle",
+    "position" : {
+      "x" : 1139.0,
+      "y" : 168.0
+    },
+    "angle" : 0.0,
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 15.0
+    },
+    "sprite" : null,
+    "colour" : "0x008000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 2.0,
+      "shape" : "DYNAMIC"
+    }
+  }, {
+    "name" : "Rectangle4",
+    "type" : "Rectangle",
+    "position" : {
+      "x" : 326.0,
+      "y" : 882.0
+    },
+    "angle" : 0.0,
+    "size" : {
+      "width" : 300.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "0x000000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "STATIC"
+    }
+  }, {
+    "name" : "Rectangle5",
+    "type" : "Rectangle",
+    "position" : {
+      "x" : 447.0,
+      "y" : 63.0
+    },
+    "angle" : 0.0,
+    "size" : {
+      "width" : 100.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "0x000000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "DYNAMIC"
+    }
+  }, {
+    "name" : "Circle6",
+    "type" : "Circle",
+    "position" : {
+      "x" : 496.0,
+      "y" : 28.0
+    },
+    "angle" : 0.0,
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 15.0
+    },
+    "sprite" : null,
+    "colour" : "0x008000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "DYNAMIC"
+    }
+  } ],
+  "inventoryObjects" : [ {
+    "name" : "box1",
+    "type" : "rectangle",
+    "count" : 1,
+    "angle" : 0.0,
+    "size" : {
+      "width" : 100.0,
+      "height" : 50.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "RED",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.0,
+      "restitution" : 0.0,
+      "shape" : "DYNAMIC"
+    },
+    "radius" : 0.0
+  }, {
+    "name" : "ball1",
+    "type" : "circle",
+    "count" : 1,
+    "angle" : 0.0,
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 15.0
+    },
+    "sprite" : null,
+    "colour" : "GREEN",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "DYNAMIC"
+    },
+    "radius" : 0.0
+  }, {
+    "name" : "box2",
+    "type" : "rectangle",
+    "count" : 1,
+    "angle" : 0.0,
+    "size" : {
+      "width" : 100.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "DYNAMIC"
+    },
+    "radius" : 0.0
+  }, {
+    "name" : "box3",
+    "type" : "rectangle",
+    "count" : 1,
+    "angle" : 0.0,
+    "size" : {
+      "width" : 300.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "STATIC"
+    },
+    "radius" : 0.0
+  }, {
+    "name" : "trampoline",
+    "type" : "rectangle",
+    "count" : 1,
+    "angle" : 0.0,
+    "size" : {
+      "width" : 150.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "GREY",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 5.0,
+      "shape" : "STATIC"
+    },
+    "radius" : 0.0
+  }, {
+    "name" : "box5",
+    "type" : "rectangle",
+    "count" : 1,
+    "angle" : 45.0,
+    "size" : {
+      "width" : 300.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "0xB87333ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.0,
+      "restitution" : 0.0,
+      "shape" : "STATIC"
+    },
+    "radius" : 0.0
+  } ]
+}

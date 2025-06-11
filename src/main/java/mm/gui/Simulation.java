@@ -14,7 +14,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import mm.FxToGameObject;
 import mm.GameObjectConverter;
 import mm.InventoryObjectConverter;
 import mm.ObjectImporter;
@@ -22,6 +21,7 @@ import mm.PhysicsVisualPair;
 import mm.core.physics.ResettableAnimationTimer;
 import mm.model.objects.GameObject;
 import mm.model.objects.InventoryObject;
+import mm.model.objects.LevelExport;
 import mm.model.objects.Position;
 
 import org.jbox2d.callbacks.ContactImpulse;
@@ -61,10 +61,13 @@ public class Simulation {
     private VBox inventoryItemBox;
     /** The storage for dropped items while playing */
     private final List<GameObject> droppedObjects = new ArrayList<>();
+    /** The storage for dropped items while playing as InventoryObjects */
+    private List<InventoryObject> inventoryObjects = new ArrayList<>();
     /** The inventory objects to be manipulated */
     private final List<StackPane> inventroyWrappers = new ArrayList<>();
     /** The noPlaceZones existing inside the simulation */
     private final List<PhysicsVisualPair> noPlaceZones = new ArrayList<>();
+
 
     /**
      * Creates and returns the main simulation scene.
@@ -124,17 +127,18 @@ public class Simulation {
             if (db.hasString()) {
                 String name = db.getString(); // Use name instead of type
                 ObjectImporter importer = new ObjectImporter();
-                List<InventoryObject> inventoryObjects = importer.getInventoryObjects();
-                InventoryObject template = inventoryObjects.stream()
-                        .filter(obj -> obj.getName().equals(name)) // Match by name
-                        .findFirst().orElse(null);
+
+                this.inventoryObjects = importer.getInventoryObjects();
+                InventoryObject template = this.inventoryObjects.stream()
+                    .filter(obj -> obj.getName().equals(name)) // Match by name
+                    .findFirst().orElse(null);
 
                 if (template != null) {
                     InventoryObject newObj = new InventoryObject(
 
                         template.getName(), template.getType(), template.getCount(),
-                        template.getSize(), template.getColour(), template.getPhysics(),
-                        template.getRadius()
+                        template.getAngle(), template.getSize(), template.getColour(), 
+                        template.getPhysics(), template.getRadius()
                     );
 
                     // Center the object around the mouse
@@ -143,14 +147,16 @@ public class Simulation {
 
                     GameObject simObj = new GameObject(
                         newObj.getName(), newObj.getType(),
+
+                        new Position((float) x, (float) y), newObj.getAngle(),
                         new Position((float) x - offsetX, (float) y - offsetY),
+
                         newObj.getSize(), newObj.getColour(), newObj.getPhysics()
                     );
 
 
                     // Add the objects that are dropped to be displayed again
                     droppedObjects.add(simObj);
-
                     PhysicsVisualPair pair = GameObjectConverter.convert(simObj, world);
                     if (pair.visual != null) {
                         simSpace.getChildren().add(pair.visual);
@@ -450,12 +456,8 @@ public class Simulation {
      * Prints a confirmation message to the console.
      */
     private void exportLevel() {
-        ArrayList<GameObject> gameObjects = new ArrayList<>();
-        for (PhysicsVisualPair pair : pairs) {
-            GameObject obj = FxToGameObject.convertBack(pair);
-            gameObjects.add(obj);
-        }
-        System.out.println("export done!");
+        LevelExport LE = new LevelExport();
+        LE.export(this.pairs, this.inventoryObjects);
     }
     /**
      * Looks for contacts between objects, references them by the name. Important for level json!

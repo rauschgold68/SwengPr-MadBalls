@@ -15,7 +15,7 @@ public class ObjectImporter {
 
     public ObjectImporter() {
         // Correct resource path for all OS
-        InputStream is = getClass().getResourceAsStream("/level/basic_sandbox.json");
+        InputStream is = getClass().getResourceAsStream("/level/fun1.json");
         if (is == null) {
             System.err.println("Level JSON not found in resources!");
             return;
@@ -36,12 +36,10 @@ public class ObjectImporter {
     }
 
     public List<InventoryObject> getInventoryObjects(){
-        if (level != null && level.getInventoryObject() != null){
-            return level.getInventoryObject();
+        if (level != null && level.getInventoryObjects() != null){
+            return level.getInventoryObjects();
         }
         return new ArrayList<>();
     }
-
-    public static void main(String[] args) {}
 
 }

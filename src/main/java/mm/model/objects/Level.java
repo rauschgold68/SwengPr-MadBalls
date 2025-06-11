@@ -14,7 +14,7 @@ public class Level {
     /**
      * List of Items in Inventory (to be placed by the Player)
      */
-    private List<InventoryObject> inventory;
+    private List<InventoryObject> inventoryObjects;
 
     public Level() {}
     
@@ -33,11 +33,11 @@ public class Level {
      * Getter for inventory
      * @return List of Inventory Items
      */
-    public List<InventoryObject> getInventoryObject() {return inventory;}
+    public List<InventoryObject> getInventoryObjects() {return inventoryObjects;}
     /**
      * Setter for inventory
      * @param inventory The List of Items as inventory
      */
-    public void setInventory(List<InventoryObject> inventory) {this.inventory = inventory;}
+    public void setInventoryObjects(List<InventoryObject> inventory) {this.inventoryObjects = inventory;}
 
 }

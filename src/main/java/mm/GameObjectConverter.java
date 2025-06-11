@@ -55,9 +55,11 @@ public class GameObjectConverter {
                 BodyDef def = new BodyDef();
                 def.type = BodyType.STATIC;
                 def.position.set((x + width / 2) / SCALE, (y + height / 2) / SCALE);
+                def.angle = (float) Math.toRadians(obj.getAngle());  
                 body = world.createBody(def);
                 // Unique name for collision detection later on.
                 body.setUserData(obj.getName());
+
 
                 PolygonShape shape = new PolygonShape();
                 shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
@@ -80,6 +82,7 @@ public class GameObjectConverter {
                 BodyDef def = new BodyDef();
                 def.type = BodyType.STATIC;
                 def.position.set((x + width / 2) / SCALE, (y + height / 2) / SCALE);
+                def.angle = (float) Math.toRadians(obj.getAngle());
                 body = world.createBody(def);
                 // Unique name for collision detection later on.
                 body.setUserData(obj.getName());
@@ -104,6 +107,7 @@ public class GameObjectConverter {
                 BodyDef def = new BodyDef();
                 def.type = physics.isDynamic() ? BodyType.DYNAMIC : BodyType.STATIC;
                 def.position.set((x + width / 2) / SCALE, (y + height / 2) / SCALE);
+                def.angle = (float) Math.toRadians(obj.getAngle());
                 body = world.createBody(def);
 
                 // Unique name for collision detection later on.
@@ -133,8 +137,9 @@ public class GameObjectConverter {
 
             // JBox2D body
             BodyDef def = new BodyDef();
-            def.type = physics.isDynamic() ? BodyType.DYNAMIC : BodyType.STATIC;
+            def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
             def.position.set(x / SCALE, y / SCALE);
+            def.angle = (float) Math.toRadians(obj.getAngle());
             body = world.createBody(def);
 
             // Unique name for collision detection later on.
@@ -149,7 +154,7 @@ public class GameObjectConverter {
             fixture.friction = physics.getFriction();
             fixture.restitution = physics.getRestitution();
             body.createFixture(fixture);
-        }
+        }Simulation adjustments and new objects for simulation
 
         return new PhysicsVisualPair(visual, body);
     }

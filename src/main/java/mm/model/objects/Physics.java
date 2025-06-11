@@ -5,28 +5,14 @@ package mm.model.objects;
  * Contains properties such as body type, density, friction, restitution, and shape.
  */
 public class Physics {
-    /** The type of the physics body (e.g., DYNAMIC, STATIC) */
-    private String bodyType;
     /** The density of the object */
     private float density;
     /** The friction coefficient of the object */
     private float friction;
     /** The restitution (bounciness) of the object */
     private float restitution;
-    /** The shape of the object (e.g., circle, rectangle) */
+    /** The shape of the object (shows type of Object e.g. DYNAMIC, STATIC) */
     private String shape;
-
-    /**
-     * Gets the body type of the object.
-     * @return the body type
-     */
-    public String getBodyType() {return this.bodyType;}
-
-    /**
-     * Sets the body type of the object.
-     * @param newBodyType the new body type to set
-     */
-    public void setBodyType(String newBodyType) {this.bodyType = newBodyType;}
 
     /**
      * Gets the density of the object.
@@ -76,35 +62,4 @@ public class Physics {
      */
     public void setShape(String newShape) {this.shape = newShape;}
 
-    /**
-     * Checks if the body type is dynamic.
-     * @return true if the body type is DYNAMIC, false otherwise
-     */
-    public boolean isDynamic(){
-        if (getBodyType().equalsIgnoreCase("DYNAMIC")) return true;
-        else return false;
-    }
-
-    /**
-     * Sets the body type to DYNAMIC.
-     */
-    public void setDynamic(){
-        this.bodyType = "DYNAMIC";
-    }
-
-    /**
-     * Checks if the body type is static.
-     * @return true if the body type is STATIC, false otherwise
-     */
-    public boolean isStatic(){
-        if (getBodyType().equalsIgnoreCase("STATIC")) return true;
-        else return false;
-    }
-
-    /**
-     * Sets the body type to STATIC.
-     */
-    public void setStatic() {
-        this.bodyType = "STATIC";
-    }
 }

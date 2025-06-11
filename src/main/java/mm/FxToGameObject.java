@@ -15,6 +15,7 @@ public class FxToGameObject {
 
         String name;
         Position position = new Position(0,0);
+        float angle = (float) Math.toDegrees(pair.body.getAngle());
         Size size = new Size();
         String colour;
         String type;
@@ -58,14 +59,14 @@ public class FxToGameObject {
             throw new IllegalArgumentException("Shape-Typ nicht unterstützt: " + shape.getClass());
         }
 
-        physics.setShape(pair.body.getType().toString());
+        physics.setShape(pair.body.getType().toString().toUpperCase());
         Fixture fixture = pair.body.getFixtureList();
         physics.setDensity(fixture.getDensity());
         physics.setRestitution(fixture.getRestitution());
         physics.setFriction(fixture.getFriction());
         
 
-        gameObject = new GameObject(name, type, position, size, colour, physics);
+        gameObject = new GameObject(name, type, position, angle, size, colour, physics);
         return gameObject;
     }
 }
