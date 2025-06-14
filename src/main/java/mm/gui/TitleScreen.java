@@ -154,9 +154,9 @@ public class TitleScreen {
                 puzzleTitle.setPadding(new Insets(30, 0, 0, 0));
 
                 VBox levelCard1 = createLevelCard("Level 1", "Leichtes Einsteigerlevel",
-                                "/pictures/levelSelectBoard.jpeg");
-                VBox levelCard2 = createLevelCard("Level 2", "Knifflige Mechanik", "/pictures/levelSelectBoard.jpeg");
-                VBox levelCard3 = createLevelCard("Level 3", "Nur für Profis", "/pictures/levelSelectBoard.jpeg");
+                                "/pictures/levelSelectBoard.jpeg", "/level/level1.json", primaryStage);
+                VBox levelCard2 = createLevelCard("Level 2", "Knifflige Mechanik", "/pictures/levelSelectBoard.jpeg", "/level/level2.json", primaryStage);
+                VBox levelCard3 = createLevelCard("Level 3", "Nur für Profis", "/pictures/levelSelectBoard.jpeg", "/level/level3.json", primaryStage);
 
                 HBox cardRow = new HBox(40, levelCard1, levelCard2, levelCard3);
                 cardRow.setAlignment(Pos.CENTER);
@@ -182,7 +182,7 @@ public class TitleScreen {
 
                 btnPuzzle.setOnAction(e -> overlayBackgroundPuzzle.setVisible(true));
                 btnSandbox.setOnAction(e -> {
-                        Simulation sim = new Simulation();
+                        Simulation sim = new Simulation("/level/basic_sandbox.json");
                         Scene simScene = sim.getScene(primaryStage);
                         primaryStage.setScene(simScene);
                         primaryStage.sizeToScene();
@@ -237,7 +237,7 @@ public class TitleScreen {
                 return stack;
         }
 
-        private VBox createLevelCard(String levelName, String description, String imagePath) {
+        private VBox createLevelCard(String levelName, String description, String imagePath, String levelPath, Stage primaryStage) {
                 ImageView thumbnail = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
                 thumbnail.setFitWidth(260);
                 thumbnail.setFitHeight(160);
@@ -260,6 +260,10 @@ public class TitleScreen {
 
                 card.setOnMouseClicked(e -> {
                         System.out.println("Starting level: " + levelName);
+                        Simulation sim = new Simulation(levelPath);
+                        Scene simScene = sim.getScene(primaryStage);
+                        primaryStage.setScene(simScene);
+                        primaryStage.sizeToScene();
                 });
 
                 return card;

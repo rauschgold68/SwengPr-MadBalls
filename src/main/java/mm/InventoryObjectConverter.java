@@ -46,22 +46,60 @@ public class InventoryObjectConverter {
 
             float width = obj.getSize().getWidth();
             float height = obj.getSize().getHeight();
-            Rectangle rect = new Rectangle(width, height, Color.valueOf(obj.getColour()));
-            visual = rect;
 
-            BodyDef def = new BodyDef();
-            def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
-            body = world.createBody(def);
+            if (obj.getName().equalsIgnoreCase("winZone")){
+                Rectangle rect = new Rectangle(width, height);
+                rect.setFill(PatternCreator.createWinzone(width, height));
+                visual = rect;
 
-            PolygonShape shape = new PolygonShape();
-            shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
+                BodyDef def = new BodyDef();
+                def.type = BodyType.STATIC;
+                body = world.createBody(def);
 
-            FixtureDef fixture = new FixtureDef();
-            fixture.shape = shape;
-            fixture.density = physics.getDensity();
-            fixture.friction = physics.getFriction();
-            fixture.restitution = physics.getRestitution();
-            body.createFixture(fixture);
+                PolygonShape shape = new PolygonShape();
+                shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
+
+                FixtureDef fixture = new FixtureDef();
+                fixture.shape = shape;
+                fixture.isSensor = true;
+                body.createFixture(fixture);
+                
+            } else if (obj.getName().equalsIgnoreCase("noPlaceZone")){
+                Rectangle rect = new Rectangle(width, height);
+                rect.setFill(PatternCreator.createNoPlaceZone(width, height));
+                visual = rect;
+
+                BodyDef def = new BodyDef();
+                def.type = BodyType.STATIC;
+                body = world.createBody(def);
+
+                PolygonShape shape = new PolygonShape();
+                shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
+
+                FixtureDef fixture = new FixtureDef();
+                fixture.shape = shape;
+                fixture.isSensor = true;
+                body.createFixture(fixture);
+
+            } else { 
+
+                Rectangle rect = new Rectangle(width, height, Color.valueOf(obj.getColour()));
+                visual = rect;
+
+                BodyDef def = new BodyDef();
+                def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
+                body = world.createBody(def);
+
+                PolygonShape shape = new PolygonShape();
+                shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
+
+                FixtureDef fixture = new FixtureDef();
+                fixture.shape = shape;
+                fixture.density = physics.getDensity();
+                fixture.friction = physics.getFriction();
+                fixture.restitution = physics.getRestitution();
+                body.createFixture(fixture);
+            }
 
         } else if ("circle".equalsIgnoreCase(type)) {
             float radius = obj.getSize().getRadius();

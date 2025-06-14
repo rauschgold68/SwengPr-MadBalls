@@ -44,7 +44,8 @@ import java.util.List;
  * </p>
  */
 public class Simulation {
-
+    /** Level path for diffren levels */
+    private String levelPath = "/level/level1.json"; // default
     /** The physics world for the simulation */
     private World world;
     /** List of pairs of physics objects and their visuals */
@@ -68,6 +69,16 @@ public class Simulation {
     /** The noPlaceZones existing inside the simulation */
     private final List<PhysicsVisualPair> noPlaceZones = new ArrayList<>();
 
+    /** Default constructor */
+    public Simulation() {}
+
+    /**
+     * Constructor for specific level select.
+     * @param levelPath
+     */
+    public Simulation(String levelPath) {
+        this.levelPath = levelPath;
+    }
 
     /**
      * Creates and returns the main simulation scene.
@@ -126,7 +137,7 @@ public class Simulation {
 
             if (db.hasString()) {
                 String name = db.getString(); // Use name instead of type
-                ObjectImporter importer = new ObjectImporter();
+                ObjectImporter importer = new ObjectImporter(levelPath);
 
                 this.inventoryObjects = importer.getInventoryObjects();
                 InventoryObject template = this.inventoryObjects.stream()
@@ -369,11 +380,10 @@ public class Simulation {
      */
     private void setupSimulation() {
         simSpace.getChildren().removeIf(node -> !(node instanceof Button));
-
         world = new World(new Vec2(0.0f, 9.8f));
         pairs = new ArrayList<>();
 
-        ObjectImporter importer = new ObjectImporter();
+        ObjectImporter importer = new ObjectImporter(levelPath); // use selected path
         List<GameObject> gameObjects = importer.getGameObjects();
 
         // Add level objects
@@ -414,7 +424,7 @@ public class Simulation {
      */
     private void setupInventory() {
 
-        ObjectImporter importer = new ObjectImporter();
+        ObjectImporter importer = new ObjectImporter(levelPath); // use selected path
         List<InventoryObject> inventoryObjects = importer.getInventoryObjects();
 
         for (InventoryObject obj : inventoryObjects) {

@@ -1,55 +1,5 @@
 {
-  "levelObjects": [
-    {
-      "name": "winPlat",
-      "type": "rectangle",
-      "position": {
-        "x": 0,
-        "y": 920
-      },
-      "size": {
-        "width": 1920,
-        "height": 20,
-        "radius": 0
-      },
-      "sprite": null,
-      "colour": "RED",
-      "physics": {
-        "density": 1.0,
-        "friction": 1.0,
-        "restitution": 1.0,
-        "shape": "STATIC"
-      }
-    },
-    {
-      "name": "noPlaceZone",
-      "type": "rectangle",
-      "position": { "x": 200, "y": 400 },
-      "size": { "width": 200, "height": 40, "radius": 0 },
-      "sprite": null,
-      "colour": "NOPLACEZONE",
-      "physics": {
-        "density": 1.0,
-        "friction": 1.0,
-        "restitution": 0.0,
-        "shape": "STATIC"
-      }
-    },
-    {
-      "name": "winZone",
-      "type": "rectangle",
-      "position": { "x": 200, "y": 800 },
-      "size": { "width": 200, "height": 40, "radius": 0 },
-      "sprite": null,
-      "colour": "WINZONE",
-      "physics": {
-        "density": 1.0,
-        "friction": 1.0,
-        "restitution": 0.0,
-        "shape": "STATIC"
-      }
-    }
-  ],
+  "levelObjects": [],
   "inventoryObjects": [
     {
       "name": "box1",
@@ -69,6 +19,53 @@
         "restitution": 1.0,
 
         "shape": "DYNAMIC"
+      }
+    },
+    {
+      "name": "winZone",
+      "type": "rectangle",
+      "count": 1,
+      "size": { "width": 200, "height": 40, "radius": 0 },
+      "sprite": null,
+      "colour": "WINZONE",
+      "physics": {
+        "density": 1.0,
+        "friction": 1.0,
+        "restitution": 0.0,
+        "shape": "STATIC"
+      }
+    },
+    {
+      "name": "winPlat",
+      "type": "rectangle",
+      "count": 1,
+      "angle": 0.0,
+      "size": {
+        "width": 50,
+        "height": 10,
+        "radius": 0
+      },
+      "sprite": null,
+      "colour": "RED",
+      "physics": {
+        "density": 1.0,
+        "friction": 1.0,
+        "restitution": 1.0,
+        "shape": "STATIC"
+      }
+    },
+    {
+      "name": "noPlaceZone",
+      "type": "rectangle",
+      "count": 1,
+      "size": { "width": 200, "height": 40, "radius": 0 },
+      "sprite": null,
+      "colour": "NOPLACEZONE",
+      "physics": {
+        "density": 1.0,
+        "friction": 1.0,
+        "restitution": 0.0,
+        "shape": "STATIC"
       }
     },
     {
