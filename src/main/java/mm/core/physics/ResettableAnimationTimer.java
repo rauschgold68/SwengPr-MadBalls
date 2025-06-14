@@ -106,6 +106,7 @@ public class ResettableAnimationTimer extends AnimationTimer {
         }
     }
 
+
     /**
      * Resets the timer so that the next call to {@link #handle(long)} will reinitialize timing.
      * Useful for restarting the simulation.

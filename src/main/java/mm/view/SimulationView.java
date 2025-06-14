@@ -1,0 +1,272 @@
+package mm.view;
+
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+
+/**
+ * The {@code SimulationView} class is responsible for constructing and managing
+ * the JavaFX UI components for the simulation screen in the MadBalls game.
+ * <p>
+ * This class contains only UI-related code and exposes methods to access
+ * and update the main panes and controls. All simulation logic and state
+ * should be handled by the controller and model, following the MVC pattern.
+ * </p>
+ *
+ * <h3>Responsibilities:</h3>
+ * <ul>
+ *   <li>Builds and arranges the main simulation layout, including the simulation area, sidebar, inventory, and overlays.</li>
+ *   <li>Provides access to UI components for the controller to update or attach event handlers.</li>
+ *   <li>Manages the quick menu overlay for settings, returning to the title screen, and quitting the game.</li>
+ *   <li>Handles basic UI styling and layout, but not business logic or event handling.</li>
+ * </ul>
+ *
+ * <h3>UI Structure:</h3>
+ * <ul>
+ *   <li>{@code BorderPane mainPane} - The root layout for the simulation screen.</li>
+ *   <li>{@code Pane simSpace} - The central area where simulation objects are displayed.</li>
+ *   <li>{@code VBox sideBar} - The sidebar containing the inventory and menu buttons.</li>
+ *   <li>{@code StackPane inventoryBox} - The container for inventory items.</li>
+ *   <li>{@code VBox inventoryItemBox} - The box holding individual inventory item nodes.</li>
+ *   <li>{@code HBox bottomBar} - The bottom bar for additional controls or information.</li>
+ *   <li>{@code StackPane overlaySettings} - The overlay for quick menu actions (settings, back, quit).</li>
+ *   <li>{@code StackPane rootStack} - The root stack pane to layer overlays above the main content.</li>
+ * </ul>
+ *
+ * <h3>Note:</h3>
+ * <ul>
+ *   <li>This class does not contain any simulation logic or state management.</li>
+ *   <li>Event handlers should be attached by the controller, not in this class.</li>
+ * </ul>
+ */
+public class SimulationView {
+
+    private BorderPane mainPane;
+    private Pane simSpace;
+    private HBox bottomBar;
+    private StackPane inventoryBox;
+    private VBox inventoryItemBox;
+    private VBox sideBar;
+    private StackPane overlaySettings;
+    private Scene scene;
+    private StackPane rootStack;
+
+    public Button playButton;
+    public Button stopButton;
+    public Button settingsButton;
+    public Button deleteButton;
+    public Button importButton;
+    public Button saveButton;
+
+    /**
+     * Constructs the SimulationView and builds the UI layout for the simulation screen.
+     * Initializes all main panes, sidebars, inventory containers, and overlays.
+     *
+     * @param primaryStage the primary stage of the application, used for binding and overlay sizing
+     */
+    public SimulationView(Stage primaryStage) {
+        // Main layout container
+        mainPane = new BorderPane();
+        mainPane.setId("root-pane");
+
+        // Simulation area
+        simSpace = new Pane();
+        simSpace.getStyleClass().add("sim-space");
+        mainPane.setCenter(simSpace);
+
+        // Sidebar with menu buttons
+        sideBar = new VBox();
+        sideBar.getStyleClass().add("side-bar");
+        sideBar.setPrefWidth(200);
+
+        // Inventory box
+        inventoryBox = new StackPane();
+        inventoryBox.getStyleClass().add("inventory-box");
+        VBox.setVgrow(inventoryBox, Priority.ALWAYS);
+        inventoryItemBox = new VBox();
+        inventoryBox.getChildren().add(inventoryItemBox);
+        inventoryItemBox.getStyleClass().add("inventoryItemBox");
+
+        HBox squareContainer = new HBox();
+        squareContainer.getStyleClass().add("square-container");
+        squareContainer.setAlignment(Pos.CENTER);
+
+        StackPane menuSquare = new StackPane();
+        menuSquare.getStyleClass().add("menu-square");
+
+        GridPane grid = new GridPane();
+        grid.getStyleClass().add("menu-grid");
+
+        // Populate grid with buttons/icons (no event handlers here)
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                Button btn = new Button();
+                btn.getStyleClass().add("menu-button");
+                FontIcon icon = null;
+
+                if (row == 0 && col == 0) {
+                    icon = new FontIcon(FontAwesomeSolid.PLAY);
+                    playButton = btn;
+                } else if (row == 0 && col == 1) {
+                    icon = new FontIcon(FontAwesomeSolid.STOP);
+                    stopButton = btn;
+                } else if (row == 0 && col == 2) {
+                    icon = new FontIcon(FontAwesomeSolid.COGS);
+                    settingsButton = btn;
+                } else if (row == 1 && col == 0) {
+                    icon = new FontIcon(FontAwesomeSolid.TRASH_ALT);
+                    deleteButton = btn;
+                } else if (row == 1 && col == 1) {
+                    icon = new FontIcon(FontAwesomeSolid.FOLDER_PLUS);
+                    importButton = btn;
+                } else if (row == 1 && col == 2) {
+                    icon = new FontIcon(FontAwesomeSolid.SAVE);
+                    saveButton = btn;
+                }
+
+                if (icon != null) {
+                    icon.setIconSize(16);
+                    icon.setIconColor(Color.WHITE);
+                    btn.setGraphic(icon);
+                }
+
+                grid.add(btn, col, row);
+            }
+        }
+
+        menuSquare.getChildren().add(grid);
+        squareContainer.getChildren().add(menuSquare);
+        sideBar.getChildren().addAll(inventoryBox, squareContainer);
+        mainPane.setRight(sideBar);
+
+        // Bottom bar
+        bottomBar = new HBox();
+        bottomBar.getStyleClass().add("bottom-bar");
+        bottomBar.setPrefHeight(150);
+        mainPane.setBottom(bottomBar);
+
+        // Overlay for settings (initially hidden)
+        overlaySettings = createQuickMenuOverlay(primaryStage);
+        overlaySettings.setVisible(false);
+
+        // Root stack to layer overlay on top of mainPane
+        rootStack = new StackPane();
+        rootStack.getChildren().addAll(mainPane, overlaySettings);
+        rootStack.prefWidthProperty().bind(primaryStage.widthProperty());
+        rootStack.prefHeightProperty().bind(primaryStage.heightProperty());
+
+        scene = new Scene(rootStack);
+        scene.getStylesheets().add(
+                getClass().getResource("/styling/simulation.css").toExternalForm());
+
+        // Toggle overlay with ESC (controller should wire up event handler)
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                overlaySettings.setVisible(!overlaySettings.isVisible());
+                event.consume();
+            }
+        });
+    }
+
+    /**
+     * Creates the quick menu overlay for settings, returning to the title screen, and quitting the game.
+     * The overlay is initially hidden and can be toggled visible by the controller.
+     *
+     * @param ownerStage the owner stage for the overlay, used for sizing and binding
+     * @return the StackPane overlay containing the quick menu
+     */
+    private StackPane createQuickMenuOverlay(Stage ownerStage) {
+        StackPane overlay = new StackPane();
+        overlay.setStyle("-fx-background-color: rgba(30, 30, 50, 0.7);");
+        overlay.setPickOnBounds(true);
+
+        VBox window = new VBox(20);
+        window.setAlignment(Pos.TOP_CENTER);
+        window.setPadding(new Insets(15));
+        window.setMaxWidth(300);
+        window.setMaxHeight(180);
+        window.setBackground(new Background(new BackgroundFill(
+                Color.rgb(10, 10, 20, 0.9), new CornerRadii(10), Insets.EMPTY)));
+
+        HBox topRow = new HBox();
+        Button btnClose = new Button("✕");
+        btnClose.setStyle(
+                "-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        topRow.getChildren().addAll(spacer, btnClose);
+
+        Button btnBack = new Button("Back to Title Screen");
+        btnBack.getStyleClass().add("menu-button");
+        btnBack.setMaxWidth(Double.MAX_VALUE);
+        btnBack.setPrefHeight(40);
+
+        Button btnQuit = new Button("Quit Game");
+        btnQuit.getStyleClass().add("menu-button");
+        btnQuit.setMaxWidth(Double.MAX_VALUE);
+        btnQuit.setPrefHeight(40);
+
+        window.getChildren().addAll(topRow, btnBack, btnQuit);
+
+        overlay.getChildren().add(window);
+        StackPane.setAlignment(window, Pos.CENTER);
+
+        return overlay;
+    }
+
+    /**
+     * Returns the main simulation scene containing all UI components.
+     * @return the JavaFX Scene for the simulation screen
+     */
+    public Scene getScene() { return scene; }
+
+    /**
+     * Returns the simulation area pane where game objects are displayed.
+     * @return the Pane representing the simulation area
+     */
+    public Pane getSimSpace() { return simSpace; }
+
+    /**
+     * Returns the inventory box container.
+     * @return the StackPane containing the inventory items
+     */
+    public StackPane getInventoryBox() { return inventoryBox; }
+
+    /**
+     * Returns the VBox containing inventory item nodes.
+     * @return the VBox for inventory items
+     */
+    public VBox getInventoryItemBox() { return inventoryItemBox; }
+
+    /**
+     * Returns the sidebar VBox containing inventory and menu buttons.
+     * @return the VBox representing the sidebar
+     */
+    public VBox getSideBar() { return sideBar; }
+
+    /**
+     * Returns the bottom bar HBox for additional controls or information.
+     * @return the HBox representing the bottom bar
+     */
+    public HBox getBottomBar() { return bottomBar; }
+
+    /**
+     * Returns the overlay settings StackPane for quick menu actions.
+     * @return the StackPane for the quick menu overlay
+     */
+    public StackPane getOverlaySettings() { return overlaySettings; }
+
+    /**
+     * Returns the root stack pane that layers overlays above the main content.
+     * @return the StackPane root of the simulation view
+     */
+    public StackPane getRootStack() { return rootStack; }
+}

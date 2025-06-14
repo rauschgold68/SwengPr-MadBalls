@@ -13,9 +13,7 @@ module mm {
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.fontawesome5;
-
-    exports mm.gui;
-
+    
     opens mm.model.objects to com.fasterxml.jackson.databind;
     opens mm to javafx.graphics;
 }

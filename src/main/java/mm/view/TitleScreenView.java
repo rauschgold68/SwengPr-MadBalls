@@ -1,4 +1,4 @@
-package mm.gui;
+package mm.view;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -15,64 +15,101 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 /**
- * The TitleScreen class constructs the main menu scene for the MadBalls game.
- * It provides navigation to puzzles, sandbox mode, options, and quitting the application.
- * The screen features custom-styled buttons, background images, and overlays for options and level selection.
+ * The {@code TitleScreenView} class constructs and exposes all JavaFX UI components
+ * for the main menu (title screen) of the MadBalls game.
+ * <p>
+ * This class is responsible for building the visual layout and structure of the title screen,
+ * including the main menu buttons, logo, background images, overlays for options and level selection,
+ * and decorative elements. It does not contain any event handling or navigation logic; all such logic
+ * should be managed by the controller.
+ * </p>
+ *
+ * <h3>Responsibilities:</h3>
+ * <ul>
+ *   <li>Builds and arranges the main menu layout, including logo, board, and menu buttons.</li>
+ *   <li>Creates overlays for options and puzzle/level selection, exposing them for controller use.</li>
+ *   <li>Provides utility methods for constructing decorative UI elements (pins, cards).</li>
+ *   <li>Exposes all relevant UI components as public fields for the controller to attach event handlers.</li>
+ * </ul>
+ *
+ * <h3>UI Structure:</h3>
+ * <ul>
+ *   <li>{@code btnPuzzle, btnSandbox, btnOptions, btnQuit} - Main menu buttons.</li>
+ *   <li>{@code btnCloseOptions, btnClosePuzzle} - Close buttons for overlays.</li>
+ *   <li>{@code btnUploadTexture} - Button for uploading a texture pack in the options overlay.</li>
+ *   <li>{@code overlayBackgroundOptions, overlayBackgroundPuzzle} - Overlays for options and level selection.</li>
+ *   <li>{@code optionsWindow} - The options overlay window container.</li>
+ *   <li>{@code root} - The root StackPane containing all layers.</li>
+ *   <li>{@code scene} - The JavaFX Scene for the title screen.</li>
+ * </ul>
+ *
+ * <h3>Notes:</h3>
+ * <ul>
+ *   <li>This class should not contain any event handling or navigation logic.</li>
+ *   <li>All UI elements that need interaction should be exposed as public fields for the controller.</li>
+ *   <li>Level card click handlers should be set by the controller.</li>
+ * </ul>
  */
-public class TitleScreen {
+public class TitleScreenView {
+
+    /** Main menu buttons for navigation. */
+    public Button btnPuzzle, btnSandbox, btnOptions, btnQuit;
+    /** Close buttons for overlays. */
+    public Button btnCloseOptions, btnClosePuzzle;
+    /** Button for uploading a texture pack in the options overlay. */
+    public Button btnUploadTexture;
+    /** Overlay for options/settings. */
+    public StackPane overlayBackgroundOptions;
+    /** Overlay for puzzle/level selection. */
+    public StackPane overlayBackgroundPuzzle;
+    /** The options overlay window container. */
+    public VBox optionsWindow;
+    /** The root StackPane containing all layers. */
+    public StackPane root;
+    /** The JavaFX Scene for the title screen. */
+    public Scene scene;
+
 
     /**
-     * Builds and returns the main title scene for the application.
-     * <p>
-     * The scene includes:
-     * <ul>
-     *   <li>Menu buttons for Puzzles, Sandbox, Options, and Quit, each with a decorative pin</li>
-     *   <li>Logo and board background images</li>
-     *   <li>Overlay windows for options and level selection</li>
-     *   <li>Keyboard shortcut handling (ESC to close overlays)</li>
-     * </ul>
+     * Constructs the title screen view and builds the UI layout.
+     * All event handling and navigation logic should be managed by the controller.
      *
-     * @param primaryStage The main application window, used for scene switching.
-     * @return The fully constructed title {@link Scene}.
+     * @param primaryStage The main application window, used for resource loading and sizing.
      */
-    public Scene createTitleScene(Stage primaryStage) {
+    public TitleScreenView(Stage primaryStage) {
+        // Menu buttons
+        btnPuzzle = new Button("Puzzles");
+        btnSandbox = new Button("Sandbox");
+        btnOptions = new Button("Options");
+        btnQuit = new Button("Quit");
 
-        // Create menu buttons.
-        Button btnPuzzle = new Button("Puzzles");
-        Button btnSandbox = new Button("Sandbox");
-        Button btnOptions = new Button("Options");
-        Button btnQuit = new Button("Quit");
-
-        // Apply playful rotation to each button for a casual look.
         btnPuzzle.setRotate(-7);
         btnSandbox.setRotate(0);
         btnOptions.setRotate(5);
         btnQuit.setRotate(-3);
 
-        // Arrange the top row of buttons (Puzzles, Sandbox, Options) with colored pins.
+        // Top row: Puzzles, Sandbox, Options (with pins)
         HBox topRow = new HBox(60,
                 btnWithPin(btnPuzzle, Color.RED),
                 btnWithPin(btnSandbox, Color.BLUE),
                 btnWithPin(btnOptions, Color.GREEN));
         topRow.setAlignment(Pos.CENTER);
 
-        // Arrange the bottom row with the Quit button and its pin.
+        // Bottom row: Quit (with pin)
         HBox bottomRow = new HBox(btnWithPin(btnQuit, Color.YELLOW));
         bottomRow.setAlignment(Pos.BASELINE_RIGHT);
 
-        // Stack the button rows vertically.
+        // Stack button rows vertically
         VBox buttonLayer = new VBox(40, topRow, bottomRow);
         buttonLayer.setAlignment(Pos.CENTER);
 
-        // Load background images for the logo and board.
+        // Logo and board backgrounds
         Image backgroundLogo = new Image(getClass().getResourceAsStream("/pictures/MadBallsLogo.jpeg"));
         Image backgroundBoard = new Image(getClass().getResourceAsStream("/pictures/MB_TitleScreenBoard.jpeg"));
 
-        // Create a box for the logo image.
         HBox logoBox = new HBox();
         logoBox.setPrefSize(800, 400);
         logoBox.setAlignment(Pos.CENTER);
-
         BackgroundImage logoBg = new BackgroundImage(
                 backgroundLogo,
                 BackgroundRepeat.NO_REPEAT,
@@ -81,12 +118,10 @@ public class TitleScreen {
                 new BackgroundSize(100, 100, true, true, true, false));
         logoBox.setBackground(new Background(logoBg));
 
-        // === boardBox ===
         HBox boardBox = new HBox(buttonLayer);
         boardBox.setPrefSize(600, 400);
         boardBox.setAlignment(Pos.CENTER);
         boardBox.setPadding(new Insets(0, 0, 20, 0));
-
         BackgroundImage boardBg = new BackgroundImage(
                 backgroundBoard,
                 BackgroundRepeat.NO_REPEAT,
@@ -98,8 +133,8 @@ public class TitleScreen {
         VBox logoANDBoard = new VBox(logoBox, boardBox);
         logoANDBoard.setPadding(new Insets(0, 0, 30, 0));
 
-        // === Overlay: Optionen ===
-        StackPane overlayBackgroundOptions = new StackPane();
+        // === Overlay: Options ===
+        overlayBackgroundOptions = new StackPane();
         overlayBackgroundOptions.setVisible(false);
 
         Image levelSelect = new Image(getClass().getResourceAsStream("/pictures/levelSelect.png"));
@@ -111,13 +146,13 @@ public class TitleScreen {
                 new BackgroundSize(1920, 1080, true, true, true, true));
         overlayBackgroundOptions.setBackground(new Background(levelSelectBg));
 
-        VBox optionsWindow = new VBox(25);
+        optionsWindow = new VBox(25);
         optionsWindow.setMaxSize(720, 480);
         optionsWindow.setMinSize(720, 480);
         optionsWindow.setPadding(new Insets(30));
         optionsWindow.setAlignment(Pos.TOP_CENTER);
         optionsWindow.setBackground(new Background(new BackgroundFill(
-                Color.rgb(10, 10, 20, 0.7), new CornerRadii(20), Insets.EMPTY))); // Stil vom Game
+                Color.rgb(10, 10, 20, 0.7), new CornerRadii(20), Insets.EMPTY)));
 
         HBox topBar = new HBox();
         topBar.setPrefWidth(720);
@@ -129,9 +164,8 @@ public class TitleScreen {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Button btnCloseOptions = new Button("X");
+        btnCloseOptions = new Button("X");
         btnCloseOptions.getStyleClass().add("close-btn");
-        btnCloseOptions.setOnAction(e -> overlayBackgroundOptions.setVisible(false));
         topBar.getChildren().addAll(lblTitleAudio, spacer, btnCloseOptions);
 
         Label lblMusic = new Label("Musik-Lautstärke:");
@@ -150,7 +184,7 @@ public class TitleScreen {
 
         Label lblTexturePack = new Label("Texture Pack:");
         lblTexturePack.setStyle("-fx-text-fill: white;");
-        Button btnUploadTexture = new Button("Upload...");
+        btnUploadTexture = new Button("Upload...");
         HBox textureRow = new HBox(20, lblTexturePack, btnUploadTexture);
         textureRow.setAlignment(Pos.CENTER_LEFT);
 
@@ -159,7 +193,7 @@ public class TitleScreen {
         StackPane.setAlignment(optionsWindow, Pos.CENTER);
 
         // === Overlay: Puzzle / Level-Selector ===
-        StackPane overlayBackgroundPuzzle = new StackPane();
+        overlayBackgroundPuzzle = new StackPane();
         overlayBackgroundPuzzle.setVisible(false);
 
         Image levelSelectImage = new Image(getClass().getResourceAsStream("/pictures/levelSelect.png"));
@@ -177,16 +211,17 @@ public class TitleScreen {
 
         VBox levelCard1 = createLevelCard("Level 1", "Leichtes Einsteigerlevel",
                 "/pictures/levelSelectBoard.jpeg", "/level/level1.json", primaryStage);
-        VBox levelCard2 = createLevelCard("Level 2", "Knifflige Mechanik", "/pictures/levelSelectBoard.jpeg", "/level/level2.json", primaryStage);
-        VBox levelCard3 = createLevelCard("Level 3", "Nur für Profis", "/pictures/levelSelectBoard.jpeg", "/level/level3.json", primaryStage);
+        VBox levelCard2 = createLevelCard("Level 2", "Knifflige Mechanik",
+                "/pictures/levelSelectBoard.jpeg", "/level/level2.json", primaryStage);
+        VBox levelCard3 = createLevelCard("Level 3", "Nur für Profis",
+                "/pictures/levelSelectBoard.jpeg", "/level/level3.json", primaryStage);
 
         HBox cardRow = new HBox(40, levelCard1, levelCard2, levelCard3);
         cardRow.setAlignment(Pos.CENTER);
         cardRow.setPadding(new Insets(20, 0, 0, 0));
 
-        Button btnClosePuzzle = new Button("X");
+        btnClosePuzzle = new Button("X");
         btnClosePuzzle.getStyleClass().add("close-btn");
-        btnClosePuzzle.setOnAction(e -> overlayBackgroundPuzzle.setVisible(false));
         StackPane.setAlignment(btnClosePuzzle, Pos.TOP_RIGHT);
         StackPane.setMargin(btnClosePuzzle, new Insets(20));
 
@@ -196,52 +231,25 @@ public class TitleScreen {
 
         overlayBackgroundPuzzle.getChildren().addAll(cardWrapper, btnClosePuzzle);
 
-        // === Button Styles + Events ===
+        // === Button Styles ===
         btnPuzzle.getStyleClass().add("btnTS");
         btnSandbox.getStyleClass().add("btnTS");
         btnOptions.getStyleClass().add("btnTS");
         btnQuit.getStyleClass().add("btnTS");
 
-        btnPuzzle.setOnAction(e -> overlayBackgroundPuzzle.setVisible(true));
-        btnSandbox.setOnAction(e -> {
-            Simulation sim = new Simulation("/level/basic_sandbox.json");
-            Scene simScene = sim.getScene(primaryStage);
-            primaryStage.setScene(simScene);
-            primaryStage.sizeToScene();
-        });
-
-        btnOptions.setOnAction(e -> overlayBackgroundOptions.setVisible(true));
-        btnQuit.setOnAction(e -> Platform.exit());
-
         // === Root-Layout ===
-        StackPane root = new StackPane();
+        root = new StackPane();
         root.setStyle("-fx-background-color: #0e1722;");
         root.getChildren().addAll(logoANDBoard, overlayBackgroundPuzzle, overlayBackgroundOptions);
 
-        Scene scene = new Scene(root);
+        scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/styling/titleScreen.css").toExternalForm());
-
-        scene.setOnKeyPressed(event -> {
-            switch (event.getCode()) {
-                case ESCAPE:
-                    if (overlayBackgroundOptions.isVisible()) {
-                        overlayBackgroundOptions.setVisible(false);
-                    } else if (overlayBackgroundPuzzle.isVisible()) {
-                        overlayBackgroundPuzzle.setVisible(false);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        });
 
         // force CSS and layout pass
         Platform.runLater(() -> {
             root.applyCss();
             root.layout();
         });
-
-        return scene;
     }
 
     /**
@@ -274,7 +282,7 @@ public class TitleScreen {
 
     /**
      * Creates a card for level selection, including a thumbnail, name, and description.
-     * Clicking the card starts the corresponding level.
+     * Clicking the card should be handled by the controller.
      *
      * @param levelName    The display name of the level.
      * @param description  A short description of the level.
@@ -304,13 +312,7 @@ public class TitleScreen {
                 new BackgroundFill(Color.rgb(30, 30, 50, 0.8), new CornerRadii(16), Insets.EMPTY)));
         card.getStyleClass().add("level-card");
 
-        card.setOnMouseClicked(e -> {
-            System.out.println("Starting level: " + levelName);
-            Simulation sim = new Simulation(levelPath);
-            Scene simScene = sim.getScene(primaryStage);
-            primaryStage.setScene(simScene);
-            primaryStage.sizeToScene();
-        });
+        // Controller should set the onMouseClicked handler for navigation
 
         return card;
     }

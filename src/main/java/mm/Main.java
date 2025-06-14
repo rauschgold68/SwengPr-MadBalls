@@ -3,7 +3,7 @@ package mm;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import mm.gui.TitleScreen;
+import mm.controller.TitleScreenController;
 import mm.model.objects.Level;
 
 /**
@@ -39,8 +39,8 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-        TitleScreen titleScreen = new TitleScreen();
-        Scene titleScene = titleScreen.createTitleScene(primaryStage);
+        TitleScreenController titleController = new TitleScreenController(primaryStage);
+        Scene titleScene = titleController.getScene();
         primaryStage.setTitle("MadBalls©");
         primaryStage.setScene(titleScene);
 
