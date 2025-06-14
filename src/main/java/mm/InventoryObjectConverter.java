@@ -16,24 +16,52 @@ import mm.model.objects.InventoryObject;
 import mm.model.objects.Physics;
 
 /**
- * Utility class for converting InventoryObject instances into their corresponding
+ * Utility class for converting {@link InventoryObject} instances into their corresponding
  * JavaFX visual representations and Box2D physics bodies for use in the inventory system.
+ * <p>
+ * This class provides a static method to convert an {@code InventoryObject} into a {@link PhysicsVisualPair},
+ * which contains both the JavaFX {@link Shape} for rendering and the JBox2D {@link Body} for physics simulation.
+ * The conversion process uses the properties of the {@code InventoryObject} (such as type, size, color, and physics)
+ * to create the appropriate visual and physical representations.
+ * </p>
+ * <p>
+ * <b>Supported types:</b>
+ * <ul>
+ *   <li>Rectangle</li>
+ *   <li>Circle</li>
+ * </ul>
+ * <b>Special names:</b>
+ * <ul>
+ *   <li>"winZone": Rendered with a special pattern and created as a static sensor body.</li>
+ *   <li>"noPlaceZone": Rendered with a special pattern and created as a static sensor body.</li>
+ * </ul>
+ * <b>Other objects</b> are rendered and simulated according to their properties.
+ * </p>
+ * <p>
+ * <b>Usage example:</b>
+ * <pre>
+ *     InventoryObject obj = ...;
+ *     World world = ...;
+ *     PhysicsVisualPair pair = InventoryObjectConverter.convert(obj, world);
+ * </pre>
+ * </p>
  */
 public class InventoryObjectConverter {
     /** Scale factor for converting between game units and physics world units */
     private static final float SCALE = 50.0f;
     
     /**
-     * Converts an InventoryObject to a PhysicsVisualPair, which contains both the JavaFX visual
+     * Converts an {@link InventoryObject} to a {@link PhysicsVisualPair}, which contains both the JavaFX visual
      * representation and the Box2D physics body.
      * <p>
      * Supports rectangle and circle shapes. The created visual and body are configured
-     * according to the InventoryObject's properties.
+     * according to the {@code InventoryObject}'s properties. Special handling is provided for objects
+     * named "winZone" and "noPlaceZone", which are rendered with custom patterns and created as static sensor bodies.
      * </p>
      *
-     * @param obj   The individual inventory object to be converted
-     * @param world The Box2D world where the body is created
-     * @return      A PhysicsVisualPair containing the visual and physics body
+     * @param obj   The individual {@link InventoryObject} to be converted. Must not be {@code null}.
+     * @param world The Box2D {@link World} where the body is created. Must not be {@code null}.
+     * @return      A {@link PhysicsVisualPair} containing the visual and physics body.
      */
     public static PhysicsVisualPair convert(InventoryObject obj, World world){
 

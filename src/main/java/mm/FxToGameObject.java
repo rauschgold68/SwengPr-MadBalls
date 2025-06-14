@@ -8,23 +8,43 @@ import org.jbox2d.dynamics.*;
 
 /**
  * Utility class for converting JavaFX visual shapes and their associated physics
- * (PhysicsVisualPair) back into GameObject instances.
+ * (PhysicsVisualPair) back into {@link GameObject} instances.
  * <p>
  * This is typically used when exporting or serializing the current state of the simulation,
- * allowing the visual and physical properties of objects to be captured in a GameObject
- * representation.
+ * allowing the visual and physical properties of objects to be captured in a {@code GameObject}
+ * representation. The conversion extracts all relevant properties from the JavaFX {@code Shape}
+ * and the JBox2D {@code Body}, such as position, size, color, angle, and physics parameters.
+ * </p>
+ * <p>
+ * <b>Supported shapes:</b>
+ * <ul>
+ *   <li>{@link javafx.scene.shape.Rectangle}</li>
+ *   <li>{@link javafx.scene.shape.Circle}</li>
+ * </ul>
+ * <b>Unsupported shapes</b> will result in an {@link IllegalArgumentException}.
+ * </p>
+ * <p>
+ * <b>Usage example:</b>
+ * <pre>
+ *     PhysicsVisualPair pair = ...;
+ *     GameObject obj = FxToGameObject.convertBack(pair);
+ * </pre>
+ * </p>
  */
 public class FxToGameObject {
-    // Static counter to generate unique names for new GameObjects
+    /**
+     * Static counter to generate unique names for new {@link GameObject} instances.
+     * Each time a new object is created, this counter is incremented and appended to the type.
+     */
     private static int nextname; 
     
     /**
-     * Converts a PhysicsVisualPair (which contains a JavaFX Shape and a JBox2D Body)
-     * back into a GameObject, extracting all relevant properties such as position,
+     * Converts a {@link PhysicsVisualPair} (which contains a JavaFX {@link Shape} and a JBox2D {@link Body})
+     * back into a {@link GameObject}, extracting all relevant properties such as position,
      * size, color, angle, and physics parameters.
      *
-     * @param pair The PhysicsVisualPair containing the visual (Shape) and physical (Body) representation.
-     * @return A new GameObject instance representing the same object.
+     * @param pair The {@code PhysicsVisualPair} containing the visual ({@link Shape}) and physical ({@link Body}) representation.
+     * @return A new {@link GameObject} instance representing the same object.
      * @throws IllegalArgumentException if the shape type is not supported.
      */
     public static GameObject convertBack(PhysicsVisualPair pair) {

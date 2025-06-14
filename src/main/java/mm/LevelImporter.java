@@ -13,27 +13,33 @@ import mm.model.objects.LevelReader;
  * Utility class for importing level data (GameObjects and InventoryObjects) from a JSON resource file.
  * <p>
  * This class loads a level from a specified JSON file in the resources/level directory.
- * It provides methods to retrieve the loaded GameObjects and InventoryObjects for use in the simulation.
+ * It provides methods to retrieve the loaded {@link GameObject} and {@link InventoryObject} instances
+ * for use in the simulation or game logic.
  * </p>
  * <p>
- * Usage example:
+ * <b>Usage example:</b>
  * <pre>
  *     ObjectImporter importer = new ObjectImporter("/level/level1.json");
  *     List&lt;GameObject&gt; objects = importer.getGameObjects();
+ *     List&lt;InventoryObject&gt; inventory = importer.getInventoryObjects();
  * </pre>
  * </p>
  */
-public class ObjectImporter {
+public class LevelImporter {
 
     /** The loaded Level object containing game and inventory objects. */
     private Level level;
 
     /**
      * Constructs an ObjectImporter and loads the level from the given resource path.
+     * <p>
+     * Attempts to load the specified JSON file from the application's resources. If the file
+     * cannot be found or parsed, error messages are printed to the standard error stream.
+     * </p>
      *
      * @param resourcePath the path to the level JSON file in resources (e.g., "/level/level1.json")
      */
-    public ObjectImporter(String resourcePath) {
+    public LevelImporter(String resourcePath) {
         InputStream is = getClass().getResourceAsStream(resourcePath);
         if (is == null) {
             System.err.println("Level JSON not found in resources at: " + resourcePath);
@@ -48,9 +54,9 @@ public class ObjectImporter {
     }
 
     /**
-     * Returns the list of GameObjects loaded from the level file.
+     * Returns the list of {@link GameObject} instances loaded from the level file.
      *
-     * @return List of GameObjects, or an empty list if none are loaded.
+     * @return List of GameObjects, or an empty list if none are loaded or if loading failed.
      */
     public List<GameObject> getGameObjects() {
         if (level != null && level.getLevelObjects() != null) {
@@ -60,9 +66,9 @@ public class ObjectImporter {
     }
 
     /**
-     * Returns the list of InventoryObjects loaded from the level file.
+     * Returns the list of {@link InventoryObject} instances loaded from the level file.
      *
-     * @return List of InventoryObjects, or an empty list if none are loaded.
+     * @return List of InventoryObjects, or an empty list if none are loaded or if loading failed.
      */
     public List<InventoryObject> getInventoryObjects() {
         if (level != null && level.getInventoryObjects() != null) {

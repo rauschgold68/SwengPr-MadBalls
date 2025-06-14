@@ -16,7 +16,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import mm.GameObjectConverter;
 import mm.InventoryObjectConverter;
-import mm.ObjectImporter;
+import mm.LevelImporter;
 import mm.PhysicsVisualPair;
 import mm.core.physics.ResettableAnimationTimer;
 import mm.model.objects.GameObject;
@@ -41,40 +41,60 @@ import java.util.List;
  * <p>
  * Handles the simulation area, inventory, sidebar, and menu overlays.
  * Responsible for setting up the simulation, inventory, and exporting levels.
+ * Provides drag-and-drop functionality for inventory objects, manages simulation state,
+ * and handles user interactions such as pausing, resuming, and exporting levels.
  * </p>
+ * <ul>
+ *   <li>Supports level selection and loading via {@code levelPath}.</li>
+ *   <li>Manages the physics world and synchronizes JavaFX visuals with Box2D bodies.</li>
+ *   <li>Handles inventory drag-and-drop, placement restrictions, and visual feedback.</li>
+ *   <li>Provides quick menu overlay for settings, returning to title, and quitting.</li>
+ *   <li>Exports the current simulation state to a JSON level file.</li>
+ * </ul>
+ * 
+ * Example usage:
+ * <pre>
+ *     Simulation sim = new Simulation("/level/level1.json");
+ *     Scene scene = sim.getScene(primaryStage);
+ *     primaryStage.setScene(scene);
+ * </pre>
  */
 public class Simulation {
-    /** Level path for diffren levels */
+    /** Level path for different levels. */
     private String levelPath = "/level/level1.json"; // default
-    /** The physics world for the simulation */
+    /** The physics world for the simulation. */
     private World world;
-    /** List of pairs of physics objects and their visuals */
+    /** List of pairs of physics objects and their visuals. */
     private List<PhysicsVisualPair> pairs;
-    /** The pane where simulation objects are displayed */
+    /** The pane where simulation objects are displayed. */
     private Pane simSpace;
-    /** Animation timer for the simulation */
+    /** Animation timer for the simulation. */
     private ResettableAnimationTimer timer;
-    /** The bottom bar of the UI */
+    /** The bottom bar of the UI. */
     private HBox bottomBar;
-    /** The inventory box container */
+    /** The inventory box container. */
     private StackPane inventoryBox;
-    /** The VBox containing inventory items */
+    /** The VBox containing inventory items. */
     private VBox inventoryItemBox;
-    /** The storage for dropped items while playing */
+    /** The storage for dropped objects while playing. */
     private final List<GameObject> droppedObjects = new ArrayList<>();
-    /** The storage for dropped items while playing as InventoryObjects */
+    /** The storage for dropped items while playing as InventoryObjects. */
     private List<InventoryObject> inventoryObjects = new ArrayList<>();
-    /** The inventory objects to be manipulated */
+    /** The inventory objects to be manipulated. */
     private final List<StackPane> inventroyWrappers = new ArrayList<>();
-    /** The noPlaceZones existing inside the simulation */
+    /** The noPlaceZones existing inside the simulation. */
     private final List<PhysicsVisualPair> noPlaceZones = new ArrayList<>();
 
-    /** Default constructor */
+    /**
+     * Default constructor.
+     * Initializes the simulation with the default level path.
+     */
     public Simulation() {}
 
     /**
-     * Constructor for specific level select.
-     * @param levelPath
+     * Constructor for specific level selection.
+     * 
+     * @param levelPath the resource path to the level JSON file (e.g., "/level/level1.json")
      */
     public Simulation(String levelPath) {
         this.levelPath = levelPath;
@@ -82,9 +102,13 @@ public class Simulation {
 
     /**
      * Creates and returns the main simulation scene.
+     * <p>
+     * Sets up the main layout, simulation area, inventory, sidebar, and menu overlays.
+     * Handles drag-and-drop for inventory objects and manages simulation state.
+     * </p>
      *
      * @param primaryStage the primary stage of the application
-     * @return the constructed Scene
+     * @return the constructed Scene for the simulation
      */
     public Scene getScene(Stage primaryStage) {
         // main layout container
@@ -137,7 +161,7 @@ public class Simulation {
 
             if (db.hasString()) {
                 String name = db.getString(); // Use name instead of type
-                ObjectImporter importer = new ObjectImporter(levelPath);
+                LevelImporter importer = new LevelImporter(levelPath);
 
                 this.inventoryObjects = importer.getInventoryObjects();
                 InventoryObject template = this.inventoryObjects.stream()
@@ -313,9 +337,12 @@ public class Simulation {
 
     /**
      * Creates the quick menu overlay for settings, back to title, and quit.
+     * <p>
+     * The overlay is a semi-transparent pane with options to return to the title screen or quit the game.
+     * </p>
      *
      * @param ownerStage the owner stage for the overlay
-     * @return the StackPane overlay
+     * @return the StackPane overlay containing the quick menu
      */
     private StackPane createQuickMenuOverlay(Stage ownerStage) {
         // semi-transparent background
@@ -376,14 +403,17 @@ public class Simulation {
     /**
      * Sets up the simulation area by loading GameObjects and initializing the
      * physics world.
-     * Adds visual representations of objects to the simulation pane.
+     * <p>
+     * Adds visual representations of objects to the simulation pane and sets up the physics world.
+     * Also adds any dropped objects and initializes the animation timer and contact listener.
+     * </p>
      */
     private void setupSimulation() {
         simSpace.getChildren().removeIf(node -> !(node instanceof Button));
         world = new World(new Vec2(0.0f, 9.8f));
         pairs = new ArrayList<>();
 
-        ObjectImporter importer = new ObjectImporter(levelPath); // use selected path
+        LevelImporter importer = new LevelImporter(levelPath); // use selected path
         List<GameObject> gameObjects = importer.getGameObjects();
 
         // Add level objects
@@ -418,13 +448,14 @@ public class Simulation {
 
     /**
      * Sets up the inventory area by loading InventoryObjects and initializing the
-     * physics world.
-     * Adds visual representations of inventory items to the inventory pane.
-     * Making them able to be dropped into the simSpace.
+     * inventory pane.
+     * <p>
+     * Adds visual representations of inventory items to the inventory pane and enables drag-and-drop.
+     * </p>
      */
     private void setupInventory() {
 
-        ObjectImporter importer = new ObjectImporter(levelPath); // use selected path
+        LevelImporter importer = new LevelImporter(levelPath); // use selected path
         List<InventoryObject> inventoryObjects = importer.getInventoryObjects();
 
         for (InventoryObject obj : inventoryObjects) {
@@ -462,16 +493,21 @@ public class Simulation {
 
     /**
      * Exports the current level by converting all PhysicsVisualPairs to
-     * GameObjects.
+     * GameObjects and writing them to a JSON file.
+     * <p>
+     * Uses {@link LevelExport} to serialize the current simulation state.
      * Prints a confirmation message to the console.
+     * </p>
      */
     private void exportLevel() {
         LevelExport LE = new LevelExport();
         LE.export(this.pairs, this.inventoryObjects);
     }
     /**
-     * Looks for contacts between objects, references them by the name. Important for level json!
-     * Append if clause for diffrent winning conditions.
+     * Sets up a contact listener for the physics world to detect collisions.
+     * <p>
+     * Used for implementing win conditions and other collision-based logic.
+     * </p>
      */
     private void listenContact() {
         world.setContactListener(new ContactListener() {
@@ -501,7 +537,10 @@ public class Simulation {
     }
     
     /**
-     * Updates the inventory objects while simulating, showing that their are not placeable.
+     * Updates the inventory objects while simulating, showing that they are not placeable.
+     * <p>
+     * Disables inventory visuals when the simulation is running.
+     * </p>
      */
     private void updateInventoryVisuals() {
         boolean disabled = timer != null && timer.isRunning();
