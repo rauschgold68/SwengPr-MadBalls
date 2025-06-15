@@ -11,15 +11,16 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.FileChooser;
 import mm.model.GameObject;
 import mm.model.InventoryObject;
-import mm.model.Physics;
 import mm.model.PhysicsVisualPair;
 import mm.model.SimulationModel;
 import mm.view.SimulationView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
 
 /**
  * The {@code SimulationController} class coordinates the interaction between the {@link SimulationModel} and {@link SimulationView}
@@ -259,14 +260,23 @@ public class SimulationController {
         //Import level from .json - File (to implment)
         if (view.importButton != null){
             view.importButton.setOnAction(e -> {
-
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Import your level!");
+                fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("JSON Files", "*.json")
+                );
+                File file = fileChooser.showOpenDialog(primaryStage);
+                if (file != null) {
+                    model.setLevelPath("/level/" + file.getName());
+                }
+                setupSimulation();
+                setupInventory();    
             });
         }
         if (view.saveButton != null){
             view.saveButton.setOnAction(e ->{
                 PhysicsAnimationController timer = model.getTimer();
-                if (timer != null && timer.isRunning()){
-                    timer.stop();
+                if (timer != null && !timer.isRunning()){
                     model.exportLevel();
                 }
             });

@@ -20,6 +20,69 @@
       "restitution" : 1.0,
       "shape" : "DYNAMIC"
     }
+  }, {
+    "name" : "Rectangle1",
+    "type" : "Rectangle",
+    "position" : {
+      "x" : 1315.0,
+      "y" : 486.0
+    },
+    "angle" : 0.0,
+    "size" : {
+      "width" : 100.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "0x000000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "DYNAMIC"
+    }
+  }, {
+    "name" : "Rectangle2",
+    "type" : "Rectangle",
+    "position" : {
+      "x" : 834.0,
+      "y" : 295.0
+    },
+    "angle" : 0.0,
+    "size" : {
+      "width" : 100.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "sprite" : null,
+    "colour" : "0x000000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "DYNAMIC"
+    }
+  }, {
+    "name" : "Circle3",
+    "type" : "Circle",
+    "position" : {
+      "x" : 974.0,
+      "y" : 298.0
+    },
+    "angle" : 0.0,
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 15.0
+    },
+    "sprite" : null,
+    "colour" : "0x008000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 1.0,
+      "shape" : "DYNAMIC"
+    }
   } ],
   "inventoryObjects" : [ {
     "name" : "box1",
