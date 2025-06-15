@@ -16,6 +16,7 @@ import mm.model.InventoryObject;
 import mm.model.PhysicsVisualPair;
 import mm.model.SimulationModel;
 import mm.view.SimulationView;
+import mm.view.TitleScreenView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -301,6 +302,13 @@ public class SimulationController {
         });
 
         view.overlayBackButton.setOnAction(e -> {
+            // Hide the overlay before switching scenes to avoid overlay showing on title screen
+            view.getOverlaySettings().setVisible(false);
+            TitleScreenController titleScreenView = new TitleScreenController(primaryStage);
+            Scene newScreen = titleScreenView.getScene();
+            primaryStage.setScene(newScreen);
+            primaryStage.setWidth(scene.getWidth());
+            primaryStage.setHeight(scene.getHeight());
             
         });
 

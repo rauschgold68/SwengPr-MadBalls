@@ -317,4 +317,6 @@ public class TitleScreenView {
 
         return card;
     }
+
+    public Scene getScene() {return scene;}
 }
