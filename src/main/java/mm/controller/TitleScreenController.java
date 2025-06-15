@@ -95,6 +95,26 @@ public class TitleScreenController {
         view.btnCloseOptions.setOnAction(e -> view.overlayBackgroundOptions.setVisible(false));
         view.btnClosePuzzle.setOnAction(e -> view.overlayBackgroundPuzzle.setVisible(false));
 
+        // Level card click handlers
+        view.levelCard1.setOnMouseClicked(e -> {
+            SimulationController simController = new SimulationController(primaryStage, "/level/level1.json");
+            Scene simScene = simController.getScene();
+            primaryStage.setScene(simScene);
+            primaryStage.sizeToScene();
+        });
+        view.levelCard2.setOnMouseClicked(e -> {
+            SimulationController simController = new SimulationController(primaryStage, "/level/level2.json");
+            Scene simScene = simController.getScene();
+            primaryStage.setScene(simScene);
+            primaryStage.sizeToScene();
+        });
+        view.levelCard3.setOnMouseClicked(e -> {
+            SimulationController simController = new SimulationController(primaryStage, "/level/level3.json");
+            Scene simScene = simController.getScene();
+            primaryStage.setScene(simScene);
+            primaryStage.sizeToScene();
+        });
+
         // Keyboard shortcut: ESC closes overlays
         view.scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {

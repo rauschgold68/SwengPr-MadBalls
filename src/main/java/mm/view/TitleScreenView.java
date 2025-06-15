@@ -68,7 +68,8 @@ public class TitleScreenView {
     public StackPane root;
     /** The JavaFX Scene for the title screen. */
     public Scene scene;
-
+    /** Level selection cards for the different levels. */
+    public VBox levelCard1, levelCard2, levelCard3;
 
     /**
      * Constructs the title screen view and builds the UI layout.
@@ -209,11 +210,11 @@ public class TitleScreenView {
         puzzleTitle.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
         puzzleTitle.setPadding(new Insets(30, 0, 0, 0));
 
-        VBox levelCard1 = createLevelCard("Level 1", "Leichtes Einsteigerlevel",
+        levelCard1 = createLevelCard("Level 1", "Leichtes Einsteigerlevel",
                 "/pictures/levelSelectBoard.jpeg", "/level/level1.json", primaryStage);
-        VBox levelCard2 = createLevelCard("Level 2", "Knifflige Mechanik",
+        levelCard2 = createLevelCard("Level 2", "Knifflige Mechanik",
                 "/pictures/levelSelectBoard.jpeg", "/level/level2.json", primaryStage);
-        VBox levelCard3 = createLevelCard("Level 3", "Nur für Profis",
+        levelCard3 = createLevelCard("Level 3", "Nur für Profis",
                 "/pictures/levelSelectBoard.jpeg", "/level/level3.json", primaryStage);
 
         HBox cardRow = new HBox(40, levelCard1, levelCard2, levelCard3);
