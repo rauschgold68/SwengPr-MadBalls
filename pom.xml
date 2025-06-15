@@ -71,14 +71,14 @@
 
     <build>
         <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-            <includes>
-                <include>**/*</include>
-            </includes>
-        </resource>
-        <!-- Add more <resource> blocks here if you have other resource folders -->
-    </resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <!-- Add more <resource> blocks here if you have other resource folders -->
+        </resources>
         <plugins>
             <plugin>
                 <!-- The Compiler plugin is used to compile the sources of your project. -->
@@ -145,7 +145,7 @@
                     <!-- Create a zip of the resulting runtime image -->
                     <jlinkZipName>mm</jlinkZipName>
                     <!-- The main class, fully qualified name -->
-                    <mainClass>mm/mm.Main</mainClass>
+                    <mainClass>mm.controller.ApplicationController</mainClass>
                     <!-- Make command line arguments setable with -Dargs="" -->
                     <commandlineArgs>${args}</commandlineArgs>
                 </configuration>
@@ -157,7 +157,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>mm.Main</mainClass>
+                            <!-- Set the correct main class for the runnable jar -->
+                            <mainClass>mm.controller.ApplicationController</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
