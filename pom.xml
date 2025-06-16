@@ -199,7 +199,7 @@
                     <includeTests>true</includeTests>
                     <rulesets>
                         <!-- We are using a custom PMD rule set -->
-                        <ruleset>https://projects.isp.uni-luebeck.de/isp/pmd/-/raw/master/rules.xml</ruleset>
+                        <ruleset>CustomRules.xml</ruleset>
                     </rulesets>
                 </configuration>
             </plugin>
