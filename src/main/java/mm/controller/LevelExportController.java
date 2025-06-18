@@ -32,9 +32,6 @@ import java.util.Optional;
  * </p>
  */
 public class LevelExportController {
-    /** Counter for generating unique filenames for exported levels. */
-    int nextname = 1;
-
     /**
      * Exports the current simulation state to a JSON file.
      * <p>
