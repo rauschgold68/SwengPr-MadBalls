@@ -2,14 +2,18 @@ package mm.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javafx.scene.control.TextInputDialog;
 import mm.model.GameObject;
 import mm.model.InventoryObject;
 import mm.model.Level;
 import mm.model.PhysicsVisualPair;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Utility class for exporting the current state of a level to a JSON file.
@@ -28,9 +32,6 @@ import java.util.List;
  * </p>
  */
 public class LevelExportController {
-    /** Counter for generating unique filenames for exported levels. */
-    int nextname = 1;
-
     /**
      * Exports the current simulation state to a JSON file.
      * <p>
@@ -56,16 +57,22 @@ public class LevelExportController {
         levelOut.setInventoryObjects(inventoryObjects);
 
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            String path = "src/main/resources/level/";
-            String name = "fun" + Integer.toString(nextname++);
-            File file = new File(path + name + ".json");
-            
-            mapper.writerWithDefaultPrettyPrinter().writeValue(file, levelOut);
-        } catch (Exception e) {
-            System.err.print(e + " occured while exporting");
-        }
+        TextInputDialog dialog = new TextInputDialog("export_datei");
+        dialog.setTitle("Dateiexport");
+        dialog.setHeaderText("Dateiname eingeben:");
+        Optional<String> result = dialog.showAndWait();
 
-        System.out.println("export done!");
+        result.ifPresent(dateiname -> {
+            try {
+                String path = "src/main/resources/level/";
+                File file = new File(path + dateiname + ".json");
+                
+                mapper.writerWithDefaultPrettyPrinter().writeValue(file, levelOut);
+            } catch (Exception e) {
+                System.err.print(e + " occured while exporting");
+            }
+
+            System.out.println("export done!");
+        });
     }
 }
