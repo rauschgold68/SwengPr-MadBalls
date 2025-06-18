@@ -184,7 +184,7 @@ public class SimulationView {
         overlaySettings.setVisible(false);
 
         // Overlay for win screen (initially hidden)
-        winScreenOverlay = createWinScreenOverlay(primaryStage, true);
+        winScreenOverlay = createWinScreenOverlay(primaryStage, false);
         winScreenOverlay.setVisible(false);
 
         // Root stack to layer overlay on top of mainPane

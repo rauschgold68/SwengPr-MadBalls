@@ -82,9 +82,13 @@ public class SimulationController {
         this.model = new SimulationModel(levelPath);
         this.view = new SimulationView(primaryStage);
 
+        // WIN-LISTENER setzen
+        this.model.setWinListener(() -> {
+            Platform.runLater(() -> view.getWinScreenOverlay().setVisible(true));
+        });
+
         setupSimulation();
         setupInventory();
-
         setupDragAndDrop();
         setupMenuButtons();
         setupOverlayToggle();
