@@ -48,6 +48,7 @@
 /* Inventory box, stretches above menu square */
 .inventory-box {
   background-color: #1b2736;
+  background-color: #1b2736;
   -fx-background-color: #1b2736;
   border-color: #0e1722;
   -fx-border-color: #0e1722;
@@ -81,6 +82,7 @@
 .menu-grid {
   -fx-hgap: 10;
   -fx-vgap: 10;
+  padding: 10px;
   -fx-padding: 10;
 }
 
