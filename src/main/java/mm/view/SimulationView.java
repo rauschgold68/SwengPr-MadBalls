@@ -80,6 +80,7 @@ public class SimulationView {
     public Button importButton;
     public Button saveButton;
     public Button crownButton;
+    public Button btnWinHome;
 
     // Buttons from quick menu.
     public Button overlayBackButton;
@@ -183,7 +184,7 @@ public class SimulationView {
         overlaySettings.setVisible(false);
 
         // Overlay for win screen (initially hidden)
-        winScreenOverlay = createWinScreenOverlay(primaryStage, false);
+        winScreenOverlay = createWinScreenOverlay(primaryStage, true);
         winScreenOverlay.setVisible(false);
 
         // Root stack to layer overlay on top of mainPane
@@ -288,20 +289,20 @@ public class SimulationView {
         buttonRow.setPadding(new Insets(20, 0, 0, 0));
 
         // Main Menu icon
-        Button btnHomeIcon = new Button();
-        btnHomeIcon.getStyleClass().addAll("circle-button");
+        btnWinHome = new Button();
+        btnWinHome.getStyleClass().addAll("circle-button");
         FontIcon homeIcon = new FontIcon(FontAwesomeSolid.HOME);
         homeIcon.setIconSize(20);
         homeIcon.setIconColor(Color.WHITE);
-        btnHomeIcon.setGraphic(homeIcon);
-        btnHomeIcon.setOnAction(e -> {
+        btnWinHome.setGraphic(homeIcon);
+        btnWinHome.setOnAction(e -> {
             overlay.setVisible(false);
         });
 
         // Main Menu label to the right
         Label lblMainMenu = new Label("Main Menu");
         lblMainMenu.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
-        HBox mainMenuBox = new HBox(8, btnHomeIcon, lblMainMenu);
+        HBox mainMenuBox = new HBox(8, btnWinHome, lblMainMenu);
         mainMenuBox.setAlignment(Pos.CENTER);
 
         // Next Level icon

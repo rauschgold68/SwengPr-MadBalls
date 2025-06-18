@@ -293,6 +293,7 @@ public class SimulationController {
             view.deleteButton.setOnAction(e -> {
                 model.setDroppedObjects(new ArrayList<>());
                 model.setDroppedVisualPairs(new ArrayList<>());
+                setInventoryItemsDisabled(false);
                 setupSimulation();
             });
         }
@@ -366,5 +367,14 @@ public class SimulationController {
             Platform.exit();
         });
 
+        // win screen overlay functions
+        view.btnWinHome.setOnAction(e -> {
+            view.getWinScreenOverlay().setVisible(false);
+            TitleScreenController titleScreenView = new TitleScreenController(primaryStage);
+            Scene newScreen = titleScreenView.getScene();
+            primaryStage.setScene(newScreen);
+            primaryStage.setWidth(scene.getWidth());
+            primaryStage.setHeight(scene.getHeight());
+        });
     }
 }
