@@ -43,6 +43,7 @@ import mm.view.SimulationView;
  * <li>Setting up collision listeners for win conditions</li>
  * </ul>
  */
+
 public class SimulationModel {
 
     /** The path to the current level JSON file. */
@@ -61,6 +62,8 @@ public class SimulationModel {
     private List<PhysicsVisualPair> droppedVisualPairs = new ArrayList<>();
     /** The animation timer controlling the simulation loop. */
     private PhysicsAnimationController timer;
+    /** Flag indicating if the win screen is currently visible. */
+    private boolean winScreenVisible = false;
 
     /**
      * Constructs a SimulationModel for a specific level.
@@ -144,6 +147,15 @@ public class SimulationModel {
      */
     public String getLevelPath() {
         return levelPath;
+    }
+
+    /**
+     * Checks if the win screen is currently visible.
+     * 
+     * @return true if the win screen is visible, false otherwise
+     */
+    public boolean isWinScreenVisible() {
+        return winScreenVisible;
     }
 
     /**
@@ -312,17 +324,14 @@ public class SimulationModel {
                 Object b = contact.getFixtureB().getBody().getUserData();
 
                 if ((a != null && b != null)) {
-                    if ((a.equals("winPlat") && b.equals("ball1")) ||
-                            (a.equals("ball1") && b.equals("winPlat"))) {
+                    if ((a.equals("ball1") && (b.equals("winPlat") || b.equals("winZone"))) ||
+                            (b.equals("ball1") && (a.equals("winPlat") || a.equals("winZone")))) {
 
-                        System.out.println("WIN! ball1 hit the winPlat!");
-                        if (winListener != null)
-                            winListener.onWin(); // <--- HIER
-                    } else if ((a.equals("winZone") && b.equals("ball1")) ||
-                            (a.equals("ball1") && b.equals("winZone"))) {
-                        System.out.println("WIN ball1 is in the winZone!");
-                        if (winListener != null)
-                            winListener.onWin(); // <--- HIER
+                        System.out.println("WIN! ball1 reached the win condition!");
+                        if (winListener != null) {
+                            winScreenVisible = true;
+                            winListener.onWin();
+                        }
                     }
                 }
             }

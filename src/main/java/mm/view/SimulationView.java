@@ -8,6 +8,9 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import mm.controller.PhysicsAnimationController;
+import mm.model.SimulationModel;
+
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
@@ -81,6 +84,8 @@ public class SimulationView {
     public Button saveButton;
     public Button crownButton;
     public Button btnWinHome;
+    public Button btnWinNext;
+    public Button btnWinExport;
 
     // Buttons from quick menu.
     public Button overlayBackButton;
@@ -184,7 +189,7 @@ public class SimulationView {
         overlaySettings.setVisible(false);
 
         // Overlay for win screen (initially hidden)
-        winScreenOverlay = createWinScreenOverlay(primaryStage, false);
+        winScreenOverlay = createWinScreenOverlay(primaryStage, true);
         winScreenOverlay.setVisible(false);
 
         // Root stack to layer overlay on top of mainPane
@@ -255,15 +260,13 @@ public class SimulationView {
      * @param showNextButton whether to display the Next Level button
      * @return a StackPane overlay ready to add to your scene root
      */
-    private StackPane createWinScreenOverlay(Stage ownerStage, boolean showNextButton) {
-        // full‑screen semi‑transparent backdrop
+    private StackPane createWinScreenOverlay(Stage ownerStage, boolean isPuzzleMode) {
         StackPane overlay = new StackPane();
         overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6);");
         overlay.setVisible(false);
         overlay.prefWidthProperty().bind(ownerStage.widthProperty());
         overlay.prefHeightProperty().bind(ownerStage.heightProperty());
 
-        // window container
         VBox window = new VBox(20);
         window.setAlignment(Pos.TOP_CENTER);
         window.setPadding(new Insets(30));
@@ -279,11 +282,9 @@ public class SimulationView {
         crown.setIconSize(48);
         crown.setIconColor(Color.GOLD);
 
-        // title
         Label title = new Label("Level Complete!");
         title.setStyle("-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;");
 
-        // bottom button row inside window
         HBox buttonRow = new HBox(10);
         buttonRow.setAlignment(Pos.CENTER);
         buttonRow.setPadding(new Insets(20, 0, 0, 0));
@@ -295,46 +296,74 @@ public class SimulationView {
         homeIcon.setIconSize(20);
         homeIcon.setIconColor(Color.WHITE);
         btnWinHome.setGraphic(homeIcon);
-        btnWinHome.setOnAction(e -> {
-            overlay.setVisible(false);
-        });
+        btnWinHome.setOnAction(e -> overlay.setVisible(false));
 
-        // Main Menu label to the right
         Label lblMainMenu = new Label("Main Menu");
         lblMainMenu.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
         HBox mainMenuBox = new HBox(8, btnWinHome, lblMainMenu);
         mainMenuBox.setAlignment(Pos.CENTER);
 
         // Next Level icon
-        Button btnNextIcon = new Button();
-        btnNextIcon.getStyleClass().addAll("circle-button");
+        btnWinNext = new Button();
+        btnWinNext.getStyleClass().addAll("circle-button");
         FontIcon nextIcon = new FontIcon(FontAwesomeSolid.ARROW_RIGHT);
         nextIcon.setIconSize(20);
         nextIcon.setIconColor(Color.WHITE);
-        btnNextIcon.setGraphic(nextIcon);
-        btnNextIcon.setOnAction(e -> {
+        btnWinNext.setGraphic(nextIcon);
+        btnWinNext.setOnAction(e -> {
             overlay.setVisible(false);
             System.out.println("Next level!");
         });
 
-        // Next Level label to the left
         Label lblNext = new Label("Next Level");
         lblNext.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
-        HBox nextBox = new HBox(8, lblNext, btnNextIcon);
+        HBox nextBox = new HBox(8, lblNext, btnWinNext);
         nextBox.setAlignment(Pos.CENTER);
 
-        // spacer between them
+        Region spacer1 = new Region();
+        Region spacer2 = new Region();
+        HBox.setHgrow(spacer1, Priority.ALWAYS);
+        HBox.setHgrow(spacer2, Priority.ALWAYS);
+
+        // Resume Editing Button
+        Button btnResume = new Button();
+        btnResume.getStyleClass().addAll("circle-button");
+        FontIcon editIcon = new FontIcon(FontAwesomeSolid.PENCIL_ALT);
+        editIcon.setIconSize(20);
+        editIcon.setIconColor(Color.WHITE);
+        btnResume.setGraphic(editIcon);
+        btnResume.setOnAction(e -> overlay.setVisible(false));
+
+        Label lblResume = new Label("Resume Editing");
+        lblResume.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+        HBox resumeBox = new HBox(8, lblResume, btnResume);
+        resumeBox.setAlignment(Pos.CENTER);
+
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Add elements to buttonRow based on showNextButton
-        if (showNextButton) {
-            buttonRow.getChildren().addAll(mainMenuBox, spacer, nextBox);
+        if (isPuzzleMode) {
+            btnWinExport = new Button();
+            btnWinExport.getStyleClass().addAll("circle-button");
+            FontIcon exportIcon = new FontIcon(FontAwesomeSolid.FILE_EXPORT);
+            exportIcon.setIconSize(20);
+            exportIcon.setIconColor(Color.WHITE);
+            btnWinExport.setGraphic(exportIcon);
+            btnWinExport.setOnAction(e -> {
+                System.out.println("Export Level clicked!");
+            });
+
+            Label lblExport = new Label("Export Level");
+            lblExport.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+            HBox exportBox = new HBox(8, btnWinExport, lblExport);
+            exportBox.setAlignment(Pos.CENTER);
+
+            buttonRow.getChildren().addAll(mainMenuBox, spacer1, exportBox, spacer2, nextBox);
         } else {
-            buttonRow.getChildren().add(mainMenuBox); // Only add the main menu box
+
+            buttonRow.getChildren().addAll(mainMenuBox, spacer1, resumeBox);
         }
 
-        // assemble
         window.getChildren().addAll(crown, title, buttonRow);
         overlay.getChildren().add(window);
         StackPane.setAlignment(window, Pos.CENTER);

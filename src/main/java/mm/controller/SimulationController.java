@@ -344,7 +344,7 @@ public class SimulationController {
         StackPane overlaySettings = view.getOverlaySettings();
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ESCAPE) {
+            if (event.getCode() == KeyCode.ESCAPE && !model.isWinScreenVisible()) {
                 overlaySettings.setVisible(!overlaySettings.isVisible());
                 event.consume();
             }
@@ -380,5 +380,21 @@ public class SimulationController {
             primaryStage.setWidth(scene.getWidth());
             primaryStage.setHeight(scene.getHeight());
         });
+
+        if (view.btnWinExport != null) {
+            view.btnWinExport.setOnAction(e -> {
+                PhysicsAnimationController timer = model.getTimer();
+                if (timer != null && !timer.isRunning()) {
+                    model.exportLevel();
+                }
+            });
+        }
+
+        if (view.btnWinNext != null) {
+            view.btnWinNext.setOnAction(e -> {
+                view.getWinScreenOverlay().setVisible(false);
+                System.out.println("Next level not implemented yet.");
+            });
+        }
     }
 }
