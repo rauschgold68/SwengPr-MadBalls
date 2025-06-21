@@ -1,26 +1,34 @@
 /* Root container */
 #root-pane {
+  background-color: transparent;
   -fx-background-color: transparent;
 }
 
 /* Simulation area background */
 .sim-space {
+  background-color: white;
   -fx-background-color: white;
 }
 
 /* Buttons inside simulation area */
 .sim-space-button {
   -fx-text-fill: #0e1722;
+  background-color: #d1d1d1;
   -fx-background-color: #d1d1d1;
   -fx-border-color: #a0a0a0;
+  border-color: #a0a0a0;
+  border-width: 1px;
   -fx-border-width: 1;
   -fx-background-radius: 4;
   -fx-border-radius: 4;
+  border-radius: 4px;
+  font-size: 14px;
   -fx-font-size: 14px;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 2, 0, 0, 1);
 }
 
 .sim-space-button:hover {
+  background-color: #e0e0e0;
   -fx-background-color: #e0e0e0;
 }
 
@@ -31,16 +39,23 @@
 
 /* Sidebar container */
 .side-bar {
+  background-color: #0e1722;
   -fx-background-color: #0e1722;
+  padding: 10px 0 10px 0;
   -fx-padding: 10 0 10 0;
 }
 
 /* Inventory box, stretches above menu square */
 .inventory-box {
+  background-color: #1b2736;
+  background-color: #1b2736;
   -fx-background-color: #1b2736;
+  border-color: #0e1722;
   -fx-border-color: #0e1722;
+  border-width: 2px;
   -fx-border-width: 2;
   -fx-background-radius: 8;
+  border-radius: 8px;
   -fx-border-radius: 8;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
 }
@@ -67,6 +82,7 @@
 .menu-grid {
   -fx-hgap: 10;
   -fx-vgap: 10;
+  padding: 10px;
   -fx-padding: 10;
 }
 
@@ -149,4 +165,32 @@
 /* Change visual of inventory items when simulation is running */
 .inventory-item-disabled {
   -fx-opacity: 0.5;
+}
+
+.win-window {
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 20, 0.3, 0, 4);
+}
+
+.win-crown {
+  -fx-padding: 10;
+}
+
+.win-title {
+  -fx-text-alignment: center;
+}
+
+.circle-button {
+  -fx-background-color: #4a90e2;
+  -fx-background-radius: 50%;
+  -fx-min-width: 50px;
+  -fx-min-height: 50px;
+  -fx-max-width: 50px;
+  -fx-max-height: 50px;
+  -fx-cursor: hand;
+  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 8, 0, 0, 2);
+}
+
+.circle-button:hover {
+  -fx-scale-x: 1.1;
+  -fx-scale-y: 1.1;
 }
