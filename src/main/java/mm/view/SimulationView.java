@@ -100,7 +100,7 @@ public class SimulationView {
      * @param primaryStage the primary stage of the application, used for binding
      *                     and overlay sizing
      */
-    public SimulationView(Stage primaryStage) {
+    public SimulationView(Stage primaryStage, boolean isPuzzleMode) {
         // Main layout container
         mainPane = new BorderPane();
         mainPane.setId("root-pane");
@@ -139,6 +139,12 @@ public class SimulationView {
                 Button btn = new Button();
                 btn.getStyleClass().add("menu-button");
                 FontIcon icon = null;
+                String resetIcon;
+                if (!isPuzzleMode) {
+                    resetIcon = "TRASH_ALT";
+                } else {
+                    resetIcon = "REDO_ALT";
+                }
 
                 if (row == 0 && col == 0) {
                     icon = new FontIcon(FontAwesomeSolid.PLAY);
@@ -150,9 +156,9 @@ public class SimulationView {
                     icon = new FontIcon(FontAwesomeSolid.COGS);
                     settingsButton = btn;
                 } else if (row == 1 && col == 0) {
-                    icon = new FontIcon(FontAwesomeSolid.TRASH_ALT);
+                    icon = new FontIcon(FontAwesomeSolid.valueOf(resetIcon));
                     deleteButton = btn;
-                } else if (row == 1 && col == 1) {
+                } else if (row == 1 && col == 1 && !isPuzzleMode) {
                     icon = new FontIcon(FontAwesomeSolid.FOLDER_PLUS);
                     importButton = btn;
                 } else if (row == 1 && col == 2) {

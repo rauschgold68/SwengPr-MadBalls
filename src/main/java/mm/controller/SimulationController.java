@@ -69,6 +69,7 @@ public class SimulationController {
     private final SimulationView view;
     private final List<StackPane> inventoryWrappers = new ArrayList<>();
     private final Stage primaryStage;
+    private final boolean isPuzzleMode;
 
     /**
      * Constructs the SimulationController, sets up the model and view, and wires up
@@ -77,10 +78,11 @@ public class SimulationController {
      * @param primaryStage the primary stage of the application
      * @param levelPath    the resource path to the level JSON file
      */
-    public SimulationController(Stage primaryStage, String levelPath) {
+    public SimulationController(Stage primaryStage, String levelPath, boolean isPuzzleMode) {
         this.primaryStage = primaryStage;
         this.model = new SimulationModel(levelPath);
-        this.view = new SimulationView(primaryStage);
+        this.view = new SimulationView(primaryStage, isPuzzleMode);
+        this.isPuzzleMode = isPuzzleMode;
 
         // WIN-LISTENER setzen
         this.model.setWinListener(() -> {
