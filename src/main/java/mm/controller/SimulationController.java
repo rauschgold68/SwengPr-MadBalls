@@ -70,6 +70,7 @@ public class SimulationController {
     private final List<StackPane> inventoryWrappers = new ArrayList<>();
     private final Stage primaryStage;
     private final boolean isPuzzleMode;
+    private boolean atPuzzlesEnd;
 
     /**
      * Constructs the SimulationController, sets up the model and view, and wires up
@@ -78,10 +79,10 @@ public class SimulationController {
      * @param primaryStage the primary stage of the application
      * @param levelPath    the resource path to the level JSON file
      */
-    public SimulationController(Stage primaryStage, String levelPath, boolean isPuzzleMode) {
+    public SimulationController(Stage primaryStage, String levelPath, boolean isPuzzleMode, boolean atPuzzlesEnd) {
         this.primaryStage = primaryStage;
         this.model = new SimulationModel(levelPath);
-        this.view = new SimulationView(primaryStage, isPuzzleMode);
+        this.view = new SimulationView(primaryStage, isPuzzleMode, atPuzzlesEnd);
         this.isPuzzleMode = isPuzzleMode;
 
         // WIN-LISTENER setzen
@@ -422,14 +423,13 @@ public class SimulationController {
         switch (currentLevel) {
             case 1:
                 nextLevel = "2";
+                atPuzzlesEnd = false;
                 break;
 
             case 2:
                 nextLevel = "3";
+                atPuzzlesEnd = true;
                 break;
-            case 3:
-                nextLevel = "1";
-
             default:
                 break;
         }
@@ -437,7 +437,7 @@ public class SimulationController {
         if (view.btnWinNext != null) {
             view.btnWinNext.setOnAction(e -> {
                 SimulationController simController = new SimulationController(primaryStage, nextLevelPath,
-                        true);
+                        true, atPuzzlesEnd);
                 Scene simScene = simController.getScene();
                 primaryStage.setScene(simScene);
                 primaryStage.sizeToScene();

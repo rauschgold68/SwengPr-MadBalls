@@ -91,7 +91,7 @@ public class TitleScreenController {
         // Start sandbox mode
         view.btnSandbox.setOnAction(e -> {
             SimulationController simController = new SimulationController(primaryStage, "/level/basic_sandbox.json",
-                    false);
+                    false, false);
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
             primaryStage.sizeToScene();
@@ -109,19 +109,22 @@ public class TitleScreenController {
 
         // Level card click handlers
         view.levelCard1.setOnMouseClicked(e -> {
-            SimulationController simController = new SimulationController(primaryStage, "/level/level1.json", true);
+            SimulationController simController = new SimulationController(primaryStage, "/level/level1.json", true,
+                    false);
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
             primaryStage.sizeToScene();
         });
         view.levelCard2.setOnMouseClicked(e -> {
-            SimulationController simController = new SimulationController(primaryStage, "/level/level2.json", true);
+            SimulationController simController = new SimulationController(primaryStage, "/level/level2.json", true,
+                    false);
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
             primaryStage.sizeToScene();
         });
         view.levelCard3.setOnMouseClicked(e -> {
-            SimulationController simController = new SimulationController(primaryStage, "/level/level3.json", true);
+            SimulationController simController = new SimulationController(primaryStage, "/level/level3.json", true,
+                    true);
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
             primaryStage.sizeToScene();

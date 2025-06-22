@@ -100,7 +100,7 @@ public class SimulationView {
      * @param primaryStage the primary stage of the application, used for binding
      *                     and overlay sizing
      */
-    public SimulationView(Stage primaryStage, boolean isPuzzleMode) {
+    public SimulationView(Stage primaryStage, boolean isPuzzleMode, boolean atPuzzlesEnd) {
         // Main layout container
         mainPane = new BorderPane();
         mainPane.setId("root-pane");
@@ -195,7 +195,7 @@ public class SimulationView {
         overlaySettings.setVisible(false);
 
         // Overlay for win screen (initially hidden)
-        winScreenOverlay = createWinScreenOverlay(primaryStage, isPuzzleMode);
+        winScreenOverlay = createWinScreenOverlay(primaryStage, isPuzzleMode, atPuzzlesEnd);
         winScreenOverlay.setVisible(false);
 
         // Root stack to layer overlay on top of mainPane
@@ -266,7 +266,7 @@ public class SimulationView {
      * @param showNextButton whether to display the Next Level button
      * @return a StackPane overlay ready to add to your scene root
      */
-    private StackPane createWinScreenOverlay(Stage ownerStage, boolean isPuzzleMode) {
+    private StackPane createWinScreenOverlay(Stage ownerStage, boolean isPuzzleMode, boolean atPuzzlesEnd) {
         StackPane overlay = new StackPane();
         overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6);");
         overlay.setVisible(false);
@@ -289,6 +289,11 @@ public class SimulationView {
         crown.setIconColor(Color.GOLD);
 
         Label title = new Label("Level Complete!");
+        if (!atPuzzlesEnd) {
+            title = new Label("Level Complete!");
+        } else {
+            title = new Label("Puzzle Series Complete!");
+        }
         title.setStyle("-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;");
 
         HBox buttonRow = new HBox(10);
@@ -348,7 +353,7 @@ public class SimulationView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        if (isPuzzleMode) {
+        if (isPuzzleMode && !atPuzzlesEnd) {
             btnWinExport = new Button();
             btnWinExport.getStyleClass().addAll("circle-button");
             FontIcon exportIcon = new FontIcon(FontAwesomeSolid.FILE_EXPORT);
@@ -365,6 +370,8 @@ public class SimulationView {
             exportBox.setAlignment(Pos.CENTER);
 
             buttonRow.getChildren().addAll(mainMenuBox, spacer1, exportBox, spacer2, nextBox);
+        } else if (isPuzzleMode && atPuzzlesEnd) {
+            buttonRow.getChildren().add(mainMenuBox);
         } else {
             buttonRow.getChildren().addAll(mainMenuBox, spacer1, resumeBox);
         }
