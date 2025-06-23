@@ -329,6 +329,7 @@ public class SimulationModel {
 
                         System.out.println("WIN! ball1 reached the win condition!");
                         if (winListener != null) {
+                            timer.stop();
                             winScreenVisible = true;
                             winListener.onWin();
                         }
@@ -390,14 +391,13 @@ public class SimulationModel {
         float offsetY = (float) (template.getSize().getHeight() / 2.0);
 
         return new GameObject(
-            template.getName(), template.getType(),
-            new Position(x - offsetX, y - offsetY),
-            template.getAngle(),
-            template.getSize(),
-            template.getColour(),
-            template.getPhysics(),
-            template.isWinning()
-        );
+                template.getName(), template.getType(),
+                new Position(x - offsetX, y - offsetY),
+                template.getAngle(),
+                template.getSize(),
+                template.getColour(),
+                template.getPhysics(),
+                template.isWinning());
     }
 
     /**
