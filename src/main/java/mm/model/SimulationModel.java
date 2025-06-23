@@ -279,7 +279,7 @@ public class SimulationModel {
      * level file.
      * </p>
      */
-    public void setupInventory() {
+    public void setupInvetoryData() {
         LevelImportController importer = new LevelImportController(levelPath);
         inventoryObjects = importer.getInventoryObjects();
     }

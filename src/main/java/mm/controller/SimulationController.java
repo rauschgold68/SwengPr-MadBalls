@@ -121,9 +121,18 @@ public class SimulationController {
 
         model.setupSimulation();
 
-        // Add visuals to simSpace
-        for (PhysicsVisualPair pair : model.getPairs()) {
+        // Add visuals to simSpace and restore angles for dropped objects
+        List<GameObject> dropped = model.getDroppedObjects();
+        List<PhysicsVisualPair> pairs = model.getPairs();
+        for (PhysicsVisualPair pair : pairs) {
             if (pair.visual != null) {
+                // Try to find a dropped object with the same name and set its angle
+                for (GameObject obj : dropped) {
+                    if (obj.getName().equals(pair.body.getUserData())) {
+                        pair.visual.setRotate(obj.getAngle());
+                        break;
+                    }
+                }
                 simSpace.getChildren().add(pair.visual);
             }
         }
@@ -142,11 +151,13 @@ public class SimulationController {
         inventoryItemBox.getChildren().clear();
         inventoryWrappers.clear();
 
-        model.setupInventory();
+        model.setupInvetoryData();
 
         for (InventoryObject obj : model.getInventoryObjects()) {
             PhysicsVisualPair pair = mm.controller.InventoryObjectController.convert(obj, model.getWorld());
             if (pair.visual != null) {
+
+                pair.visual.setRotate(obj.getAngle());                
                 StackPane wrapper = new StackPane(pair.visual);
                 wrapper.setPrefSize(60, 60);
                 inventoryWrappers.add(wrapper);
@@ -243,6 +254,7 @@ public class SimulationController {
 
                     PhysicsVisualPair pair = mm.controller.GameObjectController.convert(simObj, model.getWorld());
                     if (pair.visual != null) {
+                        pair.visual.setRotate(simObj.getAngle());
                         simSpace.getChildren().add(pair.visual);
                         model.getPairs().add(pair);
                         model.getDroppedPhysicsVisualPairs().add(pair);

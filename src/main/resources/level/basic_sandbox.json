@@ -9,7 +9,7 @@
         "height": 50.0,
         "radius": 0.0
       },
-      "angle": 0.0,
+      "angle": 50.0,
       "sprite": null,
       "colour": "RED",
       "physics": {
@@ -63,7 +63,7 @@
       "name": "box3",
       "type": "rectangle",
       "count": 1,
-      "angle": 0.0,
+      "angle": 45.0,
       "size": {
         "width": 300.0,
         "height": 20.0,
@@ -89,7 +89,7 @@
         "radius": 50.0
       },
       "sprite": null,
-      "colour": "PURPLE",
+      "colour": "#800080",
       "physics": {
         "density": 0.15,
         "friction": 1.0,
