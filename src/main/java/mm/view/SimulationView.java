@@ -353,25 +353,25 @@ public class SimulationView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
+        btnWinExport = new Button();
+        btnWinExport.getStyleClass().addAll("circle-button");
+        FontIcon exportIcon = new FontIcon(FontAwesomeSolid.FILE_EXPORT);
+        exportIcon.setIconSize(20);
+        exportIcon.setIconColor(Color.WHITE);
+        btnWinExport.setGraphic(exportIcon);
+        btnWinExport.setOnAction(e -> {
+            System.out.println("Export Level clicked!");
+        });
+
+        Label lblExport = new Label("Export Level");
+        lblExport.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+        HBox exportBox = new HBox(8, btnWinExport, lblExport);
+        exportBox.setAlignment(Pos.CENTER);
+
         if (isPuzzleMode && !atPuzzlesEnd) {
-            btnWinExport = new Button();
-            btnWinExport.getStyleClass().addAll("circle-button");
-            FontIcon exportIcon = new FontIcon(FontAwesomeSolid.FILE_EXPORT);
-            exportIcon.setIconSize(20);
-            exportIcon.setIconColor(Color.WHITE);
-            btnWinExport.setGraphic(exportIcon);
-            btnWinExport.setOnAction(e -> {
-                System.out.println("Export Level clicked!");
-            });
-
-            Label lblExport = new Label("Export Level");
-            lblExport.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
-            HBox exportBox = new HBox(8, btnWinExport, lblExport);
-            exportBox.setAlignment(Pos.CENTER);
-
             buttonRow.getChildren().addAll(mainMenuBox, spacer1, exportBox, spacer2, nextBox);
         } else if (isPuzzleMode && atPuzzlesEnd) {
-            buttonRow.getChildren().add(mainMenuBox);
+            buttonRow.getChildren().addAll(mainMenuBox, spacer1, exportBox);
         } else {
             buttonRow.getChildren().addAll(mainMenuBox, spacer1, resumeBox);
         }
