@@ -136,8 +136,13 @@ public class GameObjectController {
                 def.type = physics.getShape().equalsIgnoreCase("Dynamic") ? BodyType.DYNAMIC : BodyType.STATIC;
                 def.position.set((x + width / 2) / SCALE, (y + height / 2) / SCALE);
                 def.angle = (float) Math.toRadians(obj.getAngle());
-                body = world.createBody(def);
+                body = world.createBody(def); 
                 body.setUserData(obj.getName());
+                //sets name to winwobject for winning object
+                if (!obj.getName().equals("winplat")) {
+                    String name = (obj.isWinning()) ? "winobject" : obj.getName();
+                    body.setUserData(name);
+                }
 
                 PolygonShape shape = new PolygonShape();
                 shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
@@ -168,6 +173,11 @@ public class GameObjectController {
             def.angle = (float) Math.toRadians(obj.getAngle());
             body = world.createBody(def);
             body.setUserData(obj.getName());
+            //sets name to winwobject for winning object
+            if (!obj.getName().equals("winplat")) {
+                String name = (obj.isWinning()) ? "winobject" : obj.getName();
+                body.setUserData(name);
+            }
 
             CircleShape shape = new CircleShape();
             shape.setRadius(radius / SCALE);

@@ -245,12 +245,12 @@ public class SimulationModel {
                 Object b = contact.getFixtureB().getBody().getUserData();
 
                 if ((a != null && b != null)){
-                    if ((a.equals("winPlat") && b.equals("ball1")) ||
-                        (a.equals("ball1") && b.equals("winPlat"))) {
-                        System.out.println("WIN! ball1 hit the winPlat!");
-                    } else if ((a.equals("winZone") && b.equals("ball1")) ||
-                               (a.equals("ball1") && b.equals("winZone"))) {
-                        System.out.println("WIN ball1 is in the winZone!");
+                    if ((a.equals("winPlat") && b.equals("winobject")) ||
+                        (a.equals("winobject") && b.equals("winPlat"))) {
+                        System.out.println("WIN! object hit the winPlat!");
+                    } else if ((a.equals("winZone") && b.equals("winobject")) ||
+                               (a.equals("winobject") && b.equals("winZone"))) {
+                        System.out.println("WIN object is in the winZone!");
                     }
                 }
             }
