@@ -19,7 +19,8 @@
       "friction" : 1.0,
       "restitution" : 1.0,
       "shape" : "DYNAMIC"
-    }
+    },
+      "winning": false
   }, {
     "name" : "Rectangle1",
     "type" : "Rectangle",
@@ -40,7 +41,8 @@
       "friction" : 1.0,
       "restitution" : 1.0,
       "shape" : "DYNAMIC"
-    }
+    },
+    "winning": false
   }, {
     "name" : "Rectangle2",
     "type" : "Rectangle",
@@ -61,7 +63,8 @@
       "friction" : 1.0,
       "restitution" : 1.0,
       "shape" : "STATIC"
-    }
+    },
+    "winning": false
   }, {
     "name" : "Rectangle3",
     "type" : "Rectangle",
@@ -82,7 +85,8 @@
       "friction" : 1.0,
       "restitution" : 1.0,
       "shape" : "DYNAMIC"
-    }
+    },
+    "winning": false
   }, {
     "name" : "Circle4",
     "type" : "Circle",
@@ -103,7 +107,8 @@
       "friction" : 1.0,
       "restitution" : 1.0,
       "shape" : "DYNAMIC"
-    }
+    },
+    "winning": false
   }, {
     "name" : "Rectangle5",
     "type" : "Rectangle",
@@ -124,7 +129,8 @@
       "friction" : 1.0,
       "restitution" : 1.0,
       "shape" : "STATIC"
-    }
+    },
+    "winning": false
   }, {
     "name" : "Rectangle6",
     "type" : "Rectangle",
@@ -145,7 +151,8 @@
       "friction" : 1.0,
       "restitution" : 1.0,
       "shape" : "STATIC"
-    }
+    },
+    "winning": false
   } ],
   "inventoryObjects" : [ {
     "name" : "box1",
@@ -165,7 +172,7 @@
       "restitution" : 1.0,
       "shape" : "DYNAMIC"
     },
-    "radius" : 0.0
+    "winning": false
   }, {
     "name" : "ball1",
     "type" : "circle",
@@ -184,7 +191,7 @@
       "restitution" : 1.0,
       "shape" : "DYNAMIC"
     },
-    "radius" : 0.0
+    "winning": false
   }, {
     "name" : "box2",
     "type" : "rectangle",
@@ -203,7 +210,7 @@
       "restitution" : 1.0,
       "shape" : "STATIC"
     },
-    "radius" : 0.0
+    "winning": false
   }, {
     "name" : "box3",
     "type" : "rectangle",
@@ -222,7 +229,7 @@
       "restitution" : 1.0,
       "shape" : "DYNAMIC"
     },
-    "radius" : 0.0
+    "winning": false
   }, {
     "name" : "box4",
     "type" : "rectangle",
@@ -241,7 +248,7 @@
       "restitution" : 1.0,
       "shape" : "DYNAMIC"
     },
-    "radius" : 0.0
+    "winning": false
   }, {
     "name" : "ball2",
     "type" : "circle",
@@ -260,6 +267,6 @@
       "restitution" : 1.0,
       "shape" : "DYNAMIC"
     },
-    "radius" : 0.0
+    "winning": false
   } ]
 }

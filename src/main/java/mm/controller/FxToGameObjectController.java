@@ -36,11 +36,6 @@ import org.jbox2d.dynamics.*;
  * </p>
  */
 public class FxToGameObjectController {
-    /**
-     * Static counter to generate unique names for new {@link GameObject} instances.
-     * Each time a new object is created, this counter is incremented and appended to the type.
-     */
-    private static int nextname; 
     
     /**
      * Converts a {@link PhysicsVisualPair} (which contains a JavaFX {@link Shape} and a JBox2D {@link Body})
@@ -54,27 +49,28 @@ public class FxToGameObjectController {
     public static GameObject convertBack(PhysicsVisualPair pair) {
         GameObject gameObject = null;
 
-        String name;
+        String name = (String) pair.body.getUserData();
         Position position = new Position(0,0);
         // Angle is converted from radians (JBox2D) to degrees
         float angle = (float) Math.toDegrees(pair.body.getAngle());
         Size size = new Size();
-        String colour;
+        String colour = null;
         String type;
         Physics physics = new Physics();
+        boolean winning = pair.body.getUserData().equals("winobject");
 
         // The JavaFX Shape representing the visual part of the object
         Shape shape = pair.visual;
 
-        // Extract color from the shape, defaulting to "BLACK" if not set
-        Color tmp = (Color) shape.getFill();
-        colour = (tmp != null) ? tmp.toString():"BLACK";
+        if (!pair.body.getUserData().equals("winZone") && !pair.body.getUserData().equals("noPlaceZone")) {
+            // Extract color from the shape, defaulting to "BLACK" if not set
+            Color tmp = (Color) shape.getFill();
+            colour = (tmp != null) ? tmp.toString():"BLACK";
+        }
 
         // Handle Rectangle shapes
         if (shape instanceof Rectangle) {
             type = "Rectangle";
-            // Generate a unique name for the object
-            name = type + Integer.toString(nextname++);
             javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) shape;
             float x = (float) rect.getTranslateX();
             float y = (float) rect.getTranslateY();
@@ -91,7 +87,6 @@ public class FxToGameObjectController {
         // Handle Circle shapes
         } else if (shape instanceof Circle) {
             type = "Circle";
-            name = type + Integer.toString(nextname++);
             javafx.scene.shape.Circle circle = (javafx.scene.shape.Circle) shape;
             float x = (float) circle.getTranslateX();
             float y = (float) circle.getTranslateY();
@@ -117,7 +112,7 @@ public class FxToGameObjectController {
         physics.setFriction(fixture.getFriction());
         
         // Create and return the new GameObject
-        gameObject = new GameObject(name, type, position, angle, size, colour, physics, false);
+        gameObject = new GameObject(name, type, position, angle, size, colour, physics, winning);
         return gameObject;
     }
 }
