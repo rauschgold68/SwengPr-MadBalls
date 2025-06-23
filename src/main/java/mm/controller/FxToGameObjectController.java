@@ -36,11 +36,6 @@ import org.jbox2d.dynamics.*;
  * </p>
  */
 public class FxToGameObjectController {
-    /**
-     * Static counter to generate unique names for new {@link GameObject} instances.
-     * Each time a new object is created, this counter is incremented and appended to the type.
-     */
-    private static int nextname; 
     
     /**
      * Converts a {@link PhysicsVisualPair} (which contains a JavaFX {@link Shape} and a JBox2D {@link Body})
