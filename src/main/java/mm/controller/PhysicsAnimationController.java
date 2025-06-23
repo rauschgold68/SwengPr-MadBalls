@@ -78,6 +78,15 @@ public class PhysicsAnimationController extends AnimationTimer {
             return;
         }
 
+        for (PhysicsVisualPair pair: pairs) {
+            String tmp_name = (String) pair.body.getUserData();
+            if (tmp_name.equalsIgnoreCase("ballon")) {
+                float up = /*-6.15f;*/-1 / pair.body.getFixtureList().getDensity();
+                Vec2 boyancy = new Vec2(0f, up);
+                pair.body.applyForceToCenter(boyancy);
+            }
+        }
+
         float timeStep = (now - lastTime) / 1_000_000_000.0f;
         world.step(timeStep, 8, 3);
         lastTime = now;

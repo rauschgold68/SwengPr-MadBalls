@@ -124,6 +124,25 @@
         "restitution": 1.0,
         "shape": "STATIC"
       }
+    },
+    {
+      "name": "ballon",
+      "type": "circle",
+      "count": 1,
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": null,
+      "colour": "PURPLE",
+      "physics": {
+        "density": 0.18,
+        "friction":1.0,
+        "restitution": 0.5,
+        "shape": "DYNAMIC"
+      }
     }
   ]
 }
