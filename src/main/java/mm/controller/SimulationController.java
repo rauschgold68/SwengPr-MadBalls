@@ -69,6 +69,8 @@ public class SimulationController {
     private final SimulationView view;
     private final List<StackPane> inventoryWrappers = new ArrayList<>();
     private final Stage primaryStage;
+    private final boolean isPuzzleMode;
+    private boolean atPuzzlesEnd;
 
     /**
      * Constructs the SimulationController, sets up the model and view, and wires up
@@ -77,10 +79,11 @@ public class SimulationController {
      * @param primaryStage the primary stage of the application
      * @param levelPath    the resource path to the level JSON file
      */
-    public SimulationController(Stage primaryStage, String levelPath) {
+    public SimulationController(Stage primaryStage, String levelPath, boolean isPuzzleMode, boolean atPuzzlesEnd) {
         this.primaryStage = primaryStage;
         this.model = new SimulationModel(levelPath);
-        this.view = new SimulationView(primaryStage);
+        this.view = new SimulationView(primaryStage, isPuzzleMode, atPuzzlesEnd);
+        this.isPuzzleMode = isPuzzleMode;
 
         // WIN-LISTENER setzen
         this.model.setWinListener(() -> {
@@ -92,6 +95,7 @@ public class SimulationController {
         setupDragAndDrop();
         setupMenuButtons();
         setupOverlayToggle();
+        setupWinNextLevel();
     }
 
     /**
@@ -389,11 +393,54 @@ public class SimulationController {
                 }
             });
         }
+    }
 
+    /**
+     * Extracts the level number from the level path.
+     * 
+     * @param levelPath the resource path to the level JSON file
+     * @return the extracted level number, or -1 if not found
+     */
+    private int extractLevelNumber(String levelPath) {
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("level(\\d+)\\.json").matcher(levelPath);
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group(1));
+        }
+        return -1; // oder eine andere Fehlerbehandlung
+    }
+
+    /**
+     * Sets up the next level button on the win screen.
+     * <p>
+     * This method determines the next level based on the current level number and
+     * wires up the button to start the next level.
+     * </p>
+     */
+    private void setupWinNextLevel() {
+        int currentLevel = extractLevelNumber(model.getLevelPath());
+        String nextLevel = "1";
+        ;
+        switch (currentLevel) {
+            case 1:
+                nextLevel = "2";
+                atPuzzlesEnd = false;
+                break;
+
+            case 2:
+                nextLevel = "3";
+                atPuzzlesEnd = true;
+                break;
+            default:
+                break;
+        }
+        String nextLevelPath = "/level/level" + nextLevel + ".json";
         if (view.btnWinNext != null) {
             view.btnWinNext.setOnAction(e -> {
-                view.getWinScreenOverlay().setVisible(false);
-                System.out.println("Next level not implemented yet.");
+                SimulationController simController = new SimulationController(primaryStage, nextLevelPath,
+                        true, atPuzzlesEnd);
+                Scene simScene = simController.getScene();
+                primaryStage.setScene(simScene);
+                primaryStage.sizeToScene();
             });
         }
     }
