@@ -172,7 +172,8 @@
         "friction": 0.75,
         "restitution": 0.5,
         "shape": "DYNAMIC"
-      }
+      },
+      "winning": true
     },
     {
       "name": "ballon",
