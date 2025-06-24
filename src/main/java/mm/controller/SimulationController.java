@@ -516,5 +516,14 @@ public class SimulationController {
 
             event.consume();
         });
+
+        visual.setOnScroll(event -> {
+            float currentAngle = simObj.getAngle();
+            float newAngle = currentAngle + 15;
+
+            pair.visual.setRotate(newAngle);
+            simObj.setAngle(newAngle);
+
+        });
     }
 }
