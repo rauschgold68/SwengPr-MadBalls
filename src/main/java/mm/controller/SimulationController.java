@@ -121,9 +121,18 @@ public class SimulationController {
 
         model.setupSimulation();
 
-        // Add visuals to simSpace
-        for (PhysicsVisualPair pair : model.getPairs()) {
+        // Add visuals to simSpace and restore angles for dropped objects
+        List<GameObject> dropped = model.getDroppedObjects();
+        List<PhysicsVisualPair> pairs = model.getPairs();
+        for (PhysicsVisualPair pair : pairs) {
             if (pair.visual != null) {
+                for (GameObject obj : dropped) {
+                    if (obj.getName().equals(pair.body.getUserData())) {
+                        pair.visual.setRotate(obj.getAngle());
+                        addMoveHandlersToDroppedVisual(pair, obj);
+                        break;
+                    }
+                }
                 simSpace.getChildren().add(pair.visual);
             }
         }
@@ -142,13 +151,19 @@ public class SimulationController {
         inventoryItemBox.getChildren().clear();
         inventoryWrappers.clear();
 
-        model.setupInventory();
+        model.setupInvetoryData();
 
         for (InventoryObject obj : model.getInventoryObjects()) {
             PhysicsVisualPair pair = mm.controller.InventoryObjectController.convert(obj, model.getWorld());
             if (pair.visual != null) {
+                pair.visual.setRotate(obj.getAngle());                
+
+                // Dynamically adjust wrapper size based on rotated dimensions
+                double rotatedWidth = pair.visual.getBoundsInParent().getWidth();
+                double rotatedHeight = pair.visual.getBoundsInParent().getHeight();
+
                 StackPane wrapper = new StackPane(pair.visual);
-                wrapper.setPrefSize(60, 60);
+                wrapper.setPrefSize(rotatedWidth + 20, rotatedHeight + 20); // Add padding to prevent overlap
                 inventoryWrappers.add(wrapper);
 
                 wrapper.setOnDragDetected(event -> {
@@ -162,7 +177,11 @@ public class SimulationController {
                     content.putString(obj.getName());
                     db.setContent(content);
 
-                    javafx.scene.image.WritableImage snapshot = pair.visual.snapshot(null, null);
+                    // Create a snapshot with transparent background
+                    javafx.scene.SnapshotParameters snapshotParameters = new javafx.scene.SnapshotParameters();
+                    snapshotParameters.setFill(javafx.scene.paint.Color.TRANSPARENT); // Set transparent background
+                    javafx.scene.image.WritableImage snapshot = pair.visual.snapshot(snapshotParameters, null);
+
                     db.setDragView(snapshot, snapshot.getWidth() / 2, snapshot.getHeight() / 2);
 
                     event.consume();
@@ -171,6 +190,9 @@ public class SimulationController {
                 inventoryItemBox.getChildren().add(wrapper);
             }
         }
+
+        // Add spacing between items in the inventory
+        inventoryItemBox.setSpacing(15); // Adjust spacing as needed
     }
 
     /**
@@ -243,9 +265,12 @@ public class SimulationController {
 
                     PhysicsVisualPair pair = mm.controller.GameObjectController.convert(simObj, model.getWorld());
                     if (pair.visual != null) {
+                        pair.visual.setRotate(simObj.getAngle());
                         simSpace.getChildren().add(pair.visual);
                         model.getPairs().add(pair);
                         model.getDroppedPhysicsVisualPairs().add(pair);
+
+                        addMoveHandlersToDroppedVisual(pair, simObj);
                     }
                     success = true;
                 }
@@ -443,5 +468,62 @@ public class SimulationController {
                 primaryStage.sizeToScene();
             });
         }
+    }
+
+    /**
+     * Adds mouse event handlers to a dropped object's visual node to enable moving it within the simulation area.
+     * <ul>
+     *   <li>Only objects that originated from the inventory (i.e., dropped objects) should use this handler.</li>
+     *   <li>The method updates the {@link GameObject}'s position and the {@link PhysicsVisualPair}'s Box2D body.</li>
+     *   <li>Visual feedback includes cursor changes and can be extended for more effects (e.g., opacity, shadows).</li>
+     *   <li>Optionally, checks for placement restrictions (such as no-place zones) can be added.</li>
+     * </ul>
+     *
+     * @param pair   the {@link PhysicsVisualPair} containing the visual node and Box2D body to be moved
+     * @param simObj the {@link GameObject} model instance associated with the visual
+     */
+    private void addMoveHandlersToDroppedVisual(PhysicsVisualPair pair, GameObject simObj) {
+        javafx.scene.Node visual = pair.visual;
+        final double[] dragDelta = new double[2];
+
+        visual.setOnMouseEntered(event -> visual.setCursor(javafx.scene.Cursor.CLOSED_HAND));
+        visual.setOnMouseExited(event -> visual.setCursor(javafx.scene.Cursor.DEFAULT));
+
+        visual.setOnMousePressed(event -> {
+            dragDelta[0] = event.getSceneX() - visual.getTranslateX();
+            dragDelta[1] = event.getSceneY() - visual.getTranslateY();
+            event.consume();
+        });
+
+        visual.setOnMouseDragged(event -> {
+            double newX = event.getSceneX() - dragDelta[0];
+            double newY = event.getSceneY() - dragDelta[1];
+
+            // Optionally: Check for no-place zones here if needed
+
+            visual.setTranslateX(newX);
+            visual.setTranslateY(newY);
+
+            // Update the GameObject's position (for export, etc.)
+            simObj.getPosition().setX((float) newX);
+            simObj.getPosition().setY((float) newY);
+
+            // JBoxd change the point of animation
+            pair.body.setTransform(
+                new org.jbox2d.common.Vec2((float) (newX / 50.0), (float) (newY / 50.0)), 
+                pair.body.getAngle()
+            );
+
+            event.consume();
+        });
+
+        visual.setOnScroll(event -> {
+            float currentAngle = simObj.getAngle();
+            float newAngle = currentAngle + 15;
+
+            pair.visual.setRotate(newAngle);
+            simObj.setAngle(newAngle);
+
+        });
     }
 }
