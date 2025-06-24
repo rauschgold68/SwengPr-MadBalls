@@ -9,7 +9,7 @@
         "height": 50.0,
         "radius": 0.0
       },
-      "angle": 50.0,
+      "angle": 90.0,
       "sprite": null,
       "colour": "RED",
       "physics": {

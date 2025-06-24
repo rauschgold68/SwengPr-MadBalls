@@ -156,10 +156,14 @@ public class SimulationController {
         for (InventoryObject obj : model.getInventoryObjects()) {
             PhysicsVisualPair pair = mm.controller.InventoryObjectController.convert(obj, model.getWorld());
             if (pair.visual != null) {
-
                 pair.visual.setRotate(obj.getAngle());                
+
+                // Dynamically adjust wrapper size based on rotated dimensions
+                double rotatedWidth = pair.visual.getBoundsInParent().getWidth();
+                double rotatedHeight = pair.visual.getBoundsInParent().getHeight();
+
                 StackPane wrapper = new StackPane(pair.visual);
-                wrapper.setPrefSize(60, 60);
+                wrapper.setPrefSize(rotatedWidth + 20, rotatedHeight + 20); // Add padding to prevent overlap
                 inventoryWrappers.add(wrapper);
 
                 wrapper.setOnDragDetected(event -> {
@@ -186,6 +190,9 @@ public class SimulationController {
                 inventoryItemBox.getChildren().add(wrapper);
             }
         }
+
+        // Add spacing between items in the inventory
+        inventoryItemBox.setSpacing(15); // Adjust spacing as needed
     }
 
     /**
