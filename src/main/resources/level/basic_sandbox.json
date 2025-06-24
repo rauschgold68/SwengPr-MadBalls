@@ -6,16 +6,36 @@
       "type": "rectangle",
       "size": {
         "width": 100.0,
-        "height": 50.0,
+        "height": 100.0,
         "radius": 0.0
       },
       "angle": 0.0,
       "sprite": null,
-      "colour": "RED",
+      "colour": "BROWN",
       "physics": {
         "density": 1.0,
-        "friction": 1.0,
-        "restitution": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "DYNAMIC"
+      },
+      "winning": false,
+      "count": 1
+    },
+    {
+      "name": "Domino",
+      "type": "rectangle",
+      "size": {
+        "width": 20.0,
+        "height": 100.0,
+        "radius": 0.0
+      },
+      "angle": 0.0,
+      "sprite": null,
+      "colour": "BROWN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
         "shape": "DYNAMIC"
       },
       "winning": false,
@@ -34,7 +54,7 @@
       "colour": "WINZONE",
       "physics": {
         "density": 1.0,
-        "friction": 1.0,
+        "friction": 0.0,
         "restitution": 0.0,
         "shape": "STATIC"
       },
@@ -54,13 +74,13 @@
       "colour": "RED",
       "physics": {
         "density": 1.0,
-        "friction": 1.0,
-        "restitution": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
         "shape": "STATIC"
       }
     },
     {
-      "name": "box3",
+      "name": "platform",
       "type": "rectangle",
       "count": 1,
       "angle": 0.0,
@@ -73,9 +93,85 @@
       "colour": "BLACK",
       "physics": {
         "density": 1.0,
-        "friction": 1.0,
+        "friction": 0.4,
         "restitution": 0.1,
         "shape": "STATIC"
+      }
+    },
+    {
+      "name": "log",
+      "type": "circle",
+      "count": 1,
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": null,
+      "colour": "GREEN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      }
+    },
+    {
+      "name": "tennisball",
+      "type": "circle",
+      "count": 1,
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 10.0
+      },
+      "sprite": null,
+      "colour": "YELLOW",
+      "physics": {
+        "density": 0.1,
+        "friction": 0.9,
+        "restitution": 0.75,
+        "shape": "DYNAMIC"
+      }
+    },
+    {
+      "name": "bowlingball",
+      "type": "circle",
+      "count": 1,
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 35.0
+      },
+      "sprite": null,
+      "colour": "GREY",
+      "physics": {
+        "density": 0.9,
+        "friction": 0.5,
+        "restitution": 0.3,
+        "shape": "DYNAMIC"
+      }
+    },
+    {
+      "name": "ball",
+      "type": "circle",
+      "count": 1,
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 25.0
+      },
+      "sprite": null,
+      "colour": "BLACK",
+      "physics": {
+        "density": 0.5,
+        "friction": 0.75,
+        "restitution": 0.5,
+        "shape": "DYNAMIC"
       }
     },
     {
@@ -92,7 +188,7 @@
       "colour": "PURPLE",
       "physics": {
         "density": 0.15,
-        "friction": 1.0,
+        "friction": 0.9,
         "restitution": 0.2,
         "shape": "DYNAMIC"
       }
