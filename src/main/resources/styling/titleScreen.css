@@ -6,8 +6,8 @@
   -fx-border-radius: 5px;
   -fx-background-radius: 5px;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 4, 0, 2, 2);
-  -fx-pref-width: 105px;
-  -fx-pref-height: 105px;
+  -fx-pref-width: 118px;
+  -fx-pref-height: 118px;
 }
 
 .btnTS:hover {
