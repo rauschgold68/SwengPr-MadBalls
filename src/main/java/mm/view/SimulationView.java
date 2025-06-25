@@ -21,7 +21,7 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
  * should be handled by the controller and model, following the MVC pattern.
  * </p>
  *
- * <h3>Responsibilities:</h3>
+ * <h2>Responsibilities:</h2>
  * <ul>
  * <li>Builds and arranges the main simulation layout, including the simulation
  * area, sidebar, inventory, and overlays.</li>
@@ -33,7 +33,7 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
  * handling.</li>
  * </ul>
  *
- * <h3>UI Structure:</h3>
+ * <h2>UI Structure:</h2>
  * <ul>
  * <li>{@code BorderPane mainPane} - The root layout for the simulation
  * screen.</li>
@@ -52,7 +52,7 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
  * the main content.</li>
  * </ul>
  *
- * <h3>Note:</h3>
+ * <h2>Note:</h2>
  * <ul>
  * <li>This class does not contain any simulation logic or state
  * management.</li>

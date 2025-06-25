@@ -26,7 +26,6 @@ import mm.view.PatternViewFactory;
  * The conversion process uses the properties of the {@code InventoryObject} (such as type, size, color, and physics)
  * to create the appropriate visual and physical representations.
  * </p>
- * <p>
  * <b>Supported types:</b>
  * <ul>
  *   <li>Rectangle</li>
@@ -38,15 +37,12 @@ import mm.view.PatternViewFactory;
  *   <li>"noPlaceZone": Rendered with a special pattern and created as a static sensor body.</li>
  * </ul>
  * <b>Other objects</b> are rendered and simulated according to their properties.
- * </p>
- * <p>
  * <b>Usage example:</b>
  * <pre>
  *     InventoryObject obj = ...;
  *     World world = ...;
  *     PhysicsVisualPair pair = InventoryObjectController.convert(obj, world);
  * </pre>
- * </p>
  */
 public class InventoryObjectController {
     /** Scale factor for converting between game units and physics world units */

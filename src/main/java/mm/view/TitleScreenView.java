@@ -24,7 +24,7 @@ import javafx.stage.Stage;
  * should be managed by the controller.
  * </p>
  *
- * <h3>Responsibilities:</h3>
+ * <h2>Responsibilities:</h2>
  * <ul>
  *   <li>Builds and arranges the main menu layout, including logo, board, and menu buttons.</li>
  *   <li>Creates overlays for options and puzzle/level selection, exposing them for controller use.</li>
@@ -32,7 +32,7 @@ import javafx.stage.Stage;
  *   <li>Exposes all relevant UI components as public fields for the controller to attach event handlers.</li>
  * </ul>
  *
- * <h3>UI Structure:</h3>
+ * <h2>UI Structure:</h2>
  * <ul>
  *   <li>{@code btnPuzzle, btnSandbox, btnOptions, btnQuit} - Main menu buttons.</li>
  *   <li>{@code btnCloseOptions, btnClosePuzzle} - Close buttons for overlays.</li>
@@ -43,7 +43,7 @@ import javafx.stage.Stage;
  *   <li>{@code scene} - The JavaFX Scene for the title screen.</li>
  * </ul>
  *
- * <h3>Notes:</h3>
+ * <h2>Notes:</h2>
  * <ul>
  *   <li>This class should not contain any event handling or navigation logic.</li>
  *   <li>All UI elements that need interaction should be exposed as public fields for the controller.</li>

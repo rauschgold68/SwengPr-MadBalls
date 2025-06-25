@@ -15,14 +15,12 @@ import mm.model.Level;
  * It provides methods to retrieve the loaded {@link GameObject} and {@link InventoryObject} instances
  * for use in the simulation or game logic.
  * </p>
- * <p>
  * <b>Usage example:</b>
  * <pre>
  *     ObjectImporter importer = new ObjectImporter("/level/level1.json");
  *     List&lt;GameObject&gt; objects = importer.getGameObjects();
  *     List&lt;InventoryObject&gt; inventory = importer.getInventoryObjects();
  * </pre>
- * </p>
  */
 public class LevelImportController {
 

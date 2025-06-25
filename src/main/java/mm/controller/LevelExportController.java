@@ -21,13 +21,11 @@ import java.util.Optional;
  * The exported file is saved in the <code>src/main/resources/level/</code> directory
  * with a unique name (e.g., <code>fun1.json</code>, <code>fun2.json</code>, ...).
  * </p>
- * <p>
  * Usage example:
  * <pre>
  *     LevelExportController exporter = new LevelExportController();
  *     exporter.export(pairs, inventoryObjects);
  * </pre>
- * </p>
  */
 public class LevelExportController {
     /**

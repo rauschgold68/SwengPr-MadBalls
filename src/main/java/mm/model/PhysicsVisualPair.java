@@ -15,14 +15,12 @@ import org.jbox2d.dynamics.Body;
  * The {@link #visual} field holds the JavaFX {@code Shape} used for drawing the object on screen,
  * while the {@link #body} field holds the JBox2D {@code Body} used for physics simulation.
  * </p>
- * <p>
  * <b>Usage example:</b>
  * <pre>
  *     PhysicsVisualPair pair = GameObjectController.convert(gameObject, world);
  *     Shape visual = pair.getVisual();
  *     Body body = pair.getBody();
  * </pre>
- * </p>
  */
 public class PhysicsVisualPair {
     /** The JavaFX visual representation of the object (for rendering). */

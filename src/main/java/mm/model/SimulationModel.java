@@ -31,7 +31,7 @@ import mm.controller.PhysicsAnimationController;
  * as the Model in an MVC architecture.
  * </p>
  *
- * <h3>Responsibilities:</h3>
+ * <h2>Responsibilities:</h2>
  * <ul>
  * <li>Loading and initializing the physics world and game objects from a level
  * file</li>
@@ -322,11 +322,12 @@ public class SimulationModel {
                 Object a = contact.getFixtureA().getBody().getUserData();
                 Object b = contact.getFixtureB().getBody().getUserData();
 
-                if ((a != null && b != null)) {
+                if (a != null && b != null) {
                     if ((a.equals("winobject") && (b.equals("winPlat") || b.equals("winZone"))) ||
                             (b.equals("winobject") && (a.equals("winPlat") || a.equals("winZone")))) {
 
                         System.out.println("WIN! ball1 reached the win condition!");
+                        assert(winListener != null);
                         if (winListener != null) {
                             timer.stop();
                             winScreenVisible = true;

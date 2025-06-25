@@ -146,7 +146,7 @@ public class AbstractObject {
     /**
      * Sets the position of the object.
      *
-     * @param newPosition the new position to set (must not be {@code null})
+     * @param winning the new value to set (must not be {@code null})
      */
     public void setWinning(boolean winning) {this.winning = winning;}
 

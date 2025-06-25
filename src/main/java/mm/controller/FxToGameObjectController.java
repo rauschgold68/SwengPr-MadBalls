@@ -19,21 +19,17 @@ import org.jbox2d.dynamics.*;
  * representation. The conversion extracts all relevant properties from the JavaFX {@code Shape}
  * and the JBox2D {@code Body}, such as position, size, color, angle, and physics parameters.
  * </p>
- * <p>s
  * <b>Supported shapes:</b>
  * <ul>
  *   <li>{@link javafx.scene.shape.Rectangle}</li>
  *   <li>{@link javafx.scene.shape.Circle}</li>
  * </ul>
  * <b>Unsupported shapes</b> will result in an {@link IllegalArgumentException}.
- * </p>
- * <p>
  * <b>Usage example:</b>
  * <pre>
  *     PhysicsVisualPair pair = ...;
  *     GameObject obj = FxToGameObjectController.convertBack(pair);
  * </pre>
- * </p>
  */
 public class FxToGameObjectController {
     

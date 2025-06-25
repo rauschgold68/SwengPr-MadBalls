@@ -10,7 +10,6 @@ import mm.view.TitleScreenView;
  * the {@link TitleScreenView}
  * and the rest of the application for the MadBalls game's main menu (title
  * screen).
- * <p>
  * This controller is responsible for:
  * <ul>
  * <li>Wiring up event handlers for all main menu buttons and overlays.</li>
@@ -22,9 +21,8 @@ import mm.view.TitleScreenView;
  * </ul>
  * <b>Note:</b> All UI construction is handled by {@link TitleScreenView}. This
  * class should not contain any UI layout code.
- * </p>
  *
- * <h3>Fields:</h3>
+ * <h2>Fields:</h2>
  * <ul>
  * <li>{@code view} - The {@link TitleScreenView} instance containing all UI
  * components for the title screen.</li>
@@ -32,7 +30,7 @@ import mm.view.TitleScreenView;
  * switching.</li>
  * </ul>
  *
- * <h3>Main Responsibilities:</h3>
+ * <h2>Main Responsibilities:</h2>
  * <ul>
  * <li>Show overlays for puzzle/level selection and options.</li>
  * <li>Start the sandbox mode by switching to the simulation scene.</li>
@@ -41,7 +39,7 @@ import mm.view.TitleScreenView;
  * <li>Expose the main menu scene for use by the application entry point.</li>
  * </ul>
  *
- * <h3>Extensibility:</h3>
+ * <h2>Extensibility:</h2>
  * <ul>
  * <li>To handle level card clicks, expose the card nodes from the view and wire
  * their handlers here.</li>

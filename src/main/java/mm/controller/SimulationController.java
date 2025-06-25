@@ -26,7 +26,6 @@ import java.io.File;
  * The {@code SimulationController} class coordinates the interaction between
  * the {@link SimulationModel} and {@link SimulationView}
  * in the MadBalls game, following the MVC (Model-View-Controller) pattern.
- * <p>
  * This controller is responsible for:
  * <ul>
  * <li>Initializing and updating the simulation area and inventory UI based on
@@ -41,9 +40,8 @@ import java.io.File;
  * <b>Note:</b> All business logic and event handling should be managed here.
  * The model contains only simulation state and logic,
  * and the view contains only UI construction and accessors.
- * </p>
  *
- * <h3>Main Responsibilities:</h3>
+ * <h2>Main Responsibilities:</h2>
  * <ul>
  * <li>Setup and refresh the simulation area and inventory UI.</li>
  * <li>Enable drag-and-drop of inventory objects into the simulation area.</li>
@@ -51,7 +49,7 @@ import java.io.File;
  * <li>Toggle overlays and handle keyboard shortcuts.</li>
  * </ul>
  *
- * <h3>Fields:</h3>
+ * <h2>Fields:</h2>
  * <ul>
  * <li>{@code model} - The simulation model holding all simulation state and
  * logic.</li>

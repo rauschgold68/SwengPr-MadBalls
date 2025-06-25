@@ -12,14 +12,12 @@ import java.io.InputStream;
  * This class uses Jackson's {@link ObjectMapper} to convert JSON data into a {@link Level} instance.
  * It is typically used to load level configurations from resource files within the application.
  * </p>
- * <p>
  * Usage example:
  * <pre>
  *     InputStream is = getClass().getResourceAsStream("/level/level1.json");
  *     LevelReadController reader = new LevelReadController(is);
  *     Level level = reader.readFile();
  * </pre>
- * </p>
  */
 public class LevelReadController {
     /** Jackson ObjectMapper for JSON deserialization. */

@@ -18,13 +18,11 @@ import javafx.scene.paint.Color;
  * These patterns are typically used as fill styles for rectangles or other shapes to visually
  * distinguish special regions in the game world.
  * </p>
- * <p>
  * <b>Usage example:</b>
  * <pre>
  *     Rectangle winZoneRect = new Rectangle(width, height);
  *     winZoneRect.setFill(PatternViewFactory.createWinzone(width, height));
  * </pre>
- * </p>
  */
 public class PatternViewFactory {
 
