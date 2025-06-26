@@ -76,9 +76,9 @@ public class GameObjectController {
             
             Rectangle rect = new Rectangle(width, height);
             if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
-                rect.setFill(PatternViewFactory.createNoPlaceZone(width, height));
+                rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.RED));
             } else if (obj.getName().equalsIgnoreCase("winZone")) {
-                rect.setFill(PatternViewFactory.createWinzone(width, height));
+                rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.GREEN));
             } else {
                 rect.setFill(Color.valueOf(obj.getColour()));
                 //add SpriteCodeImplementation here

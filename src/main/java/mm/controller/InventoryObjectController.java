@@ -68,64 +68,39 @@ public class InventoryObjectController {
         Shape visual = null;
         Body body = null;
 
-        if ("rectangle".equalsIgnoreCase(type)){
-
+        if ("rectangle".equalsIgnoreCase(type)) {
             float width = obj.getSize().getWidth();
             float height = obj.getSize().getHeight();
-
-            if (obj.getName().equalsIgnoreCase("winZone")){
-                Rectangle rect = new Rectangle(width, height);
-                rect.setFill(PatternViewFactory.createWinzone(width, height));
-                visual = rect;
-
-                BodyDef def = new BodyDef();
-                def.type = BodyType.STATIC;
-                body = world.createBody(def);
-
-                PolygonShape shape = new PolygonShape();
-                shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
-
-                FixtureDef fixture = new FixtureDef();
-                fixture.shape = shape;
-                fixture.isSensor = true;
-                body.createFixture(fixture);
-                
-            } else if (obj.getName().equalsIgnoreCase("noPlaceZone")){
-                Rectangle rect = new Rectangle(width, height);
-                rect.setFill(PatternViewFactory.createNoPlaceZone(width, height));
-                visual = rect;
-
-                BodyDef def = new BodyDef();
-                def.type = BodyType.STATIC;
-                body = world.createBody(def);
-
-                PolygonShape shape = new PolygonShape();
-                shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
-
-                FixtureDef fixture = new FixtureDef();
-                fixture.shape = shape;
-                fixture.isSensor = true;
-                body.createFixture(fixture);
-
-            } else { 
-
-                Rectangle rect = new Rectangle(width, height, Color.valueOf(obj.getColour()));
-                visual = rect;
-
-                BodyDef def = new BodyDef();
-                def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
-                body = world.createBody(def);
-
-                PolygonShape shape = new PolygonShape();
-                shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
-
-                FixtureDef fixture = new FixtureDef();
-                fixture.shape = shape;
-                fixture.density = physics.getDensity();
-                fixture.friction = physics.getFriction();
-                fixture.restitution = physics.getRestitution();
-                body.createFixture(fixture);
+            
+            Rectangle rect = new Rectangle(width, height);
+            if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
+                rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.RED));
+            } else if (obj.getName().equalsIgnoreCase("winZone")) {
+                rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.GREEN));
+            } else {
+                rect.setFill(Color.valueOf(obj.getColour()));
+                //add SpriteCodeImplementation here
             }
+            visual = rect;
+
+            // JBox2D body: dynamic or static based on physics shape property
+            BodyDef def = new BodyDef();
+            def.type = physics.getShape().equalsIgnoreCase("Dynamic") ? BodyType.DYNAMIC : BodyType.STATIC;
+            body = world.createBody(def); 
+            body.setUserData(obj.getName());
+
+            PolygonShape shape = new PolygonShape();
+            shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
+
+            FixtureDef fixture = new FixtureDef();
+            fixture.shape = shape;
+            fixture.density = physics.getDensity();
+            fixture.friction = physics.getFriction();
+            fixture.restitution = physics.getRestitution();
+            if(obj.getName().equalsIgnoreCase("noplacezone") || obj.getName().equalsIgnoreCase("winzone")) {
+                fixture.isSensor = true;
+            }
+            body.createFixture(fixture);
 
         } else if ("circle".equalsIgnoreCase(type)) {
             float radius = obj.getSize().getRadius();

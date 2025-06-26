@@ -323,8 +323,8 @@ public class SimulationModel {
                 Object b = contact.getFixtureB().getBody().getUserData();
 
                 if (a != null && b != null) {
-                    if ((a.equals("winobject") && (b.equals("winPlat") || b.equals("winZone"))) ||
-                            (b.equals("winobject") && (a.equals("winPlat") || a.equals("winZone")))) {
+                    if ((a.equals("winObject") && (b.equals("winPlat") || b.equals("winZone"))) ||
+                            (b.equals("winObject") && (a.equals("winPlat") || a.equals("winZone")))) {
 
                         System.out.println("WIN! ball1 reached the win condition!");
                         assert(winListener != null);
