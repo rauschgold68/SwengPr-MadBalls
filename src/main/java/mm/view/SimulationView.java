@@ -47,18 +47,47 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
  */
 public class SimulationView {
 
+    // Grouped component containers
+    /** Main layout components */
+    private final LayoutComponents layout = new LayoutComponents();
+    
+    /** Overlay components */
+    private final OverlayComponents overlays = new OverlayComponents();
+    
+    /** Inventory components */
+    private final InventoryComponents inventory = new InventoryComponents();
+
+    // Control buttons - grouped by functionality to reduce field count
+    /** Group containing simulation control buttons (play, stop, etc.) */
+    private final SimulationButtons simulationButtons = new SimulationButtons();
+    
+    /** Group containing overlay menu buttons (back, quit, close) */
+    private final OverlayButtons overlayButtons = new OverlayButtons();
+    
+    /** Group containing win screen buttons (home, next, export) */
+    private final WinScreenButtons winScreenButtons = new WinScreenButtons();
+
     // Style constants to avoid duplicate literals
     /** CSS class name for circular buttons used in overlays */
     private static final String CIRCLE_BUTTON_CLASS = "circle-button";
     
-    /** Standard white label styling for overlay text */
-    private static final String WHITE_LABEL_STYLE = "-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;";
+    /** CSS class name for white labels in overlays */
+    private static final String WHITE_LABEL_CLASS = "white-label";
     
     /** CSS class name for main menu buttons */
     private static final String MENU_BUTTON_CLASS = "menu-button";
     
-    /** Semi-transparent background color for overlay components */
-    private static final String OVERLAY_BACKGROUND = "rgba(0, 0, 0, 0.6)";
+    /** CSS class name for overlay background styling */
+    private static final String OVERLAY_BACKGROUND_CLASS = "overlay-background";
+    
+    /** CSS class name for settings overlay background */
+    private static final String SETTINGS_OVERLAY_BACKGROUND_CLASS = "settings-overlay-background";
+    
+    /** CSS class name for overlay close buttons */
+    private static final String OVERLAY_CLOSE_BUTTON_CLASS = "overlay-close-button";
+    
+    /** CSS class name for large win screen titles */
+    private static final String WIN_TITLE_LARGE_CLASS = "win-title-large";
     
     /**
      * Container for main layout components to reduce field count.
@@ -104,26 +133,6 @@ public class SimulationView {
         /** Vertical container holding individual inventory items */
         public VBox inventoryItemBox;
     }
-
-    // Grouped component containers
-    /** Main layout components */
-    private final LayoutComponents layout = new LayoutComponents();
-    
-    /** Overlay components */
-    private final OverlayComponents overlays = new OverlayComponents();
-    
-    /** Inventory components */
-    private final InventoryComponents inventory = new InventoryComponents();
-
-    // Control buttons - grouped by functionality to reduce field count
-    /** Group containing simulation control buttons (play, stop, etc.) */
-    private final SimulationButtons simulationButtons = new SimulationButtons();
-    
-    /** Group containing overlay menu buttons (back, quit, close) */
-    private final OverlayButtons overlayButtons = new OverlayButtons();
-    
-    /** Group containing win screen buttons (home, next, export) */
-    private final WinScreenButtons winScreenButtons = new WinScreenButtons();
 
     /**
      * Inner class to hold simulation control buttons, reducing overall field count.
@@ -454,7 +463,7 @@ public class SimulationView {
      */
     private StackPane createQuickMenuOverlay() {
         StackPane overlay = new StackPane();
-        overlay.setStyle("-fx-background-color: rgba(30, 30, 50, 0.7);");
+        overlay.getStyleClass().add(SETTINGS_OVERLAY_BACKGROUND_CLASS);
         overlay.setPickOnBounds(true);
 
         VBox window = createOverlayWindow();
@@ -490,8 +499,7 @@ public class SimulationView {
     private void setupOverlayButtons(VBox window) {
         HBox topRow = new HBox();
         overlayButtons.overlayCloseButton = new Button("✕");
-        overlayButtons.overlayCloseButton.setStyle(
-                "-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;");
+        overlayButtons.overlayCloseButton.getStyleClass().add(OVERLAY_CLOSE_BUTTON_CLASS);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         topRow.getChildren().addAll(spacer, overlayButtons.overlayCloseButton);
@@ -519,7 +527,7 @@ public class SimulationView {
      */
     private StackPane createWinScreenOverlay(Stage ownerStage, boolean isPuzzleMode, boolean atPuzzlesEnd) {
         StackPane overlay = new StackPane();
-        overlay.setStyle("-fx-background-color: " + OVERLAY_BACKGROUND + ";");
+        overlay.getStyleClass().add(OVERLAY_BACKGROUND_CLASS);
         overlay.setVisible(false);
         overlay.prefWidthProperty().bind(ownerStage.widthProperty());
         overlay.prefHeightProperty().bind(ownerStage.heightProperty());
@@ -557,7 +565,7 @@ public class SimulationView {
 
         String titleText = atPuzzlesEnd ? "Puzzle Series Complete!" : "Level Complete!";
         Label title = new Label(titleText);
-        title.setStyle("-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;");
+        title.getStyleClass().add(WIN_TITLE_LARGE_CLASS);
 
         window.getChildren().addAll(crown, title);
         return window;
@@ -622,7 +630,7 @@ public class SimulationView {
         }
 
         Label label = new Label(labelText);
-        label.setStyle(WHITE_LABEL_STYLE);
+        label.getStyleClass().add(WHITE_LABEL_CLASS);
         
         HBox buttonBox = new HBox(8, btn, label);
         if ("Next Level".equals(labelText)) {
