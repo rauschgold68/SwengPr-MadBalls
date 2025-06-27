@@ -27,18 +27,6 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
  * <li>Responsive layout that adapts to different screen sizes</li>
  * </ul>
  * 
- * <h2>Architecture Design:</h2>
- * <p>
- * The class has been refactored to address PMD violations and improve maintainability:
- * </p>
- * <ul>
- * <li><b>Reduced Field Count:</b> Related buttons are grouped into inner classes
- * ({@link SimulationButtons}, {@link OverlayButtons}, {@link WinScreenButtons})</li>
- * <li><b>Lower Cyclomatic Complexity:</b> Large methods broken into focused helper methods</li>
- * <li><b>Eliminated Duplicate Literals:</b> Common strings extracted as constants</li>
- * <li><b>Improved NCSS:</b> Methods kept concise and focused on single responsibilities</li>
- * </ul>
- * 
  * <h2>Usage:</h2>
  * <p>
  * The view is typically instantiated by the {@code SimulationController} and configured
@@ -72,37 +60,60 @@ public class SimulationView {
     /** Semi-transparent background color for overlay components */
     private static final String OVERLAY_BACKGROUND = "rgba(0, 0, 0, 0.6)";
     
-    // Core layout components
-    /** Main border pane that holds all primary UI components */
-    private BorderPane mainPane;
+    /**
+     * Container for main layout components to reduce field count.
+     */
+    public static class LayoutComponents {
+        /** Main border pane that holds all primary UI components */
+        public BorderPane mainPane;
+        
+        /** The simulation space where physics objects are displayed and interact */
+        public Pane simSpace;
+        
+        /** Bottom horizontal bar (currently unused but reserved for future features) */
+        public HBox bottomBar;
+        
+        /** Right sidebar containing inventory and control buttons */
+        public VBox sideBar;
+        
+        /** The main JavaFX scene containing all UI components */
+        public Scene scene;
+        
+        /** Root stack pane that layers the main content and overlays */
+        public StackPane rootStack;
+    }
     
-    /** The simulation space where physics objects are displayed and interact */
-    private Pane simSpace;
+    /**
+     * Container for overlay components to reduce field count.
+     */
+    public static class OverlayComponents {
+        /** Overlay pane for the settings/pause menu */
+        public StackPane overlaySettings;
+        
+        /** Overlay pane for the level completion/win screen */
+        public StackPane winScreenOverlay;
+    }
     
-    /** Bottom horizontal bar (currently unused but reserved for future features) */
-    private HBox bottomBar;
+    /**
+     * Container for inventory components to reduce field count.
+     */
+    public static class InventoryComponents {
+        /** Container for the inventory section in the sidebar */
+        public StackPane inventoryBox;
+        
+        /** Vertical container holding individual inventory items */
+        public VBox inventoryItemBox;
+    }
+
+    // Grouped component containers
+    /** Main layout components */
+    private final LayoutComponents layout = new LayoutComponents();
     
-    /** Right sidebar containing inventory and control buttons */
-    private VBox sideBar;
+    /** Overlay components */
+    private final OverlayComponents overlays = new OverlayComponents();
     
-    /** Overlay pane for the settings/pause menu */
-    private StackPane overlaySettings;
-    
-    /** Overlay pane for the level completion/win screen */
-    private StackPane winScreenOverlay;
-    
-    /** The main JavaFX scene containing all UI components */
-    private Scene scene;
-    
-    /** Root stack pane that layers the main content and overlays */
-    private StackPane rootStack;
-    
-    // Inventory components
-    /** Container for the inventory section in the sidebar */
-    private StackPane inventoryBox;
-    
-    /** Vertical container holding individual inventory items */
-    private VBox inventoryItemBox;
+    /** Inventory components */
+    private final InventoryComponents inventory = new InventoryComponents();
 
     // Control buttons - grouped by functionality to reduce field count
     /** Group containing simulation control buttons (play, stop, etc.) */
@@ -201,15 +212,15 @@ public class SimulationView {
      * Creates the main pane, simulation space, and bottom bar with proper styling.
      */
     private void initializeMainComponents() {
-        mainPane = new BorderPane();
-        mainPane.setId("root-pane");
+        layout.mainPane = new BorderPane();
+        layout.mainPane.setId("root-pane");
 
-        simSpace = new Pane();
-        simSpace.getStyleClass().add("sim-space");
+        layout.simSpace = new Pane();
+        layout.simSpace.getStyleClass().add("sim-space");
 
-        bottomBar = new HBox();
-        bottomBar.getStyleClass().add("bottom-bar");
-        bottomBar.setPrefHeight(150);
+        layout.bottomBar = new HBox();
+        layout.bottomBar.getStyleClass().add("bottom-bar");
+        layout.bottomBar.setPrefHeight(150);
     }
 
     /**
@@ -218,9 +229,9 @@ public class SimulationView {
      * @param isPuzzleMode determines which buttons are available (import disabled in puzzle mode)
      */
     private void createSideBarWithMenuButtons(boolean isPuzzleMode) {
-        sideBar = new VBox();
-        sideBar.getStyleClass().add("side-bar");
-        sideBar.setPrefWidth(200);
+        layout.sideBar = new VBox();
+        layout.sideBar.getStyleClass().add("side-bar");
+        layout.sideBar.setPrefWidth(200);
 
         createInventoryComponents();
         createMenuGrid(isPuzzleMode);
@@ -230,12 +241,12 @@ public class SimulationView {
      * Creates the inventory box and item container for draggable objects.
      */
     private void createInventoryComponents() {
-        inventoryBox = new StackPane();
-        inventoryBox.getStyleClass().add("inventory-box");
-        VBox.setVgrow(inventoryBox, Priority.ALWAYS);
-        inventoryItemBox = new VBox();
-        inventoryBox.getChildren().add(inventoryItemBox);
-        inventoryItemBox.getStyleClass().add("inventoryItemBox");
+        inventory.inventoryBox = new StackPane();
+        inventory.inventoryBox.getStyleClass().add("inventory-box");
+        VBox.setVgrow(inventory.inventoryBox, Priority.ALWAYS);
+        inventory.inventoryItemBox = new VBox();
+        inventory.inventoryBox.getChildren().add(inventory.inventoryItemBox);
+        inventory.inventoryItemBox.getStyleClass().add("inventoryItemBox");
     }
 
     /**
@@ -258,7 +269,7 @@ public class SimulationView {
 
         menuSquare.getChildren().add(grid);
         squareContainer.getChildren().add(menuSquare);
-        sideBar.getChildren().addAll(inventoryBox, squareContainer);
+        layout.sideBar.getChildren().addAll(inventory.inventoryBox, squareContainer);
     }
 
     /**
@@ -268,12 +279,10 @@ public class SimulationView {
      * @param isPuzzleMode determines button icons and availability
      */
     private void populateMenuGrid(GridPane grid, boolean isPuzzleMode) {
-        String resetIcon = isPuzzleMode ? "REDO_ALT" : "TRASH_ALT";
-
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 Button btn = createMenuButton();
-                FontIcon icon = createIconForPosition(row, col, resetIcon, isPuzzleMode, btn);
+                FontIcon icon = createIconForGridPosition(row, col, isPuzzleMode, btn);
                 
                 if (icon != null) {
                     setupIcon(icon);
@@ -298,34 +307,90 @@ public class SimulationView {
 
     /**
      * Creates the appropriate icon for a grid position and assigns the button reference.
+     * Simplified version with reduced parameters and complexity.
      * 
      * @param row the grid row (0-2)
      * @param col the grid column (0-2)
-     * @param resetIcon the icon name for the delete button
      * @param isPuzzleMode determines button availability
      * @param btn the button instance to assign
      * @return the FontIcon for this position, or null if no icon
      */
-    private FontIcon createIconForPosition(int row, int col, String resetIcon, boolean isPuzzleMode, Button btn) {
-        if (row == 0 && col == 0) {
-            simulationButtons.playButton = btn;
-            return new FontIcon(FontAwesomeSolid.PLAY);
-        } else if (row == 0 && col == 1) {
-            simulationButtons.stopButton = btn;
-            return new FontIcon(FontAwesomeSolid.STOP);
-        } else if (row == 0 && col == 2) {
-            simulationButtons.settingsButton = btn;
-            return new FontIcon(FontAwesomeSolid.COGS);
-        } else if (row == 1 && col == 0) {
-            simulationButtons.deleteButton = btn;
-            return new FontIcon(FontAwesomeSolid.valueOf(resetIcon));
-        } else if (row == 1 && col == 1 && !isPuzzleMode) {
-            simulationButtons.importButton = btn;
-            return new FontIcon(FontAwesomeSolid.FOLDER_PLUS);
-        } else if (row == 1 && col == 2) {
-            simulationButtons.saveButton = btn;
-            return new FontIcon(FontAwesomeSolid.SAVE);
-        } else if (row == 2 && col == 0) {
+    private FontIcon createIconForGridPosition(int row, int col, boolean isPuzzleMode, Button btn) {
+        // Row 0: Top row controls
+        if (row == 0) {
+            return createTopRowIcon(col, btn);
+        }
+        // Row 1: Middle row controls
+        if (row == 1) {
+            return createMiddleRowIcon(col, isPuzzleMode, btn);
+        }
+        // Row 2: Bottom row controls
+        if (row == 2) {
+            return createBottomRowIcon(col, btn);
+        }
+        return null;
+    }
+    
+    /**
+     * Creates icons for the top row of the grid (play, stop, settings).
+     * 
+     * @param col the column position
+     * @param btn the button to assign
+     * @return the appropriate icon or null
+     */
+    private FontIcon createTopRowIcon(int col, Button btn) {
+        switch (col) {
+            case 0:
+                simulationButtons.playButton = btn;
+                return new FontIcon(FontAwesomeSolid.PLAY);
+            case 1:
+                simulationButtons.stopButton = btn;
+                return new FontIcon(FontAwesomeSolid.STOP);
+            case 2:
+                simulationButtons.settingsButton = btn;
+                return new FontIcon(FontAwesomeSolid.COGS);
+            default:
+                return null;
+        }
+    }
+    
+    /**
+     * Creates icons for the middle row of the grid (delete, import, save).
+     * 
+     * @param col the column position
+     * @param isPuzzleMode determines button availability and icons
+     * @param btn the button to assign
+     * @return the appropriate icon or null
+     */
+    private FontIcon createMiddleRowIcon(int col, boolean isPuzzleMode, Button btn) {
+        switch (col) {
+            case 0:
+                simulationButtons.deleteButton = btn;
+                String resetIcon = isPuzzleMode ? "REDO_ALT" : "TRASH_ALT";
+                return new FontIcon(FontAwesomeSolid.valueOf(resetIcon));
+            case 1:
+                if (!isPuzzleMode) {
+                    simulationButtons.importButton = btn;
+                    return new FontIcon(FontAwesomeSolid.FOLDER_PLUS);
+                }
+                return null;
+            case 2:
+                simulationButtons.saveButton = btn;
+                return new FontIcon(FontAwesomeSolid.SAVE);
+            default:
+                return null;
+        }
+    }
+    
+    /**
+     * Creates icons for the bottom row of the grid (currently only crown button).
+     * 
+     * @param col the column position
+     * @param btn the button to assign
+     * @return the appropriate icon or null
+     */
+    private FontIcon createBottomRowIcon(int col, Button btn) {
+        if (col == 0) {
             simulationButtons.crownButton = btn;
             return new FontIcon(FontAwesomeSolid.CROWN);
         }
@@ -346,9 +411,9 @@ public class SimulationView {
      * Arranges the main UI components into their layout positions.
      */
     private void setupMainLayout() {
-        mainPane.setCenter(simSpace);
-        mainPane.setRight(sideBar);
-        mainPane.setBottom(bottomBar);
+        layout.mainPane.setCenter(layout.simSpace);
+        layout.mainPane.setRight(layout.sideBar);
+        layout.mainPane.setBottom(layout.bottomBar);
     }
 
     /**
@@ -359,11 +424,11 @@ public class SimulationView {
      * @param atPuzzlesEnd affects win screen button options
      */
     private void createOverlays(Stage primaryStage, boolean isPuzzleMode, boolean atPuzzlesEnd) {
-        overlaySettings = createQuickMenuOverlay();
-        overlaySettings.setVisible(false);
+        overlays.overlaySettings = createQuickMenuOverlay();
+        overlays.overlaySettings.setVisible(false);
 
-        winScreenOverlay = createWinScreenOverlay(primaryStage, isPuzzleMode, atPuzzlesEnd);
-        winScreenOverlay.setVisible(false);
+        overlays.winScreenOverlay = createWinScreenOverlay(primaryStage, isPuzzleMode, atPuzzlesEnd);
+        overlays.winScreenOverlay.setVisible(false);
     }
 
     /**
@@ -372,13 +437,13 @@ public class SimulationView {
      * @param primaryStage the primary stage for size binding
      */
     private void setupRootStackAndScene(Stage primaryStage) {
-        rootStack = new StackPane();
-        rootStack.getChildren().addAll(mainPane, overlaySettings, winScreenOverlay);
-        rootStack.prefWidthProperty().bind(primaryStage.widthProperty());
-        rootStack.prefHeightProperty().bind(primaryStage.heightProperty());
+        layout.rootStack = new StackPane();
+        layout.rootStack.getChildren().addAll(layout.mainPane, overlays.overlaySettings, overlays.winScreenOverlay);
+        layout.rootStack.prefWidthProperty().bind(primaryStage.widthProperty());
+        layout.rootStack.prefHeightProperty().bind(primaryStage.heightProperty());
 
-        scene = new Scene(rootStack);
-        scene.getStylesheets().add(
+        layout.scene = new Scene(layout.rootStack);
+        layout.scene.getStylesheets().add(
                 getClass().getResource("/styling/simulation.css").toExternalForm());
     }
 
@@ -590,31 +655,31 @@ public class SimulationView {
     //==================================================================================
     
     /** @return the main Scene for the simulation interface */
-    public Scene getScene() { return scene; }
+    public Scene getScene() { return layout.scene; }
     
     /** @return the simulation space where physics objects are displayed */
-    public Pane getSimSpace() { return simSpace; }
+    public Pane getSimSpace() { return layout.simSpace; }
     
     /** @return the inventory container for draggable objects */
-    public StackPane getInventoryBox() { return inventoryBox; }
+    public StackPane getInventoryBox() { return inventory.inventoryBox; }
     
     /** @return the container holding individual inventory items */
-    public VBox getInventoryItemBox() { return inventoryItemBox; }
+    public VBox getInventoryItemBox() { return inventory.inventoryItemBox; }
     
     /** @return the right sidebar containing inventory and controls */
-    public VBox getSideBar() { return sideBar; }
+    public VBox getSideBar() { return layout.sideBar; }
     
     /** @return the bottom bar (reserved for future features) */
-    public HBox getBottomBar() { return bottomBar; }
+    public HBox getBottomBar() { return layout.bottomBar; }
     
     /** @return the settings/pause menu overlay */
-    public StackPane getOverlaySettings() { return overlaySettings; }
+    public StackPane getOverlaySettings() { return overlays.overlaySettings; }
     
     /** @return the level completion overlay */
-    public StackPane getWinScreenOverlay() { return winScreenOverlay; }
+    public StackPane getWinScreenOverlay() { return overlays.winScreenOverlay; }
     
     /** @return the root container that layers all components */
-    public StackPane getRootStack() { return rootStack; }
+    public StackPane getRootStack() { return layout.rootStack; }
 
     //==================================================================================
     // BUTTON ACCESS METHODS

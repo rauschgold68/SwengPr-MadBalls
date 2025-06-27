@@ -25,10 +25,6 @@ import mm.controller.PhysicsAnimationController;
  * initialize the simulation,
  * manage inventory and dropped objects, export the current level, and handle
  * collision events.
- * <br>
- * <b>Note:</b> This class does not contain any UI or event handling code; it is
- * intended to be used
- * as the Model in an MVC architecture.
  * </p>
  *
  * <h2>Responsibilities:</h2>
