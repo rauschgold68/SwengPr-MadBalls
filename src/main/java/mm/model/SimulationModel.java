@@ -318,6 +318,7 @@ public class SimulationModel {
             @Override
             public void beginContact(Contact contact) {
                 handleContactBegin(contact);
+
             }
 
             @Override
