@@ -447,7 +447,6 @@ public class SimulationController {
     private void setupWinNextLevel() {
         int currentLevel = extractLevelNumber(model.getLevelPath());
         String nextLevel = "1";
-        ;
         switch (currentLevel) {
             case 1:
                 nextLevel = "2";
