@@ -22,34 +22,41 @@ package mm.model;
  * </p>
  */
 public class InventoryObject extends AbstractObject {
+    /** The count/quantity of this item in inventory */
     private int count;
 
     /** 
      * Default constructor.
-     * <p>
-     * Creates a new {@code InventoryObject} with default values. All fields are initialized to {@code null}, zero, or their default values.
-     * </p>
+     * Creates a new InventoryObject with default values.
      */
-    public InventoryObject() {}
+    public InventoryObject() {
+        super();
+        this.count = 0;
+    }
 
     /**
-     * Constructs an {@code InventoryObject} with the specified attributes.
-     * <p>
-     * The sprite may be set manually after creation.
-     * <b>Do NOT create new {@code InventoryObject} for similar items:</b>
-     * if the attributes are the same, just increment the count.
-     * </p>
+     * Constructs an InventoryObject with basic properties.
+     * Additional properties can be set using setter methods.
      *
-     * @param name    the name of the item (must not be {@code null})
-     * @param type    the type/category of the item (must not be {@code null})
-     * @param count   the count of this item (should be &gt;= 1)
-     * @param angle   the angle of the object before placing, in degrees
-     * @param size    the size (width, height) of the object (must not be {@code null})
-     * @param colour  the colour of the item (may be {@code null} if sprite is used)
-     * @param physics the physics information (may be {@code null} if not simulated)
+     * @param name the name of the item
+     * @param type the type/category of the item
+     * @param size the size (width, height) of the object
      */
-    public InventoryObject(String name, String type, int count, float angle, Size size, String colour, Physics physics, boolean winning) {
-        super(name, type, angle, size, colour, physics, winning);
+    public InventoryObject(String name, String type, Size size) {
+        super(name, type, size);
+        this.count = 1; // Default count for new inventory items
+    }
+
+    /**
+     * Constructs an InventoryObject with a specific count.
+     *
+     * @param name the name of the item
+     * @param type the type/category of the item
+     * @param size the size (width, height) of the object
+     * @param count the count of this item (should be >= 1)
+     */
+    public InventoryObject(String name, String type, Size size, int count) {
+        super(name, type, size);
         this.count = count;
     }
     /**

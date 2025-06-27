@@ -58,7 +58,7 @@
         "restitution": 0.0,
         "shape": "STATIC"
       },
-      "winning": true,
+      "winning": false,
       "count": 1
     },
     {
@@ -211,7 +211,7 @@
         "restitution": 0.0,
         "shape": "STATIC"
       },
-      "winning": true,
+      "winning": false,
       "count": 1
     }
   ]

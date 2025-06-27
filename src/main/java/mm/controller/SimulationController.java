@@ -67,7 +67,6 @@ public class SimulationController {
     private final SimulationView view;
     private final List<StackPane> inventoryWrappers = new ArrayList<>();
     private final Stage primaryStage;
-    private final boolean isPuzzleMode;
     private boolean atPuzzlesEnd;
 
     /**
@@ -81,9 +80,8 @@ public class SimulationController {
         this.primaryStage = primaryStage;
         this.model = new SimulationModel(levelPath);
         this.view = new SimulationView(primaryStage, isPuzzleMode, atPuzzlesEnd);
-        this.isPuzzleMode = isPuzzleMode;
 
-        // WIN-LISTENER setzen
+        // Set win listener
         this.model.setWinListener(() -> {
             Platform.runLater(() -> view.getWinScreenOverlay().setVisible(true));
         });
@@ -281,15 +279,16 @@ public class SimulationController {
     /**
      * Sets up menu button actions (play, stop, settings, delete, import, save).
      * <p>
-     * The actual buttons should be retrieved from the view and wired here.
-     * This is a placeholder for actual button wiring, which depends on your view
-     * implementation.
+     * Retrieves button groups from the refactored view and wires up event handlers.
      * </p>
      */
     private void setupMenuButtons() {
+        // Get button groups from the refactored view
+        SimulationView.SimulationButtons simButtons = view.getSimulationButtons();
+        
         // Start simulation.
-        if (view.playButton != null) {
-            view.playButton.setOnAction(e -> {
+        if (simButtons.playButton != null) {
+            simButtons.playButton.setOnAction(e -> {
                 PhysicsAnimationController timer = model.getTimer();
                 if (timer != null && !timer.isRunning()) {
                     timer.start();
@@ -297,9 +296,10 @@ public class SimulationController {
                 }
             });
         }
+        
         // Stop and reset simulation.
-        if (view.stopButton != null) {
-            view.stopButton.setOnAction(e -> {
+        if (simButtons.stopButton != null) {
+            simButtons.stopButton.setOnAction(e -> {
                 PhysicsAnimationController timer = model.getTimer();
                 if (timer != null && timer.isRunning()) {
                     timer.stop();
@@ -309,9 +309,10 @@ public class SimulationController {
                 setupSimulation();
             });
         }
+        
         // Open the settings menu.
-        if (view.settingsButton != null) {
-            view.settingsButton.setOnAction(e -> {
+        if (simButtons.settingsButton != null) {
+            simButtons.settingsButton.setOnAction(e -> {
                 PhysicsAnimationController timer = model.getTimer();
                 if (timer != null && timer.isRunning()) {
                     timer.stop();
@@ -319,9 +320,10 @@ public class SimulationController {
                 view.getOverlaySettings().setVisible(true);
             });
         }
+        
         // Delete all added objects to the simulation environment.
-        if (view.deleteButton != null) {
-            view.deleteButton.setOnAction(e -> {
+        if (simButtons.deleteButton != null) {
+            simButtons.deleteButton.setOnAction(e -> {
                 model.setDroppedObjects(new ArrayList<>());
                 model.setDroppedVisualPairs(new ArrayList<>());
                 setInventoryItemsDisabled(false);
@@ -329,9 +331,9 @@ public class SimulationController {
             });
         }
 
-        // Import level from .json - File (to implment)
-        if (view.importButton != null) {
-            view.importButton.setOnAction(e -> {
+        // Import level from .json - File (to implement)
+        if (simButtons.importButton != null) {
+            simButtons.importButton.setOnAction(e -> {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Import your level!");
                 fileChooser.getExtensionFilters().add(
@@ -344,16 +346,18 @@ public class SimulationController {
                 setupInventory();
             });
         }
-        if (view.saveButton != null) {
-            view.saveButton.setOnAction(e -> {
+        
+        if (simButtons.saveButton != null) {
+            simButtons.saveButton.setOnAction(e -> {
                 PhysicsAnimationController timer = model.getTimer();
                 if (timer != null && !timer.isRunning()) {
                     model.exportLevel();
                 }
             });
         }
-        if (view.crownButton != null) {
-            view.crownButton.setOnAction(e -> {
+        
+        if (simButtons.crownButton != null) {
+            simButtons.crownButton.setOnAction(e -> {
                 view.getWinScreenOverlay().setVisible(true);
             });
         }
@@ -375,31 +379,32 @@ public class SimulationController {
                 overlaySettings.setVisible(!overlaySettings.isVisible());
                 event.consume();
             }
-
         });
 
-        view.overlayCloseButton.setOnAction(e -> {
+        // Get button groups from the refactored view
+        SimulationView.OverlayButtons overlayButtons = view.getOverlayButtons();
+        SimulationView.WinScreenButtons winButtons = view.getWinScreenButtons();
+
+        overlayButtons.overlayCloseButton.setOnAction(e -> {
             view.getOverlaySettings().setVisible(false);
         });
 
-        view.overlayBackButton.setOnAction(e -> {
-            // Hide the overlay before switching scenes to avoid overlay showing on title
-            // screen
+        overlayButtons.overlayBackButton.setOnAction(e -> {
+            // Hide the overlay before switching scenes to avoid overlay showing on title screen
             view.getOverlaySettings().setVisible(false);
             TitleScreenController titleScreenView = new TitleScreenController(primaryStage);
             Scene newScreen = titleScreenView.getScene();
             primaryStage.setScene(newScreen);
             primaryStage.setWidth(scene.getWidth());
             primaryStage.setHeight(scene.getHeight());
-
         });
 
-        view.overlayQuitButton.setOnAction(e -> {
+        overlayButtons.overlayQuitButton.setOnAction(e -> {
             Platform.exit();
         });
 
         // win screen overlay functions
-        view.btnWinHome.setOnAction(e -> {
+        winButtons.btnWinHome.setOnAction(e -> {
             view.getWinScreenOverlay().setVisible(false);
             TitleScreenController titleScreenView = new TitleScreenController(primaryStage);
             Scene newScreen = titleScreenView.getScene();
@@ -408,8 +413,8 @@ public class SimulationController {
             primaryStage.setHeight(scene.getHeight());
         });
 
-        if (view.btnWinExport != null) {
-            view.btnWinExport.setOnAction(e -> {
+        if (winButtons.btnWinExport != null) {
+            winButtons.btnWinExport.setOnAction(e -> {
                 PhysicsAnimationController timer = model.getTimer();
                 if (timer != null && !timer.isRunning()) {
                     model.exportLevel();
@@ -442,7 +447,6 @@ public class SimulationController {
     private void setupWinNextLevel() {
         int currentLevel = extractLevelNumber(model.getLevelPath());
         String nextLevel = "1";
-        ;
         switch (currentLevel) {
             case 1:
                 nextLevel = "2";
@@ -457,8 +461,8 @@ public class SimulationController {
                 break;
         }
         String nextLevelPath = "/level/level" + nextLevel + ".json";
-        if (view.btnWinNext != null) {
-            view.btnWinNext.setOnAction(e -> {
+        if (view.getWinScreenButtons().btnWinNext != null) {
+            view.getWinScreenButtons().btnWinNext.setOnAction(e -> {
                 SimulationController simController = new SimulationController(primaryStage, nextLevelPath,
                         true, atPuzzlesEnd);
                 Scene simScene = simController.getScene();

@@ -61,92 +61,172 @@ public class InventoryObjectController {
      * @param world The Box2D {@link World} where the body is created. Must not be {@code null}.
      * @return      A {@link PhysicsVisualPair} containing the visual and physics body.
      */
-    public static PhysicsVisualPair convert(InventoryObject obj, World world){
+    public static PhysicsVisualPair convert(InventoryObject obj, World world) {
+        String type = obj.getType();
+        Shape visual;
+        Body body;
 
-        Physics physics = obj.getPhysics();
-        String type = obj.getType(); // e.g., "rectangle", "circle"
-        Shape visual = null;
-        Body body = null;
-
-        if ("rectangle".equalsIgnoreCase(type)){
-
-            float width = obj.getSize().getWidth();
-            float height = obj.getSize().getHeight();
-
-            if (obj.getName().equalsIgnoreCase("winZone")){
-                Rectangle rect = new Rectangle(width, height);
-                rect.setFill(PatternViewFactory.createWinzone(width, height));
-                visual = rect;
-
-                BodyDef def = new BodyDef();
-                def.type = BodyType.STATIC;
-                body = world.createBody(def);
-
-                PolygonShape shape = new PolygonShape();
-                shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
-
-                FixtureDef fixture = new FixtureDef();
-                fixture.shape = shape;
-                fixture.isSensor = true;
-                body.createFixture(fixture);
-                
-            } else if (obj.getName().equalsIgnoreCase("noPlaceZone")){
-                Rectangle rect = new Rectangle(width, height);
-                rect.setFill(PatternViewFactory.createNoPlaceZone(width, height));
-                visual = rect;
-
-                BodyDef def = new BodyDef();
-                def.type = BodyType.STATIC;
-                body = world.createBody(def);
-
-                PolygonShape shape = new PolygonShape();
-                shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
-
-                FixtureDef fixture = new FixtureDef();
-                fixture.shape = shape;
-                fixture.isSensor = true;
-                body.createFixture(fixture);
-
-            } else { 
-
-                Rectangle rect = new Rectangle(width, height, Color.valueOf(obj.getColour()));
-                visual = rect;
-
-                BodyDef def = new BodyDef();
-                def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
-                body = world.createBody(def);
-
-                PolygonShape shape = new PolygonShape();
-                shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
-
-                FixtureDef fixture = new FixtureDef();
-                fixture.shape = shape;
-                fixture.density = physics.getDensity();
-                fixture.friction = physics.getFriction();
-                fixture.restitution = physics.getRestitution();
-                body.createFixture(fixture);
-            }
-
+        if ("rectangle".equalsIgnoreCase(type)) {
+            visual = createRectangleVisual(obj);
+            body = createRectangleBody(obj, world);
         } else if ("circle".equalsIgnoreCase(type)) {
-            float radius = obj.getSize().getRadius();
-            Circle circ = new Circle(radius, Color.valueOf(obj.getColour()));
-            visual = circ;
-
-            BodyDef def = new BodyDef();
-            def.type = (physics.getShape().equals("DYNAMIC")) ? BodyType.DYNAMIC : BodyType.STATIC;
-            body = world.createBody(def);
-
-            CircleShape shape = new CircleShape();
-            shape.setRadius(radius / SCALE);
-
-            FixtureDef fixture = new FixtureDef();
-            fixture.shape = shape;
-            fixture.density = physics.getDensity();
-            fixture.friction = physics.getFriction();
-            fixture.restitution = physics.getRestitution();
-            body.createFixture(fixture);
+            visual = createCircleVisual(obj);
+            body = createCircleBody(obj, world);
+        } else {
+            throw new IllegalArgumentException("Unsupported shape type: " + type);
         }
 
         return new PhysicsVisualPair(visual, body);
+    }
+
+    /**
+     * Creates a JavaFX Rectangle visual representation for a rectangular InventoryObject.
+     * <p>
+     * Handles special cases for "noPlaceZone" (red pattern) and "winZone" (green pattern),
+     * while regular rectangles use the object's specified color.
+     * </p>
+     *
+     * @param obj The InventoryObject containing rectangle properties
+     * @return A configured Rectangle shape for visual rendering
+     */
+    private static Rectangle createRectangleVisual(InventoryObject obj) {
+        float width = obj.getSize().getWidth();
+        float height = obj.getSize().getHeight();
+        
+        Rectangle rect = new Rectangle(width, height);
+        
+        // Apply special patterns for zone objects
+        if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
+            rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.RED));
+        } else if (obj.getName().equalsIgnoreCase("winZone")) {
+            rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.GREEN));
+        } else {
+            rect.setFill(Color.valueOf(obj.getColour()));
+            // TODO: Add sprite code implementation here for textured objects
+        }
+        
+        return rect;
+    }
+
+    /**
+     * Creates a JBox2D Body for a rectangular InventoryObject.
+     * <p>
+     * Configures the body type (dynamic/static) based on physics properties,
+     * creates a box shape with appropriate dimensions, and sets up fixture
+     * properties including special sensor configuration for zone objects.
+     * </p>
+     *
+     * @param obj The InventoryObject containing rectangle and physics properties
+     * @param world The JBox2D World in which to create the body
+     * @return A configured Body for physics simulation
+     */
+    private static Body createRectangleBody(InventoryObject obj, World world) {
+        Physics physics = obj.getPhysics();
+        float width = obj.getSize().getWidth();
+        float height = obj.getSize().getHeight();
+
+        // Create body definition with appropriate type
+        BodyDef def = new BodyDef();
+        def.type = physics.getShape().equalsIgnoreCase("Dynamic") ? BodyType.DYNAMIC : BodyType.STATIC;
+        
+        Body body = world.createBody(def);
+        body.setUserData(obj.getName());
+
+        // Create box shape (half-extents for JBox2D)
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(width / 2 / SCALE, height / 2 / SCALE);
+
+        // Configure fixture with physics properties
+        FixtureDef fixture = createFixtureDef(shape, physics);
+        
+        // Set sensor flag for special zone objects
+        if (isZoneObject(obj.getName())) {
+            fixture.isSensor = true;
+        }
+        
+        body.createFixture(fixture);
+        return body;
+    }
+
+    /**
+     * Creates a JavaFX Circle visual representation for a circular InventoryObject.
+     * <p>
+     * Creates a circle with the specified radius and color from the InventoryObject.
+     * Currently does not handle special zone patterns for circles.
+     * </p>
+     *
+     * @param obj The InventoryObject containing circle properties
+     * @return A configured Circle shape for visual rendering
+     */
+    private static Circle createCircleVisual(InventoryObject obj) {
+        float radius = obj.getSize().getRadius();
+        return new Circle(radius, Color.valueOf(obj.getColour()));
+    }
+
+    /**
+     * Creates a JBox2D Body for a circular InventoryObject.
+     * <p>
+     * Configures the body type based on physics properties, creates a circle
+     * shape with appropriate radius, and sets up fixture properties.
+     * </p>
+     *
+     * @param obj The InventoryObject containing circle and physics properties
+     * @param world The JBox2D World in which to create the body
+     * @return A configured Body for physics simulation
+     */
+    private static Body createCircleBody(InventoryObject obj, World world) {
+        Physics physics = obj.getPhysics();
+        float radius = obj.getSize().getRadius();
+
+        // Create body definition with appropriate type
+        BodyDef def = new BodyDef();
+        def.type = physics.getShape().equals("DYNAMIC") ? BodyType.DYNAMIC : BodyType.STATIC;
+        
+        Body body = world.createBody(def);
+        body.setUserData(obj.getName());
+
+        // Create circle shape
+        CircleShape shape = new CircleShape();
+        shape.setRadius(radius / SCALE);
+
+        // Configure and attach fixture
+        FixtureDef fixture = createFixtureDef(shape, physics);
+        body.createFixture(fixture);
+        
+        return body;
+    }
+
+    /**
+     * Creates a FixtureDef with the specified shape and physics properties.
+     * <p>
+     * This helper method consolidates the common fixture configuration logic,
+     * setting density, friction, and restitution from the Physics object.
+     * </p>
+     *
+     * @param shape The JBox2D shape (CircleShape or PolygonShape)
+     * @param physics The Physics object containing material properties
+     * @return A configured FixtureDef ready for body attachment
+     */
+    private static FixtureDef createFixtureDef(org.jbox2d.collision.shapes.Shape shape, Physics physics) {
+        FixtureDef fixture = new FixtureDef();
+        fixture.shape = shape;
+        fixture.density = physics.getDensity();
+        fixture.friction = physics.getFriction();
+        fixture.restitution = physics.getRestitution();
+        return fixture;
+    }
+
+    /**
+     * Checks if the given object name represents a special zone object.
+     * <p>
+     * Zone objects (noPlaceZone, winZone) require special handling such as
+     * sensor physics bodies and custom visual patterns.
+     * </p>
+     *
+     * @param name The name of the object to check
+     * @return true if the object is a zone object, false otherwise
+     */
+    private static boolean isZoneObject(String name) {
+        return name.equalsIgnoreCase("noPlaceZone") || name.equalsIgnoreCase("winZone");
     }
 }

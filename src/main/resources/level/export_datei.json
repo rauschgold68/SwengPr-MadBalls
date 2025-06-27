@@ -1,0 +1,367 @@
+{
+  "levelObjects" : [ {
+    "name" : "ballon",
+    "type" : "Circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 50.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "0x800080ff",
+    "physics" : {
+      "density" : 0.15,
+      "friction" : 0.9,
+      "restitution" : 0.2,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1144.0,
+      "y" : 571.4286
+    }
+  }, {
+    "name" : "log",
+    "type" : "Circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 50.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "0x008000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 922.2857,
+      "y" : 421.14285
+    }
+  }, {
+    "name" : "bowlingball",
+    "type" : "Circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 35.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "0x808080ff",
+    "physics" : {
+      "density" : 0.9,
+      "friction" : 0.5,
+      "restitution" : 0.3,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1085.1428,
+      "y" : 420.57144
+    }
+  }, {
+    "name" : "tennisball",
+    "type" : "Circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 10.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "0xffff00ff",
+    "physics" : {
+      "density" : 0.1,
+      "friction" : 0.9,
+      "restitution" : 0.75,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 995.4286,
+      "y" : 494.2857
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 300.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "0x000000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 911.1428,
+      "y" : 687.1429
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 300.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "0x000000ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 839.1429,
+      "y" : 292.2857
+    }
+  }, {
+    "name" : "box1",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 100.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "angle" : 90.0,
+    "sprite" : null,
+    "colour" : "0xa52a2aff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 780.2857,
+      "y" : 97.42857
+    }
+  } ],
+  "inventoryObjects" : [ {
+    "name" : "box1",
+    "type" : "rectangle",
+    "size" : {
+      "width" : 100.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "angle" : 90.0,
+    "sprite" : null,
+    "colour" : "BROWN",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "count" : 1
+  }, {
+    "name" : "Domino",
+    "type" : "rectangle",
+    "size" : {
+      "width" : 20.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "BROWN",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "count" : 1
+  }, {
+    "name" : "winZone",
+    "type" : "rectangle",
+    "size" : {
+      "width" : 200.0,
+      "height" : 40.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "WINZONE",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.0,
+      "restitution" : 0.0,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "count" : 1
+  }, {
+    "name" : "winPlat",
+    "type" : "rectangle",
+    "size" : {
+      "width" : 50.0,
+      "height" : 10.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "RED",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "count" : 0
+  }, {
+    "name" : "platform",
+    "type" : "rectangle",
+    "size" : {
+      "width" : 300.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "count" : 1
+  }, {
+    "name" : "log",
+    "type" : "circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 50.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "GREEN",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "count" : 1
+  }, {
+    "name" : "tennisball",
+    "type" : "circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 10.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "YELLOW",
+    "physics" : {
+      "density" : 0.1,
+      "friction" : 0.9,
+      "restitution" : 0.75,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "count" : 1
+  }, {
+    "name" : "bowlingball",
+    "type" : "circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 35.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "GREY",
+    "physics" : {
+      "density" : 0.9,
+      "friction" : 0.5,
+      "restitution" : 0.3,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "count" : 1
+  }, {
+    "name" : "ball",
+    "type" : "circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 25.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 0.5,
+      "friction" : 0.75,
+      "restitution" : 0.5,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : true,
+    "count" : 1
+  }, {
+    "name" : "ballon",
+    "type" : "circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 50.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "#800080",
+    "physics" : {
+      "density" : 0.15,
+      "friction" : 0.9,
+      "restitution" : 0.2,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "count" : 1
+  }, {
+    "name" : "noPlaceZone",
+    "type" : "rectangle",
+    "size" : {
+      "width" : 200.0,
+      "height" : 40.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "noplaceZone",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 1.0,
+      "restitution" : 0.0,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "count" : 1
+  } ]
+}

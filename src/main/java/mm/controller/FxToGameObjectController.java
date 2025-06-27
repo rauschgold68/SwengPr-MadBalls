@@ -43,72 +43,141 @@ public class FxToGameObjectController {
      * @throws IllegalArgumentException if the shape type is not supported.
      */
     public static GameObject convertBack(PhysicsVisualPair pair) {
-        GameObject gameObject = null;
-
         String name = (String) pair.body.getUserData();
-        Position position = new Position(0,0);
-        // Angle is converted from radians (JBox2D) to degrees
         float angle = (float) Math.toDegrees(pair.body.getAngle());
-        Size size = new Size();
-        String colour = null;
-        String type;
-        Physics physics = new Physics();
-        boolean winning = pair.body.getUserData().equals("winobject");
-
-        // The JavaFX Shape representing the visual part of the object
+        boolean winning = pair.body.getUserData().equals("winObject");
         Shape shape = pair.visual;
 
-        if (!pair.body.getUserData().equals("winZone") && !pair.body.getUserData().equals("noPlaceZone")) {
-            // Extract color from the shape, defaulting to "BLACK" if not set
-            Color tmp = (Color) shape.getFill();
-            colour = (tmp != null) ? tmp.toString():"BLACK";
+        String colour = extractColour(pair, shape);
+        Position position = new Position(0, 0);
+        Size size = new Size();
+        String type = extractShapeProperties(shape, position, size);
+        Physics physics = extractPhysics(pair.body);
+
+        // Create GameObject with basic constructor
+        GameObject gameObject = new GameObject(name, type, position, size);
+        
+        // Set additional properties using setters
+        gameObject.setPhysics(physics);
+        gameObject.setAngle(angle);
+        gameObject.setColour(colour);
+        gameObject.setWinning(winning);
+        
+        return gameObject;
+    }
+
+    /**
+     * Extracts the color from the shape, handling special cases for certain object types.
+     * <p>
+     * This method handles the color extraction logic with special consideration for certain
+     * object types that should not have their color extracted (winZone and noPlaceZone).
+     * For regular objects, it extracts the fill color from the JavaFX Shape and converts
+     * it to a string representation, defaulting to "BLACK" if no color is set.
+     * </p>
+     * 
+     * @param pair The PhysicsVisualPair containing the body with user data
+     * @param shape The JavaFX Shape from which to extract the color
+     * @return The color as a string representation, null for special zones, or "BLACK" as default
+     */
+    private static String extractColour(PhysicsVisualPair pair, Shape shape) {
+        if (pair.body.getUserData().equals("winZone") || pair.body.getUserData().equals("noPlaceZone")) {
+            return null;
         }
+        Color tmp = (Color) shape.getFill();
+        return (tmp != null) ? tmp.toString() : "BLACK";
+    }
 
-        // Handle Rectangle shapes
+    /**
+     * Extracts shape-specific properties (position, size) and returns the shape type.
+     * <p>
+     * This method acts as a dispatcher, determining the type of JavaFX Shape and
+     * delegating to the appropriate handler method. It supports Rectangle and Circle
+     * shapes, throwing an exception for unsupported shape types.
+     * </p>
+     * 
+     * @param shape The JavaFX Shape to analyze
+     * @param position The Position object to populate with extracted coordinates
+     * @param size The Size object to populate with extracted dimensions
+     * @return A string representation of the shape type ("Rectangle" or "Circle")
+     * @throws IllegalArgumentException if the shape type is not supported
+     */
+    private static String extractShapeProperties(Shape shape, Position position, Size size) {
         if (shape instanceof Rectangle) {
-            type = "Rectangle";
-            javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) shape;
-            float x = (float) rect.getTranslateX();
-            float y = (float) rect.getTranslateY();
-            float width = (float) rect.getWidth();
-            float height = (float) rect.getHeight();
-
-            // Set position and size
-            position.setX(x);
-            position.setY(y);
-
-            size.setHeight(height);
-            size.setWidth(width);
-
-        // Handle Circle shapes
+            return handleRectangle((Rectangle) shape, position, size);
         } else if (shape instanceof Circle) {
-            type = "Circle";
-            javafx.scene.shape.Circle circle = (javafx.scene.shape.Circle) shape;
-            float x = (float) circle.getTranslateX();
-            float y = (float) circle.getTranslateY();
-            float r = (float) circle.getRadius();
-
-            // Set position and radius (width/height are zero for circles)
-            position.setX(x);
-            position.setY(y);
-            size.setHeight(0);
-            size.setWidth(0);
-            size.setRadius(r);
-
-        // Throw an error for unsupported shapes
+            return handleCircle((Circle) shape, position, size);
         } else {
             throw new IllegalArgumentException("Shape-Typ nicht unterstützt: " + shape.getClass());
         }
+    }
 
-        // Extract physics properties from the JBox2D body and fixture
-        physics.setShape(pair.body.getType().toString().toUpperCase());
-        Fixture fixture = pair.body.getFixtureList();
+    /**
+     * Handles rectangle shape properties extraction.
+     * <p>
+     * Extracts position and size properties specific to Rectangle shapes.
+     * The position is taken from the translation coordinates (translateX/Y),
+     * and the size includes both width and height dimensions.
+     * </p>
+     * 
+     * @param rect The Rectangle shape to extract properties from
+     * @param position The Position object to populate with x,y coordinates
+     * @param size The Size object to populate with width and height
+     * @return The string "Rectangle" indicating the shape type
+     */
+    private static String handleRectangle(Rectangle rect, Position position, Size size) {
+        position.setX((float) rect.getTranslateX());
+        position.setY((float) rect.getTranslateY());
+        size.setWidth((float) rect.getWidth());
+        size.setHeight((float) rect.getHeight());
+        return "Rectangle";
+    }
+
+    /**
+     * Handles circle shape properties extraction.
+     * <p>
+     * Extracts position and size properties specific to Circle shapes.
+     * The position is taken from the translation coordinates (translateX/Y).
+     * For circles, width and height are set to 0, and only the radius is used
+     * to represent the size, following the GameObject model conventions.
+     * </p>
+     * 
+     * @param circle The Circle shape to extract properties from
+     * @param position The Position object to populate with x,y coordinates
+     * @param size The Size object to populate with radius (width/height set to 0)
+     * @return The string "Circle" indicating the shape type
+     */
+    private static String handleCircle(Circle circle, Position position, Size size) {
+        position.setX((float) circle.getTranslateX());
+        position.setY((float) circle.getTranslateY());
+        size.setHeight(0);
+        size.setWidth(0);
+        size.setRadius((float) circle.getRadius());
+        return "Circle";
+    }
+
+    /**
+     * Extracts physics properties from the JBox2D body.
+     * <p>
+     * This method creates a new Physics object and populates it with properties
+     * from the JBox2D Body and its associated Fixture. The body type is converted
+     * to uppercase string format, and material properties (density, restitution,
+     * friction) are extracted from the first fixture in the body's fixture list.
+     * </p>
+     * 
+     * @param body The JBox2D Body containing the physics properties
+     * @return A new Physics object populated with the body's properties
+     */
+    private static Physics extractPhysics(Body body) {
+        Physics physics = new Physics();
+        // Convert JBox2D body type to uppercase string (e.g., "DYNAMIC", "STATIC")
+        physics.setShape(body.getType().toString().toUpperCase());
+        
+        // Extract material properties from the first fixture
+        Fixture fixture = body.getFixtureList();
         physics.setDensity(fixture.getDensity());
         physics.setRestitution(fixture.getRestitution());
         physics.setFriction(fixture.getFriction());
         
-        // Create and return the new GameObject
-        gameObject = new GameObject(name, type, position, angle, size, colour, physics, winning);
-        return gameObject;
+        return physics;
     }
 }

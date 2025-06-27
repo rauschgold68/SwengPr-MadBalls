@@ -25,29 +25,22 @@ public class GameObject extends AbstractObject {
 
     /**
      * Default constructor.
-     * <p>
-     * Creates a new {@code GameObject} with default values. All fields are initialized to {@code null} or zero.
-     * </p>
+     * Creates a new GameObject with default values.
      */
-    public GameObject() {}
+    public GameObject() {
+        super();
+    }
 
     /**
-     * Constructs a {@code GameObject} with the specified attributes.
-     * <p>
-     * The sprite may be set manually after creation.
-     * </p>
+     * Constructs a GameObject with basic properties.
      *
-     * @param name     the unique identifier for the object (must not be {@code null})
-     * @param type     the JavaFX type or category (must not be {@code null})
-     * @param position the position where to place the object (must not be {@code null})
-     * @param angle    the initial rotation of the object in degrees
-     * @param size     the size (width, height) of the object (must not be {@code null})
-     * @param colour   the colour of the object (may be {@code null} if sprite is used)
-     * @param physics  the jBox2d physics information (may be {@code null} if not simulated)
-     * @param winning  tells if object is win condition
+     * @param name the unique identifier for the object
+     * @param type the type or category of the object
+     * @param position the position where to place the object
+     * @param size the size (width, height) of the object
      */
-    public GameObject(String name, String type, Position position, float angle, Size size, String colour, Physics physics, boolean winning) {
-        super(name, type, angle, size, colour, physics, winning);
+    public GameObject(String name, String type, Position position, Size size) {
+        super(name, type, size);
         this.position = position;
     }
 

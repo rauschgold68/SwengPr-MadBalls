@@ -1,53 +1,67 @@
 package mm.model;
 
+/**
+ * Abstract base class representing a game object in the MadBalls simulation.
+ * <p>
+ * This class provides common properties and functionality for all objects that can
+ * exist in the game world, including position, size, appearance, and physics properties.
+ * </p>
+ * 
+ * @author MadBalls Development Team
+ * @version 1.0
+ * @since 1.0
+ */
 public class AbstractObject {
-    /** name of the object */
+    /** The unique name identifier of the object */
     private String name;
-    /** The type of the object */
+    /** The type or category of the object */
     private String type;
-    /** The position of the object in the level. */
+    /** The size (width, height) of the object */
     private Size size;
-    /** The angle of the object */
+    /** The rotation angle of the object in degrees */
     private float angle;
-    /** The sprite used for complex graphics (may be null). */
+    /** The sprite identifier or path for complex graphics (may be null) */
     private String sprite;
-    /** The colour of the object (only visible if the object doesn't use a sprite). */
+    /** The colour of the object (only visible if no sprite is used) */
     private String colour;
-    /** The physics object for jBox2d, containing simulation properties. */
+    /** The physics properties for jBox2d simulation */
     private Physics physics;
-    /** If set object triggers Win condition */
+    /** Whether this object triggers the win condition */
     private boolean winning;
 
     /**
      * Default constructor.
-     * <p>
-     * Creates a new {@code AbstractObject} with default values. All fields are initialized to {@code null} or zero.
-     * </p>
+     * Creates a new AbstractObject with default values.
      */
     public AbstractObject() {}
 
     /**
-     * Constructs a {@code GameObject} with the specified attributes.
-     * <p>
-     * The sprite may be set manually after creation.
-     * </p>
+     * Constructs an AbstractObject with basic properties.
+     * Additional properties can be set using setter methods.
      *
-     * @param name     the unique identifier for the object (must not be {@code null})
-     * @param type     the JavaFX type or category (must not be {@code null})
-     * @param angle    the initial rotation of the object in degrees
-     * @param size     the size (width, height) of the object (must not be {@code null})
-     * @param colour   the colour of the object (may be {@code null} if sprite is used)
-     * @param physics  the jBox2d physics information (may be {@code null} if not simulated)
-     * @param winning  tells if object is win condition
+     * @param name the unique identifier for the object
+     * @param type the type or category of the object
+     * @param size the size (width, height) of the object
      */
-    public AbstractObject(String name, String type, float angle, Size size, String colour, Physics physics, boolean winning) {
+    public AbstractObject(String name, String type, Size size) {
         this.name = name; 
         this.type = type;
-        this.angle = angle;
         this.size = size;
-        this.colour = colour;
+        this.angle = 0.0f;
+        this.winning = false;
+    }
+
+    /**
+     * Constructs an AbstractObject with essential properties.
+     * 
+     * @param name the unique identifier for the object
+     * @param type the type or category of the object
+     * @param size the size (width, height) of the object
+     * @param physics the physics properties for simulation
+     */
+    public AbstractObject(String name, String type, Size size, Physics physics) {
+        this(name, type, size);
         this.physics = physics;
-        this.winning = winning;
     }
 
     /**
@@ -120,7 +134,7 @@ public class AbstractObject {
      *
      * @param newColour the new colour to set (may be {@code null})
      */
-    public void setColor(String newColour) {this.colour = newColour;}
+    public void setColour(String newColour) {this.colour = newColour;}
 
     /**
      * Returns the physics properties of the object.
@@ -137,16 +151,16 @@ public class AbstractObject {
     public void setPhysics(Physics newPhysics) {this.physics = newPhysics;}
 
     /**
-     * Returns the position of the object.
+     * Returns whether this object triggers the win condition.
      *
-     * @return the position of the object
+     * @return true if this object triggers win condition, false otherwise
      */
     public boolean isWinning() {return this.winning;}
 
     /**
-     * Sets the position of the object.
+     * Sets whether this object triggers the win condition.
      *
-     * @param winning the new value to set (must not be {@code null})
+     * @param winning true if this object should trigger win condition
      */
     public void setWinning(boolean winning) {this.winning = winning;}
 
