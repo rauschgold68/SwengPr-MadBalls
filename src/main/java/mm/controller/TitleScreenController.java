@@ -61,7 +61,7 @@ public class TitleScreenController {
      */
     public TitleScreenController(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.view = new TitleScreenView(primaryStage);
+        this.view = new TitleScreenView();
         setupEventHandlers();
     }
 
@@ -84,10 +84,10 @@ public class TitleScreenController {
      */
     private void setupEventHandlers() {
         // Show puzzle/level selection overlay
-        view.btnPuzzle.setOnAction(e -> view.overlayBackgroundPuzzle.setVisible(true));
+        view.menuButtons.btnPuzzle.setOnAction(e -> view.overlayBackgroundPuzzle.setVisible(true));
 
         // Start sandbox mode
-        view.btnSandbox.setOnAction(e -> {
+        view.menuButtons.btnSandbox.setOnAction(e -> {
             SimulationController simController = new SimulationController(primaryStage, "/level/basic_sandbox.json",
                     false, false);
             Scene simScene = simController.getScene();
@@ -96,31 +96,31 @@ public class TitleScreenController {
         });
 
         // Show options overlay
-        view.btnOptions.setOnAction(e -> view.overlayBackgroundOptions.setVisible(true));
+        view.menuButtons.btnOptions.setOnAction(e -> view.overlayBackgroundOptions.setVisible(true));
 
         // Quit the application
-        view.btnQuit.setOnAction(e -> Platform.exit());
+        view.menuButtons.btnQuit.setOnAction(e -> Platform.exit());
 
         // Close overlays
-        view.btnCloseOptions.setOnAction(e -> view.overlayBackgroundOptions.setVisible(false));
-        view.btnClosePuzzle.setOnAction(e -> view.overlayBackgroundPuzzle.setVisible(false));
+        view.overlayButtons.btnCloseOptions.setOnAction(e -> view.overlayBackgroundOptions.setVisible(false));
+        view.overlayButtons.btnClosePuzzle.setOnAction(e -> view.overlayBackgroundPuzzle.setVisible(false));
 
         // Level card click handlers
-        view.levelCard1.setOnMouseClicked(e -> {
+        view.levelCards.levelCard1.setOnMouseClicked(e -> {
             SimulationController simController = new SimulationController(primaryStage, "/level/level1.json", true,
                     false);
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
             primaryStage.sizeToScene();
         });
-        view.levelCard2.setOnMouseClicked(e -> {
+        view.levelCards.levelCard2.setOnMouseClicked(e -> {
             SimulationController simController = new SimulationController(primaryStage, "/level/level2.json", true,
                     false);
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
             primaryStage.sizeToScene();
         });
-        view.levelCard3.setOnMouseClicked(e -> {
+        view.levelCards.levelCard3.setOnMouseClicked(e -> {
             SimulationController simController = new SimulationController(primaryStage, "/level/level3.json", true,
                     true);
             Scene simScene = simController.getScene();
