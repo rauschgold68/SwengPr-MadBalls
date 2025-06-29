@@ -87,11 +87,11 @@ public class GameObjectController {
      * <p>
      * Handles special cases for "noPlaceZone" (red pattern) and "winZone" (green pattern),
      * while regular rectangles use the object's specified color. The rectangle is positioned
-     * according to the GameObject's position coordinates.
+     * and rotated according to the GameObject's position and angle.
      * </p>
      *
      * @param obj The GameObject containing rectangle properties and position
-     * @return A configured Rectangle shape positioned for visual rendering
+     * @return A configured Rectangle shape positioned and rotated for visual rendering
      */
     private static Rectangle createRectangleVisual(GameObject obj) {
         float width = obj.getSize().getWidth();
@@ -111,9 +111,10 @@ public class GameObjectController {
             // TODO: Add sprite code implementation here for textured objects
         }
         
-        // Position the rectangle in the scene
+        // Position and rotate the rectangle in the scene
         rect.setTranslateX(x);
         rect.setTranslateY(y);
+        rect.setRotate(obj.getAngle()); // Apply the rotation from the GameObject
         
         return rect;
     }
@@ -168,11 +169,11 @@ public class GameObjectController {
      * Creates a JavaFX Circle visual representation for a circular GameObject.
      * <p>
      * Creates a circle with the specified radius and color from the GameObject,
-     * positioned according to the object's coordinates.
+     * positioned and rotated according to the object's coordinates and angle.
      * </p>
      *
      * @param obj The GameObject containing circle properties and position
-     * @return A configured Circle shape positioned for visual rendering
+     * @return A configured Circle shape positioned and rotated for visual rendering
      */
     private static Circle createCircleVisual(GameObject obj) {
         float radius = obj.getSize().getRadius();
@@ -182,6 +183,7 @@ public class GameObjectController {
         Circle circ = new Circle(radius, Color.valueOf(obj.getColour()));
         circ.setTranslateX(x);
         circ.setTranslateY(y);
+        circ.setRotate(obj.getAngle()); // Apply the rotation from the GameObject
         
         return circ;
     }

@@ -484,6 +484,9 @@ public class SimulationModel {
         float offsetY = (float) (template.getSize().getHeight() / 2.0);
 
         // Create GameObject with basic constructor
+        // The position represents the top-left corner for rectangles (consistent with JavaFX positioning)
+        // For drop coordinates (x,y), we want the center of the object to be at that position
+        // So we calculate the top-left corner by subtracting half the dimensions
         GameObject gameObject = new GameObject(
                 template.getName(), 
                 template.getType(),

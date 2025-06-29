@@ -68,6 +68,8 @@ public class SimulationController {
     private final List<StackPane> inventoryWrappers = new ArrayList<>();
     private final Stage primaryStage;
     private boolean atPuzzlesEnd;
+    // Map to track correspondence between GameObjects and their PhysicsVisualPairs
+    private final java.util.Map<GameObject, PhysicsVisualPair> gameObjectToPairMap = new java.util.HashMap<>();
 
     /**
      * Constructs the SimulationController, sets up the model and view, and wires up
@@ -120,15 +122,49 @@ public class SimulationController {
         // Add visuals to simSpace and restore angles for dropped objects
         List<GameObject> dropped = model.getDroppedObjects();
         List<PhysicsVisualPair> pairs = model.getPairs();
+        
+        // Clear the mapping and rebuild it during setup
+        gameObjectToPairMap.clear();
+        
         for (PhysicsVisualPair pair : pairs) {
             if (pair.visual != null) {
+                // Try to find the corresponding dropped object by matching the physics body's position
+                // with the stored GameObject position (since both should be in sync after creation)
+                GameObject matchedDroppedObject = null;
+                
                 for (GameObject obj : dropped) {
                     if (obj.getName().equals(pair.body.getUserData())) {
-                        pair.visual.setRotate(obj.getAngle());
-                        addMoveHandlersToDroppedVisual(pair, obj);
-                        break;
+                        // Get the physics body position (converted back to visual coordinates)
+                        org.jbox2d.common.Vec2 bodyPos = pair.body.getPosition();
+                        float expectedVisualX, expectedVisualY;
+                        
+                        // Convert physics position back to expected visual position
+                        if (pair.visual instanceof javafx.scene.shape.Rectangle) {
+                            javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
+                            expectedVisualX = (float) (bodyPos.x * 50.0f - rect.getWidth() / 2);
+                            expectedVisualY = (float) (bodyPos.y * 50.0f - rect.getHeight() / 2);
+                        } else {
+                            expectedVisualX = bodyPos.x * 50.0f;
+                            expectedVisualY = bodyPos.y * 50.0f;
+                        }
+                        
+                        // Check if this GameObject's position matches the physics body position
+                        float tolerance = 1.0f; // Small tolerance for floating point precision
+                        if (Math.abs(obj.getPosition().getX() - expectedVisualX) < tolerance &&
+                            Math.abs(obj.getPosition().getY() - expectedVisualY) < tolerance) {
+                            matchedDroppedObject = obj;
+                            break;
+                        }
                     }
                 }
+                
+                // If we found a matching dropped object, restore its properties and add handlers
+                if (matchedDroppedObject != null) {
+                    pair.visual.setRotate(matchedDroppedObject.getAngle());
+                    addMoveHandlersToDroppedVisual(pair, matchedDroppedObject);
+                    gameObjectToPairMap.put(matchedDroppedObject, pair);
+                }
+                
                 simSpace.getChildren().add(pair.visual);
             }
         }
@@ -266,6 +302,9 @@ public class SimulationController {
                         model.getPairs().add(pair);
                         model.getDroppedPhysicsVisualPairs().add(pair);
 
+                        // Store the mapping between GameObject and PhysicsVisualPair
+                        gameObjectToPairMap.put(simObj, pair);
+
                         addMoveHandlersToDroppedVisual(pair, simObj);
                     }
                     success = true;
@@ -326,6 +365,7 @@ public class SimulationController {
             simButtons.deleteButton.setOnAction(e -> {
                 model.setDroppedObjects(new ArrayList<>());
                 model.setDroppedVisualPairs(new ArrayList<>());
+                gameObjectToPairMap.clear(); // Clear the mapping when objects are deleted
                 setInventoryItemsDisabled(false);
                 setupSimulation();
             });
@@ -506,15 +546,26 @@ public class SimulationController {
             visual.setTranslateX(newX);
             visual.setTranslateY(newY);
 
-            // Update the GameObject's position (for export, etc.)
+            // Update the GameObject's position to match the visual position
             simObj.getPosition().setX((float) newX);
             simObj.getPosition().setY((float) newY);
 
-            // JBoxd change the point of animation
-            pair.body.setTransform(
-                new org.jbox2d.common.Vec2((float) (newX / 50.0), (float) (newY / 50.0)), 
-                pair.body.getAngle()
-            );
+            // Update physics body position - for rectangles, the body should be centered
+            if (visual instanceof javafx.scene.shape.Rectangle) {
+                javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) visual;
+                float centerX = (float) (newX + rect.getWidth() / 2);
+                float centerY = (float) (newY + rect.getHeight() / 2);
+                pair.body.setTransform(
+                    new org.jbox2d.common.Vec2(centerX / 50.0f, centerY / 50.0f), 
+                    pair.body.getAngle()
+                );
+            } else if (visual instanceof javafx.scene.shape.Circle) {
+                // For circles, the position is already at the center
+                pair.body.setTransform(
+                    new org.jbox2d.common.Vec2((float) (newX / 50.0), (float) (newY / 50.0)), 
+                    pair.body.getAngle()
+                );
+            }
 
             event.consume();
         });
