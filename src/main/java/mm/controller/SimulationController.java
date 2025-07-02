@@ -533,12 +533,26 @@ public class SimulationController {
         visual.setOnMouseExited(event -> visual.setCursor(javafx.scene.Cursor.DEFAULT));
 
         visual.setOnMousePressed(event -> {
+            // Check if simulation is running - if so, don't allow dragging
+            PhysicsAnimationController timer = model.getTimer();
+            if (timer != null && timer.isRunning()) {
+                event.consume();
+                return;
+            }
+            
             dragDelta[0] = event.getSceneX() - visual.getTranslateX();
             dragDelta[1] = event.getSceneY() - visual.getTranslateY();
             event.consume();
         });
 
         visual.setOnMouseDragged(event -> {
+            // Check if simulation is running - if so, don't allow dragging
+            PhysicsAnimationController timer = model.getTimer();
+            if (timer != null && timer.isRunning()) {
+                event.consume();
+                return;
+            }
+            
             double newX = event.getSceneX() - dragDelta[0];
             double newY = event.getSceneY() - dragDelta[1];
 
@@ -572,6 +586,13 @@ public class SimulationController {
         });
 
         visual.setOnScroll(event -> {
+            // Check if simulation is running - if so, don't allow rotation
+            PhysicsAnimationController timer = model.getTimer();
+            if (timer != null && timer.isRunning()) {
+                event.consume();
+                return;
+            }
+            
             float currentAngle = simObj.getAngle();
             float newAngle = currentAngle + 15;
 
