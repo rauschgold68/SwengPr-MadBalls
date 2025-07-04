@@ -2,6 +2,7 @@ package mm.controller;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
@@ -197,6 +198,14 @@ public class SimulationController {
                 StackPane wrapper = new StackPane(pair.visual);
                 wrapper.setPrefSize(rotatedWidth + 20, rotatedHeight + 20); // Add padding to prevent overlap
                 inventoryWrappers.add(wrapper);
+
+                Label countLabel = new Label(Integer.toString(obj.getCount()));
+                countLabel.getStyleClass().add("item-count");
+                countLabel.setMouseTransparent(true); // Allow drag events to pass through
+                wrapper.getChildren().add(countLabel);
+                
+                // Position the count label at the top right
+                StackPane.setAlignment(countLabel, javafx.geometry.Pos.CENTER_RIGHT);
 
                 wrapper.setOnDragDetected(event -> {
                     PhysicsAnimationController timer = model.getTimer();
