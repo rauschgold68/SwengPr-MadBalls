@@ -90,7 +90,7 @@ public class SimulationController {
         });
 
         setupSimulation();
-        setupInventory();
+        setupInventory(true); // Load data from file on initial setup
         setupDragAndDrop();
         setupMenuButtons();
         setupOverlayToggle();
@@ -172,68 +172,161 @@ public class SimulationController {
     }
 
     /**
-     * Initializes the inventory area by loading inventory objects and setting up
-     * drag-and-drop.
+     * Initializes or refreshes the inventory area.
      * <p>
-     * Clears the inventory UI, loads inventory objects from the model, and creates
-     * drag sources for each.
+     * Clears the inventory UI, optionally reloads inventory data from file,
+     * and creates drag sources for each item.
      * </p>
+     * 
+     * @param reloadData if true, reloads inventory data from JSON file; 
+     *                   if false, uses existing data with current counts
      */
-    private void setupInventory() {
+    private void setupInventory(boolean reloadData) {
         VBox inventoryItemBox = view.getInventoryItemBox();
         inventoryItemBox.getChildren().clear();
         inventoryWrappers.clear();
 
-        model.setupInvetoryData();
+        // Only reload data from file if explicitly requested
+        if (reloadData) {
+            model.setupInvetoryData();
+        }
 
+        // Delegate inventory item creation to the view
         for (InventoryObject obj : model.getInventoryObjects()) {
-            PhysicsVisualPair pair = mm.controller.InventoryObjectController.convert(obj, model.getWorld());
-            if (pair.visual != null) {
-                pair.visual.setRotate(obj.getAngle());                
-
-                // Dynamically adjust wrapper size based on rotated dimensions
-                double rotatedWidth = pair.visual.getBoundsInParent().getWidth();
-                double rotatedHeight = pair.visual.getBoundsInParent().getHeight();
-
-                StackPane wrapper = new StackPane(pair.visual);
-                wrapper.setPrefSize(rotatedWidth + 20, rotatedHeight + 20); // Add padding to prevent overlap
-                inventoryWrappers.add(wrapper);
-
-                Label countLabel = new Label(Integer.toString(obj.getCount()));
-                countLabel.getStyleClass().add("item-count");
-                countLabel.setMouseTransparent(true); // Allow drag events to pass through
-                wrapper.getChildren().add(countLabel);
-                
-                // Position the count label at the top right
-                StackPane.setAlignment(countLabel, javafx.geometry.Pos.CENTER_RIGHT);
-
-                wrapper.setOnDragDetected(event -> {
-                    PhysicsAnimationController timer = model.getTimer();
-                    if (timer != null && timer.isRunning()) {
-                        event.consume();
-                        return;
-                    }
-                    Dragboard db = wrapper.startDragAndDrop(TransferMode.COPY);
-                    ClipboardContent content = new ClipboardContent();
-                    content.putString(obj.getName());
-                    db.setContent(content);
-
-                    // Create a snapshot with transparent background
-                    javafx.scene.SnapshotParameters snapshotParameters = new javafx.scene.SnapshotParameters();
-                    snapshotParameters.setFill(javafx.scene.paint.Color.TRANSPARENT); // Set transparent background
-                    javafx.scene.image.WritableImage snapshot = pair.visual.snapshot(snapshotParameters, null);
-
-                    db.setDragView(snapshot, snapshot.getWidth() / 2, snapshot.getHeight() / 2);
-
-                    event.consume();
-                });
-
-                inventoryItemBox.getChildren().add(wrapper);
+            StackPane itemWrapper = createInventoryItemWrapper(obj);
+            if (itemWrapper != null) {
+                inventoryWrappers.add(itemWrapper);
+                setupInventoryItemHandlers(itemWrapper, obj);
+                inventoryItemBox.getChildren().add(itemWrapper);
             }
         }
 
-        // Add spacing between items in the inventory
-        inventoryItemBox.setSpacing(15); // Adjust spacing as needed
+        // Configure inventory layout
+        inventoryItemBox.setSpacing(15);
+    }
+
+    /**
+     * Creates a wrapper for an inventory item with visual styling.
+     * <p>
+     * This is a temporary helper method that should eventually be moved to the view layer
+     * for better MVC compliance.
+     * </p>
+     * 
+     * @param obj the inventory object to create a wrapper for
+     * @return a StackPane wrapper containing the visual representation
+     */
+    private StackPane createInventoryItemWrapper(InventoryObject obj) {
+        PhysicsVisualPair pair = mm.controller.InventoryObjectController.convert(obj, model.getWorld());
+        if (pair.visual == null) {
+            return null;
+        }
+        
+        pair.visual.setRotate(obj.getAngle());
+        
+        // Dynamically adjust wrapper size based on rotated dimensions
+        double rotatedWidth = pair.visual.getBoundsInParent().getWidth();
+        double rotatedHeight = pair.visual.getBoundsInParent().getHeight();
+
+        StackPane wrapper = new StackPane(pair.visual);
+        wrapper.setPrefSize(rotatedWidth + 20, rotatedHeight + 20);
+
+        Label countLabel = new Label(Integer.toString(obj.getCount()));
+        countLabel.setMouseTransparent(true);
+        
+        // Apply appropriate CSS class based on count
+        if (obj.getCount() <= 0) {
+            countLabel.getStyleClass().add("item-count-no");
+            wrapper.setStyle("-fx-opacity: 0.5;");
+        } else {
+            countLabel.getStyleClass().add("item-count-yes");
+            wrapper.setStyle("");
+        }
+        
+        wrapper.getChildren().add(countLabel);
+        StackPane.setAlignment(countLabel, javafx.geometry.Pos.CENTER_RIGHT);
+        
+        return wrapper;
+    }
+
+    /**
+     * Sets up event handlers for an inventory item wrapper.
+     * <p>
+     * This method contains the controller logic for drag-and-drop behavior
+     * while keeping UI creation in the view.
+     * </p>
+     * 
+     * @param wrapper the inventory item wrapper
+     * @param obj the inventory object associated with this wrapper
+     */
+    private void setupInventoryItemHandlers(StackPane wrapper, InventoryObject obj) {
+        wrapper.setOnDragDetected(event -> {
+            // Business logic: check if drag should be allowed
+            if (!isDragAllowed(obj)) {
+                event.consume();
+                return;
+            }
+            
+            // Delegate drag setup to helper method
+            startInventoryItemDrag(wrapper, obj, event);
+        });
+    }
+    
+    /**
+     * Determines if an inventory item can be dragged.
+     * <p>
+     * Business logic method that checks game state and item availability.
+     * </p>
+     * 
+     * @param obj the inventory object to check
+     * @return true if the item can be dragged, false otherwise
+     */
+    private boolean isDragAllowed(InventoryObject obj) {
+        PhysicsAnimationController timer = model.getTimer();
+        
+        // Cannot drag during simulation
+        if (timer != null && timer.isRunning()) {
+            return false;
+        }
+        
+        // Cannot drag items with zero count
+        if (obj.getCount() <= 0) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Starts the drag operation for an inventory item.
+     * <p>
+     * Helper method to reduce complexity in the main drag handler.
+     * </p>
+     */
+    private void startInventoryItemDrag(StackPane wrapper, InventoryObject obj, javafx.scene.input.MouseEvent event) {
+        Dragboard db = wrapper.startDragAndDrop(TransferMode.COPY);
+        ClipboardContent content = new ClipboardContent();
+        content.putString(obj.getName());
+        db.setContent(content);
+
+        // Create drag image from the visual component
+        javafx.scene.Node visual = wrapper.getChildren().get(0); // First child should be the visual
+        javafx.scene.SnapshotParameters snapshotParameters = new javafx.scene.SnapshotParameters();
+        snapshotParameters.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        javafx.scene.image.WritableImage snapshot = visual.snapshot(snapshotParameters, null);
+        
+        db.setDragView(snapshot, snapshot.getWidth() / 2, snapshot.getHeight() / 2);
+        event.consume();
+    }
+
+    /**
+     * Refreshes the inventory display without reloading data from file.
+     * <p>
+     * This method updates the visual representation of inventory items
+     * based on current count values, without resetting counts from the JSON file.
+     * </p>
+     */
+    private void refreshInventoryDisplay() {
+        setupInventory(false);
     }
 
     /**
@@ -317,6 +410,9 @@ public class SimulationController {
                         addMoveHandlersToDroppedVisual(pair, simObj);
                     }
                     success = true;
+                    
+                    // Refresh inventory to show updated count
+                    refreshInventoryDisplay();
                 }
             }
             event.setDropCompleted(success);
@@ -354,7 +450,13 @@ public class SimulationController {
                     timer.reset();
                     setInventoryItemsDisabled(false);
                 }
+                // Restore inventory counts and refresh
+                model.restoreInventoryCounts();
+                model.setDroppedObjects(new ArrayList<>());
+                model.setDroppedVisualPairs(new ArrayList<>());
+                gameObjectToPairMap.clear();
                 setupSimulation();
+                refreshInventoryDisplay(); // Refresh inventory to show updated counts
             });
         }
         
@@ -372,11 +474,15 @@ public class SimulationController {
         // Delete all added objects to the simulation environment.
         if (simButtons.deleteButton != null) {
             simButtons.deleteButton.setOnAction(e -> {
+                // Restore inventory counts before clearing objects
+                model.restoreInventoryCounts();
+                
                 model.setDroppedObjects(new ArrayList<>());
                 model.setDroppedVisualPairs(new ArrayList<>());
                 gameObjectToPairMap.clear(); // Clear the mapping when objects are deleted
                 setInventoryItemsDisabled(false);
                 setupSimulation();
+                refreshInventoryDisplay(); // Refresh inventory to show updated counts
             });
         }
 
@@ -392,7 +498,7 @@ public class SimulationController {
                     model.setLevelPath("/level/" + file.getName());
                 }
                 setupSimulation();
-                setupInventory();
+                setupInventory(true); // Reload data when importing new level
             });
         }
         

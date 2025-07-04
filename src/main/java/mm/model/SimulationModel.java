@@ -499,6 +499,8 @@ public class SimulationModel {
         gameObject.setColour(template.getColour());
         gameObject.setSprite(template.getSprite());
         gameObject.setWinning(template.isWinning());
+
+        template.setCount(template.getCount() - 1);
         
         return gameObject;
     }
@@ -524,5 +526,21 @@ public class SimulationModel {
             }
         }
         return false;
+    }
+
+    /**
+     * Restores inventory counts for all dropped objects.
+     * <p>
+     * This method should be called when clearing all dropped objects to return
+     * their counts to the inventory.
+     * </p>
+     */
+    public void restoreInventoryCounts() {
+        for (GameObject droppedObj : droppedObjects) {
+            InventoryObject inventoryTemplate = findInventoryObjectByName(droppedObj.getName());
+            if (inventoryTemplate != null) {
+                inventoryTemplate.setCount(inventoryTemplate.getCount() + 1);
+            }
+        }
     }
 }
