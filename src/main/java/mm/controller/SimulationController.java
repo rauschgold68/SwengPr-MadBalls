@@ -16,6 +16,7 @@ import javafx.stage.FileChooser;
 import mm.model.GameObject;
 import mm.model.InventoryObject;
 import mm.model.PhysicsVisualPair;
+import mm.model.Position;
 import mm.model.SimulationModel;
 import mm.view.SimulationView;
 
@@ -71,6 +72,10 @@ public class SimulationController {
     private boolean atPuzzlesEnd;
     // Map to track correspondence between GameObjects and their PhysicsVisualPairs
     private final java.util.Map<GameObject, PhysicsVisualPair> gameObjectToPairMap = new java.util.HashMap<>();
+
+    // Drag start position and angle for undo functionality
+    private Position dragStartPosition;
+    private float dragStartAngle;
 
     /**
      * Constructs the SimulationController, sets up the model and view, and wires up
@@ -397,26 +402,23 @@ public class SimulationController {
 
                 if (template != null) {
                     GameObject simObj = model.createGameObjectFromInventory(template, (float) x, (float) y);
-                    model.addDroppedObject(simObj);
-
+                    
                     PhysicsVisualPair pair = mm.controller.GameObjectController.convert(simObj, model.getWorld());
                     if (pair.visual != null) {
                         pair.visual.setRotate(simObj.getAngle());
-                        simSpace.getChildren().add(pair.visual);
-                        model.getPairs().add(pair);
-                        model.getDroppedPhysicsVisualPairs().add(pair);
-
-                        // Store the mapping between GameObject and PhysicsVisualPair
-                        gameObjectToPairMap.put(simObj, pair);
-
+                        
+                        // Create and execute add command
+                        AddObjectCommand addCommand = new AddObjectCommand(
+                            model, simSpace, simObj, pair, gameObjectToPairMap, this::refreshInventoryDisplay
+                        );
+                        model.getUndoRedoManager().executeCommand(addCommand);
+                        
                         addMoveHandlersToDroppedVisual(pair, simObj);
                     }
                     success = true;
-                    
-                    // Refresh inventory to show updated count
-                    refreshInventoryDisplay();
                 }
             }
+            
             event.setDropCompleted(success);
             event.consume();
         });
@@ -473,18 +475,39 @@ public class SimulationController {
             });
         }
         
+        // Undo button
+        if (simButtons.undoButton != null) {
+            simButtons.undoButton.setOnAction(e -> {
+                if (isInteractionAllowed()) {
+                    model.getUndoRedoManager().undo();
+                }
+            });
+        }
+        
+        // Redo button
+        if (simButtons.redoButton != null) {
+            simButtons.redoButton.setOnAction(e -> {
+                if (isInteractionAllowed()) {
+                    model.getUndoRedoManager().redo();
+                }
+            });
+        }
+        
         // Delete all added objects to the simulation environment.
         if (simButtons.deleteButton != null) {
             simButtons.deleteButton.setOnAction(e -> {
+                // Clear undo/redo history when deleting all objects
+                model.getUndoRedoManager().clear();
+                
                 // Restore inventory counts before clearing objects
                 model.restoreInventoryCounts();
                 
                 model.setDroppedObjects(new ArrayList<>());
                 model.setDroppedVisualPairs(new ArrayList<>());
-                gameObjectToPairMap.clear(); // Clear the mapping when objects are deleted
+                gameObjectToPairMap.clear();
                 setInventoryItemsDisabled(false);
                 setupSimulation();
-                refreshInventoryDisplay(); // Refresh inventory to show updated counts
+                refreshInventoryDisplay();
             });
         }
 
@@ -631,14 +654,6 @@ public class SimulationController {
 
     /**
      * Adds mouse event handlers to a dropped object's visual node to enable moving it within the simulation area.
-     * <ul>
-     *   <li>Only objects that originated from the inventory (i.e., dropped objects) should use this handler.</li>
-     *   <li>The method updates the {@link GameObject}'s position and the {@link PhysicsVisualPair}'s Box2D body.</li>
-     *   <li>Visual feedback includes cursor changes and can be extended for more effects (e.g., opacity, shadows).</li>
-     * </ul>
-     *
-     * @param pair   the {@link PhysicsVisualPair} containing the visual node and Box2D body to be moved
-     * @param simObj the {@link GameObject} model instance associated with the visual
      */
     private void addMoveHandlersToDroppedVisual(PhysicsVisualPair pair, GameObject simObj) {
         javafx.scene.Node visual = pair.visual;
@@ -648,13 +663,14 @@ public class SimulationController {
         visual.setOnMouseExited(event -> visual.setCursor(javafx.scene.Cursor.DEFAULT));
 
         visual.setOnMousePressed(event -> {
-
-            // Prevent moving objects during simulation
             if (!isInteractionAllowed()) {
-
                 event.consume();
                 return;
             }
+            
+            // Store starting position and angle for undo
+            dragStartPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
+            dragStartAngle = simObj.getAngle();
             
             dragDelta[0] = event.getSceneX() - visual.getTranslateX();
             dragDelta[1] = event.getSceneY() - visual.getTranslateY();
@@ -662,9 +678,7 @@ public class SimulationController {
         });
 
         visual.setOnMouseDragged(event -> {
-            // Prevent moving objects during simulation
             if (!isInteractionAllowed()) {
-
                 event.consume();
                 return;
             }
@@ -679,7 +693,7 @@ public class SimulationController {
             simObj.getPosition().setX((float) newX);
             simObj.getPosition().setY((float) newY);
 
-            // Update physics body position - for rectangles, the body should be centered
+            // Update physics body position
             if (visual instanceof javafx.scene.shape.Rectangle) {
                 javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) visual;
                 float centerX = (float) (newX + rect.getWidth() / 2);
@@ -689,7 +703,6 @@ public class SimulationController {
                     pair.body.getAngle()
                 );
             } else if (visual instanceof javafx.scene.shape.Circle) {
-                // For circles, the position is already at the center
                 pair.body.setTransform(
                     new org.jbox2d.common.Vec2((float) (newX / 50.0), (float) (newY / 50.0)), 
                     pair.body.getAngle()
@@ -698,18 +711,42 @@ public class SimulationController {
 
             event.consume();
         });
-
-        visual.setOnScroll(event -> {
-
-            // Prevent rotating objects during simulation
+        
+        visual.setOnMouseReleased(event -> {
             if (!isInteractionAllowed()) {
-
                 event.consume();
                 return;
             }
             
+            // Create move command if position or angle changed
+            Position currentPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
             float currentAngle = simObj.getAngle();
-            float newAngle = currentAngle + 15;
+            
+            if (dragStartPosition != null && 
+                (Math.abs(dragStartPosition.getX() - currentPosition.getX()) > 1.0f ||
+                 Math.abs(dragStartPosition.getY() - currentPosition.getY()) > 1.0f ||
+                 Math.abs(dragStartAngle - currentAngle) > 1.0f)) {
+                
+                MoveObjectCommand moveCommand = new MoveObjectCommand(
+                    simObj, pair, dragStartPosition, currentPosition, dragStartAngle, currentAngle
+                );
+                model.getUndoRedoManager().executeCommand(moveCommand);
+            }
+            
+            event.consume();
+        });
+
+        visual.setOnScroll(event -> {
+            if (!isInteractionAllowed()) {
+                event.consume();
+                return;
+            }
+            
+            // Store starting angle for undo
+            float startAngle = simObj.getAngle();
+            Position currentPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
+            
+            float newAngle = startAngle + 15;
 
             // Update visual rotation
             pair.visual.setRotate(newAngle);
@@ -717,14 +754,18 @@ public class SimulationController {
             // Update GameObject angle
             simObj.setAngle(newAngle);
 
-            
-
-
-            // Update physics body rotation - convert degrees to radians
+            // Update physics body rotation
             pair.body.setTransform(
                 pair.body.getPosition(), 
                 (float) Math.toRadians(newAngle)
             );
+            
+            // Create move command for rotation
+            MoveObjectCommand rotateCommand = new MoveObjectCommand(
+                simObj, pair, currentPosition, currentPosition, startAngle, newAngle
+            );
+            model.getUndoRedoManager().executeCommand(rotateCommand);
+            
             event.consume();
         });
     }

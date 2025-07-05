@@ -14,6 +14,7 @@ import mm.controller.GameObjectController;
 import mm.controller.LevelExportController;
 import mm.controller.LevelImportController;
 import mm.controller.PhysicsAnimationController;
+import mm.controller.UndoRedoController;
 
 /**
  * The SimulationModel class encapsulates the core simulation state and logic
@@ -61,10 +62,10 @@ public class SimulationModel {
     private boolean winScreenVisible = false;
     /** Listener for win condition events in the simulation. */
     private WinListener winListener;
+    private final UndoRedoController UndoRedoController = new UndoRedoController();
 
     /**
      * Constructs a SimulationModel for a specific level.
-     *
      * @param levelPath the resource path to the level JSON file (e.g.,
      *                  "/level/level1.json")
      */
@@ -540,6 +541,26 @@ public class SimulationModel {
             InventoryObject inventoryTemplate = findInventoryObjectByName(droppedObj.getName());
             if (inventoryTemplate != null) {
                 inventoryTemplate.setCount(inventoryTemplate.getCount() + 1);
+            }
+        }
+    }
+
+    /**
+     * Gets the undo/redo manager for this simulation.
+     */
+    public UndoRedoController getUndoRedoManager() {
+        return UndoRedoController;
+    }
+    
+    /**
+     * Increments the inventory count for a specific item.
+     * Used when undoing object placement.
+     */
+    public void incrementInventoryCount(String itemName) {
+        for (InventoryObject obj : inventoryObjects) {
+            if (obj.getName().equals(itemName)) {
+                obj.setCount(obj.getCount() + 1);
+                break;
             }
         }
     }
