@@ -27,6 +27,14 @@ public class AddObjectController implements Command {
         public final Map<GameObject, PhysicsVisualPair> gameObjectToPairMap;
         public final Runnable refreshInventoryCallback;
         
+        /**
+         * Constructs a new AddObjectParams with the required simulation dependencies.
+         * 
+         * @param model The simulation model to manage game state
+         * @param simSpace The JavaFX pane where visual objects are displayed
+         * @param gameObjectToPairMap The mapping between game objects and their physics-visual pairs
+         * @param refreshInventoryCallback The callback to refresh the inventory display
+         */
         public AddObjectParams(SimulationModel model, Pane simSpace, 
                               Map<GameObject, PhysicsVisualPair> gameObjectToPairMap,
                               Runnable refreshInventoryCallback) {

@@ -745,9 +745,13 @@ public class SimulationController {
                  Math.abs(dragStartPosition.getY() - currentPosition.getY()) > 1.0f ||
                  Math.abs(dragStartAngle - currentAngle) > 1.0f)) {
         
-                MoveObjectController moveCommand = new MoveObjectController(
-                    simObj, pair, dragStartPosition, currentPosition, dragStartAngle, currentAngle
-                );
+                MoveObjectController.MoveObjectParams moveParams = new MoveObjectController.MoveObjectParams.Builder()
+                    .setGameObject(simObj)
+                    .setPair(pair)
+                    .setPositions(dragStartPosition, currentPosition)
+                    .setAngles(dragStartAngle, currentAngle)
+                    .build();
+                MoveObjectController moveCommand = new MoveObjectController(moveParams);
                 model.getUndoRedoManager().executeCommand(moveCommand);
             }
             
@@ -779,9 +783,13 @@ public class SimulationController {
             );
             
             // Create move command for rotation
-            MoveObjectController rotateCommand = new MoveObjectController(
-                simObj, pair, currentPosition, currentPosition, startAngle, newAngle
-            );
+            MoveObjectController.MoveObjectParams rotateParams = new MoveObjectController.MoveObjectParams.Builder()
+                .setGameObject(simObj)
+                .setPair(pair)
+                .setPositions(currentPosition, currentPosition)
+                .setAngles(startAngle, newAngle)
+                .build();
+            MoveObjectController rotateCommand = new MoveObjectController(rotateParams);
             model.getUndoRedoManager().executeCommand(rotateCommand);
             
             event.consume();
