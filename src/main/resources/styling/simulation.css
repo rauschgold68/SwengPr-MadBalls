@@ -212,3 +212,25 @@
   -fx-text-fill: white;
   -fx-font-size: 14px;
 }
+
+.item-count-yes {
+  -fx-background-color: rgba(0, 255, 26, 0.8);
+  -fx-background-radius: 10;
+  -fx-text-fill: black;
+  -fx-padding: 2 6 2 6;
+  -fx-font-size: 12px;
+  -fx-font-weight: bold;
+}
+
+.item-count-no {
+  -fx-background-color: rgba(255, 0, 0, 0.8);
+  -fx-background-radius: 10;
+  -fx-text-fill: black;
+  -fx-padding: 2 6 2 6;
+  -fx-font-size: 12px;
+  -fx-font-weight: bold;
+}
+
+.item-count-no-wrapper {
+  -fx-opacity: 0.5;
+}
