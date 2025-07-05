@@ -157,11 +157,16 @@ public class MenuGridFactory {
      * Creates icons for the bottom row of the grid (currently only crown button).
      */
     private FontIcon createBottomRowIcon(int col, Button btn) {
-        if (col == 0) {
-            simulationButtons.crownButton = btn;
-            return new FontIcon(FontAwesomeSolid.CROWN);
+        switch (col) {
+            case 1:
+                simulationButtons.undoButton = btn;
+                return new FontIcon(FontAwesomeSolid.REPLY);
+            case 2:
+                simulationButtons.redoButton = btn;
+                return new FontIcon(FontAwesomeSolid.SHARE);
+            default:
+            return null;
         }
-        return null;
     }
 
     /**

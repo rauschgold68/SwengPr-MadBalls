@@ -162,6 +162,7 @@ public class SimulationController {
                 // If we found a matching dropped object, restore its properties and add handlers
                 if (matchedDroppedObject != null) {
                     pair.visual.setRotate(matchedDroppedObject.getAngle());
+
                     addMoveHandlersToDroppedVisual(pair, matchedDroppedObject);
                     gameObjectToPairMap.put(matchedDroppedObject, pair);
                 }
@@ -634,7 +635,6 @@ public class SimulationController {
      *   <li>Only objects that originated from the inventory (i.e., dropped objects) should use this handler.</li>
      *   <li>The method updates the {@link GameObject}'s position and the {@link PhysicsVisualPair}'s Box2D body.</li>
      *   <li>Visual feedback includes cursor changes and can be extended for more effects (e.g., opacity, shadows).</li>
-     *   <li>Optionally, checks for placement restrictions (such as no-place zones) can be added.</li>
      * </ul>
      *
      * @param pair   the {@link PhysicsVisualPair} containing the visual node and Box2D body to be moved
@@ -648,8 +648,10 @@ public class SimulationController {
         visual.setOnMouseExited(event -> visual.setCursor(javafx.scene.Cursor.DEFAULT));
 
         visual.setOnMousePressed(event -> {
+
             // Prevent moving objects during simulation
             if (!isInteractionAllowed()) {
+
                 event.consume();
                 return;
             }
@@ -662,14 +664,13 @@ public class SimulationController {
         visual.setOnMouseDragged(event -> {
             // Prevent moving objects during simulation
             if (!isInteractionAllowed()) {
+
                 event.consume();
                 return;
             }
             
             double newX = event.getSceneX() - dragDelta[0];
             double newY = event.getSceneY() - dragDelta[1];
-
-            // Optionally: Check for no-place zones here if needed
 
             visual.setTranslateX(newX);
             visual.setTranslateY(newY);
@@ -699,8 +700,10 @@ public class SimulationController {
         });
 
         visual.setOnScroll(event -> {
+
             // Prevent rotating objects during simulation
             if (!isInteractionAllowed()) {
+
                 event.consume();
                 return;
             }
@@ -708,9 +711,20 @@ public class SimulationController {
             float currentAngle = simObj.getAngle();
             float newAngle = currentAngle + 15;
 
+            // Update visual rotation
             pair.visual.setRotate(newAngle);
-            simObj.setAngle(newAngle);
             
+            // Update GameObject angle
+            simObj.setAngle(newAngle);
+
+            
+
+
+            // Update physics body rotation - convert degrees to radians
+            pair.body.setTransform(
+                pair.body.getPosition(), 
+                (float) Math.toRadians(newAngle)
+            );
             event.consume();
         });
     }

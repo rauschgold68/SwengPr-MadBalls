@@ -137,6 +137,12 @@ public class SimulationView {
         
         /** Button to manually trigger the win screen (testing/cheat feature) */
         public Button crownButton;
+
+        /** Button to trigger a undo of the last action taken*/
+        public Button undoButton;
+        
+        /** Button to trigger a redo of the last action taken */
+        public Button redoButton;
     }
 
     /**
