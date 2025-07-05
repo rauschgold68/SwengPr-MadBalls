@@ -481,15 +481,13 @@ public class SimulationModel {
      * @return a new GameObject instance based on the template and position
      */
     public GameObject createGameObjectFromInventory(InventoryObject template, float x, float y) {
-        float offsetX = (float) (template.getSize().getWidth() / 2.0);
-        float offsetY = (float) (template.getSize().getHeight() / 2.0);
+        // Calculate offset to center the object on the drop position
+        float offsetX = template.getSize().getWidth() / 2;
+        float offsetY = template.getSize().getHeight() / 2;
 
-        // Create GameObject with basic constructor
-        // The position represents the top-left corner for rectangles (consistent with JavaFX positioning)
-        // For drop coordinates (x,y), we want the center of the object to be at that position
-        // So we calculate the top-left corner by subtracting half the dimensions
+        // Create new GameObject with adjusted position
         GameObject gameObject = new GameObject(
-                template.getName(), 
+                template.getName(),
                 template.getType(),
                 new Position(x - offsetX, y - offsetY),
                 template.getSize());
@@ -501,7 +499,8 @@ public class SimulationModel {
         gameObject.setSprite(template.getSprite());
         gameObject.setWinning(template.isWinning());
 
-        template.setCount(template.getCount() - 1);
+        // Don't modify inventory count here - let the command handle it
+        // template.setCount(template.getCount() - 1);
         
         return gameObject;
     }
@@ -560,6 +559,22 @@ public class SimulationModel {
         for (InventoryObject obj : inventoryObjects) {
             if (obj.getName().equals(itemName)) {
                 obj.setCount(obj.getCount() + 1);
+                break;
+            }
+        }
+    }
+    
+    /**
+     * Decrements the inventory count for a specific item.
+     * Used when redoing object placement.
+     */
+    public void decrementInventoryCount(String itemName) {
+        for (InventoryObject obj : inventoryObjects) {
+            if (obj.getName().equals(itemName)) {
+                int currentCount = obj.getCount();
+                if (currentCount > 0) {
+                    obj.setCount(currentCount - 1);
+                }
                 break;
             }
         }

@@ -10,7 +10,7 @@ import java.util.Map;
  * Command for adding an object to the simulation.
  * Handles both the model and view updates for undo/redo.
  */
-public class AddObjectCommand implements Command {
+public class AddObjectController implements Command {
     private final SimulationModel model;
     private final Pane simSpace;
     private final GameObject gameObject;
@@ -18,7 +18,7 @@ public class AddObjectCommand implements Command {
     private final Map<GameObject, PhysicsVisualPair> gameObjectToPairMap;
     private final Runnable refreshInventoryCallback;
     
-    public AddObjectCommand(SimulationModel model, Pane simSpace, GameObject gameObject, 
+    public AddObjectController(SimulationModel model, Pane simSpace, GameObject gameObject, 
                            PhysicsVisualPair pair, Map<GameObject, PhysicsVisualPair> gameObjectToPairMap,
                            Runnable refreshInventoryCallback) {
         this.model = model;
@@ -43,6 +43,9 @@ public class AddObjectCommand implements Command {
         
         // Update mapping
         gameObjectToPairMap.put(gameObject, pair);
+        
+        // Decrease inventory count when executing (for redo operations)
+        model.decrementInventoryCount(gameObject.getName());
         
         // Refresh inventory display
         refreshInventoryCallback.run();

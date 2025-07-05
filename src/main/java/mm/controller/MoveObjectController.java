@@ -8,7 +8,7 @@ import mm.model.Position;
  * Command for moving an object in the simulation.
  * Stores the old and new positions for undo/redo.
  */
-public class MoveObjectCommand implements Command {
+public class MoveObjectController implements Command {
     private final GameObject gameObject;
     private final PhysicsVisualPair pair;
     private final Position oldPosition;
@@ -16,7 +16,7 @@ public class MoveObjectCommand implements Command {
     private final float oldAngle;
     private final float newAngle;
     
-    public MoveObjectCommand(GameObject gameObject, PhysicsVisualPair pair, 
+    public MoveObjectController(GameObject gameObject, PhysicsVisualPair pair, 
                            Position oldPosition, Position newPosition,
                            float oldAngle, float newAngle) {
         this.gameObject = gameObject;

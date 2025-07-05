@@ -401,14 +401,29 @@ public class SimulationController {
                 InventoryObject template = model.findInventoryObjectByName(name);
 
                 if (template != null) {
-                    GameObject simObj = model.createGameObjectFromInventory(template, (float) x, (float) y);
+                    // Create the GameObject but don't modify inventory count yet
+                    // The command will handle inventory count changes for proper undo/redo
+                    GameObject simObj = new GameObject(
+                        template.getName(),
+                        template.getType(),
+                        new Position((float) x - template.getSize().getWidth() / 2, 
+                                   (float) y - template.getSize().getHeight() / 2),
+                        template.getSize()
+                    );
+                    
+                    // Set additional properties
+                    simObj.setPhysics(template.getPhysics());
+                    simObj.setAngle(template.getAngle());
+                    simObj.setColour(template.getColour());
+                    simObj.setSprite(template.getSprite());
+                    simObj.setWinning(template.isWinning());
                     
                     PhysicsVisualPair pair = mm.controller.GameObjectController.convert(simObj, model.getWorld());
                     if (pair.visual != null) {
                         pair.visual.setRotate(simObj.getAngle());
                         
-                        // Create and execute add command
-                        AddObjectCommand addCommand = new AddObjectCommand(
+                        // Create and execute add command - this will handle inventory count
+                        AddObjectController addCommand = new AddObjectController(
                             model, simSpace, simObj, pair, gameObjectToPairMap, this::refreshInventoryDisplay
                         );
                         model.getUndoRedoManager().executeCommand(addCommand);
@@ -727,7 +742,7 @@ public class SimulationController {
                  Math.abs(dragStartPosition.getY() - currentPosition.getY()) > 1.0f ||
                  Math.abs(dragStartAngle - currentAngle) > 1.0f)) {
                 
-                MoveObjectCommand moveCommand = new MoveObjectCommand(
+                MoveObjectController moveCommand = new MoveObjectController(
                     simObj, pair, dragStartPosition, currentPosition, dragStartAngle, currentAngle
                 );
                 model.getUndoRedoManager().executeCommand(moveCommand);
@@ -761,7 +776,7 @@ public class SimulationController {
             );
             
             // Create move command for rotation
-            MoveObjectCommand rotateCommand = new MoveObjectCommand(
+            MoveObjectController rotateCommand = new MoveObjectController(
                 simObj, pair, currentPosition, currentPosition, startAngle, newAngle
             );
             model.getUndoRedoManager().executeCommand(rotateCommand);
