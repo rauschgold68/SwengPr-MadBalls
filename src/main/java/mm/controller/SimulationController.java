@@ -272,6 +272,19 @@ public class SimulationController {
     }
     
     /**
+     * Determines if dragging/moving is allowed based on simulation state.
+     * <p>
+     * Business logic method that checks if the simulation is currently running.
+     * </p>
+     * 
+     * @return true if dragging/moving is allowed, false if simulation is running
+     */
+    private boolean isInteractionAllowed() {
+        PhysicsAnimationController timer = model.getTimer();
+        return timer == null || !timer.isRunning();
+    }
+    
+    /**
      * Determines if an inventory item can be dragged.
      * <p>
      * Business logic method that checks game state and item availability.
@@ -281,19 +294,7 @@ public class SimulationController {
      * @return true if the item can be dragged, false otherwise
      */
     private boolean isDragAllowed(InventoryObject obj) {
-        PhysicsAnimationController timer = model.getTimer();
-        
-        // Cannot drag during simulation
-        if (timer != null && timer.isRunning()) {
-            return false;
-        }
-        
-        // Cannot drag items with zero count
-        if (obj.getCount() <= 0) {
-            return false;
-        }
-        
-        return true;
+        return isInteractionAllowed() && obj.getCount() > 0;
     }
     
     /**
@@ -648,8 +649,7 @@ public class SimulationController {
 
         visual.setOnMousePressed(event -> {
             // Prevent moving objects during simulation
-            PhysicsAnimationController timer = model.getTimer();
-            if (timer != null && timer.isRunning()) {
+            if (!isInteractionAllowed()) {
                 event.consume();
                 return;
             }
@@ -661,8 +661,7 @@ public class SimulationController {
 
         visual.setOnMouseDragged(event -> {
             // Prevent moving objects during simulation
-            PhysicsAnimationController timer = model.getTimer();
-            if (timer != null && timer.isRunning()) {
+            if (!isInteractionAllowed()) {
                 event.consume();
                 return;
             }
@@ -701,8 +700,7 @@ public class SimulationController {
 
         visual.setOnScroll(event -> {
             // Prevent rotating objects during simulation
-            PhysicsAnimationController timer = model.getTimer();
-            if (timer != null && timer.isRunning()) {
+            if (!isInteractionAllowed()) {
                 event.consume();
                 return;
             }
