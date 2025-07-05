@@ -92,7 +92,7 @@ public class PhysicsAnimationController extends AnimationTimer {
 
                 String tmp_name = (String) pair.body.getUserData();
                 if (tmp_name.equalsIgnoreCase("ballon")) {
-                    float up = /*-6.15f;*/-1 / pair.body.getFixtureList().getDensity();
+                    float up = -1 / pair.body.getFixtureList().getDensity();
                     Vec2 boyancy = new Vec2(0f, up);
                     pair.body.applyForceToCenter(boyancy);
                 }
