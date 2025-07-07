@@ -146,7 +146,7 @@
         "height": 0.0,
         "radius": 35.0
       },
-      "sprite": null,
+      "sprite": "/objectVisuals/bowlingBall.jpeg",
       "colour": "GREY",
       "physics": {
         "density": 0.9,
