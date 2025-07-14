@@ -9,14 +9,14 @@ import java.util.List;
  * It provides collision detection as a core business service for the simulation model.
  * </p>
  */
-public class CollisionDetectionService {
+public class CollisionDetection {
     
     private final SimulationModel model;
     
     /**
      * Package-private constructor - only the SimulationModel should create this service.
      */
-    CollisionDetectionService(SimulationModel model) {
+    CollisionDetection(SimulationModel model) {
         this.model = model;
     }
     
