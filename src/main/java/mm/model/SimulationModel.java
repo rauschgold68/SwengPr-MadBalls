@@ -560,6 +560,41 @@ public class SimulationModel {
     }
 
     /**
+     * Checks if a given position is inside any win zone.
+     *
+     * @param x the x-coordinate to check
+     * @param y the y-coordinate to check
+     * @return true if the position is inside a win zone, false otherwise
+     */
+    public boolean isInWinZone(double x, double y) {
+        for (PhysicsVisualPair pair : physics.pairs) {
+            Object userData = pair.body.getUserData();
+            if ("winZone".equals(userData) || "winPlat".equals(userData)) {
+                if (pair.visual instanceof javafx.scene.shape.Rectangle) {
+                    javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
+                    double zoneX = rect.getTranslateX();
+                    double zoneY = rect.getTranslateY();
+                    double zoneW = rect.getWidth();
+                    double zoneH = rect.getHeight();
+                    if (x >= zoneX && x <= zoneX + zoneW && y >= zoneY && y <= zoneY + zoneH) {
+                        return true;
+                    }
+                } else if (pair.visual instanceof javafx.scene.shape.Circle) {
+                    javafx.scene.shape.Circle circle = (javafx.scene.shape.Circle) pair.visual;
+                    double centerX = circle.getTranslateX();
+                    double centerY = circle.getTranslateY();
+                    double radius = circle.getRadius();
+                    double distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+                    if (distance <= radius) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Restores inventory counts for all dropped objects.
      * <p>
      * This method should be called when clearing all dropped objects to return
