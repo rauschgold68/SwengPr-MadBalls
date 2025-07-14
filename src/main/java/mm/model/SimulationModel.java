@@ -46,7 +46,7 @@ public class SimulationModel {
     private final SimulationState state = new SimulationState();
     private final UndoRedoController undoRedoController = new UndoRedoController();
 
-    private final CollisionDetectionService collisionService;
+    private final CollisionDetection collisionService;
 
     /**
      * Container for physics-related simulation components.
@@ -96,7 +96,7 @@ public class SimulationModel {
      */
     public SimulationModel(String levelPath) {
         this.state.levelPath = levelPath;
-        this.collisionService = new CollisionDetectionService(this);
+        this.collisionService = new CollisionDetection(this);
     }
 
     /**
