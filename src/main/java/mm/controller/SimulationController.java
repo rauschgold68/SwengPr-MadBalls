@@ -847,7 +847,7 @@ public class SimulationController {
 
     /**
      * Checks if moving an object to a new position would cause it to overlap with other objects.
-     * Excludes objects that are in the win zone from collision detection.
+     * Delegates to the model's collision detection service.
      * 
      * @param movingPair The physics-visual pair being moved
      * @param newX The proposed new X position
@@ -855,134 +855,6 @@ public class SimulationController {
      * @return true if the new position would cause an overlap, false otherwise
      */
     private boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY) {
-        if (movingPair.visual instanceof javafx.scene.shape.Rectangle) {
-            javafx.scene.shape.Rectangle movingRect = (javafx.scene.shape.Rectangle) movingPair.visual;
-            double movingWidth = movingRect.getWidth();
-            double movingHeight = movingRect.getHeight();
-            
-            // Check against all other dropped objects
-            for (PhysicsVisualPair otherPair : model.getDroppedPhysicsVisualPairs()) {
-                if (otherPair == movingPair) continue; // Skip self
-                
-                // Skip objects in the win zone
-                if (isObjectInWinZone(otherPair)) continue;
-                
-                if (otherPair.visual instanceof javafx.scene.shape.Rectangle) {
-                    javafx.scene.shape.Rectangle otherRect = (javafx.scene.shape.Rectangle) otherPair.visual;
-                    double otherX = otherRect.getTranslateX();
-                    double otherY = otherRect.getTranslateY();
-                    double otherWidth = otherRect.getWidth();
-                    double otherHeight = otherRect.getHeight();
-                    
-                    // AABB (Axis-Aligned Bounding Box) collision detection
-                    if (newX < otherX + otherWidth &&
-                        newX + movingWidth > otherX &&
-                        newY < otherY + otherHeight &&
-                        newY + movingHeight > otherY) {
-                        return true; // Collision detected
-                    }
-                } else if (otherPair.visual instanceof javafx.scene.shape.Circle) {
-                    javafx.scene.shape.Circle otherCircle = (javafx.scene.shape.Circle) otherPair.visual;
-                    double otherCenterX = otherCircle.getTranslateX();
-                    double otherCenterY = otherCircle.getTranslateY();
-                    double otherRadius = otherCircle.getRadius();
-                    
-                    // Rectangle-Circle collision detection
-                    double rectCenterX = newX + movingWidth / 2;
-                    double rectCenterY = newY + movingHeight / 2;
-                    
-                    double deltaX = Math.abs(rectCenterX - otherCenterX);
-                    double deltaY = Math.abs(rectCenterY - otherCenterY);
-                    
-                    if (deltaX > (movingWidth / 2 + otherRadius) || 
-                        deltaY > (movingHeight / 2 + otherRadius)) {
-                        continue; // No collision
-                    }
-                    
-                    if (deltaX <= (movingWidth / 2) || deltaY <= (movingHeight / 2)) {
-                        return true; // Collision detected
-                    }
-                    
-                    double cornerDistSq = Math.pow(deltaX - movingWidth / 2, 2) + 
-                                         Math.pow(deltaY - movingHeight / 2, 2);
-                    if (cornerDistSq <= Math.pow(otherRadius, 2)) {
-                        return true; // Collision detected
-                    }
-                }
-            }
-        } else if (movingPair.visual instanceof javafx.scene.shape.Circle) {
-            javafx.scene.shape.Circle movingCircle = (javafx.scene.shape.Circle) movingPair.visual;
-            double movingRadius = movingCircle.getRadius();
-            
-            // Check against all other dropped objects
-            for (PhysicsVisualPair otherPair : model.getDroppedPhysicsVisualPairs()) {
-                if (otherPair == movingPair) continue; // Skip self
-                
-                // Skip objects in the win zone
-                if (isObjectInWinZone(otherPair)) continue;
-                
-                if (otherPair.visual instanceof javafx.scene.shape.Circle) {
-                    javafx.scene.shape.Circle otherCircle = (javafx.scene.shape.Circle) otherPair.visual;
-                    double otherX = otherCircle.getTranslateX();
-                    double otherY = otherCircle.getTranslateY();
-                    double otherRadius = otherCircle.getRadius();
-                    
-                    // Circle-Circle collision detection
-                    double distance = Math.sqrt(Math.pow(newX - otherX, 2) + Math.pow(newY - otherY, 2));
-                    if (distance < movingRadius + otherRadius) {
-                        return true; // Collision detected
-                    }
-                } else if (otherPair.visual instanceof javafx.scene.shape.Rectangle) {
-                    // Circle-Rectangle collision (reverse of above)
-                    javafx.scene.shape.Rectangle otherRect = (javafx.scene.shape.Rectangle) otherPair.visual;
-                    double otherX = otherRect.getTranslateX();
-                    double otherY = otherRect.getTranslateY();
-                    double otherWidth = otherRect.getWidth();
-                    double otherHeight = otherRect.getHeight();
-                    
-                    double rectCenterX = otherX + otherWidth / 2;
-                    double rectCenterY = otherY + otherHeight / 2;
-                    
-                    double deltaX = Math.abs(newX - rectCenterX);
-                    double deltaY = Math.abs(newY - rectCenterY);
-                    
-                    if (deltaX > (otherWidth / 2 + movingRadius) || 
-                        deltaY > (otherHeight / 2 + movingRadius)) {
-                        continue; // No collision
-                    }
-                    
-                    if (deltaX <= (otherWidth / 2) || deltaY <= (otherHeight / 2)) {
-                        return true; // Collision detected
-                    }
-                    
-                    double cornerDistSq = Math.pow(deltaX - otherWidth / 2, 2) + 
-                                         Math.pow(deltaY - otherHeight / 2, 2);
-                    if (cornerDistSq <= Math.pow(movingRadius, 2)) {
-                        return true; // Collision detected
-                    }
-                }
-            }
-        }
-        
-        return false; // No collision
-    }
-
-    /**
-     * Checks if an object is located within the win zone.
-     * 
-     * @param pair The physics-visual pair to check
-     * @return true if the object is in the win zone, false otherwise
-     */
-    private boolean isObjectInWinZone(PhysicsVisualPair pair) {
-        if (pair.visual instanceof javafx.scene.shape.Rectangle) {
-            javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
-            double centerX = rect.getTranslateX() + rect.getWidth() / 2;
-            double centerY = rect.getTranslateY() + rect.getHeight() / 2;
-            return model.isInWinZone(centerX, centerY);
-        } else if (pair.visual instanceof javafx.scene.shape.Circle) {
-            javafx.scene.shape.Circle circle = (javafx.scene.shape.Circle) pair.visual;
-            return model.isInWinZone(circle.getTranslateX(), circle.getTranslateY());
-        }
-        return false;
+        return model.wouldCauseOverlap(movingPair, newX, newY);
     }
 }

@@ -46,6 +46,8 @@ public class SimulationModel {
     private final SimulationState state = new SimulationState();
     private final UndoRedoController undoRedoController = new UndoRedoController();
 
+    private final CollisionDetectionService collisionService;
+
     /**
      * Container for physics-related simulation components.
      */
@@ -94,6 +96,7 @@ public class SimulationModel {
      */
     public SimulationModel(String levelPath) {
         this.state.levelPath = levelPath;
+        this.collisionService = new CollisionDetectionService(this);
     }
 
     /**
@@ -644,5 +647,18 @@ public class SimulationModel {
                 break;
             }
         }
+    }
+
+    /**
+     * Checks if moving an object would cause a collision.
+     * Delegates to the collision detection service.
+     * 
+     * @param movingPair The physics-visual pair being moved
+     * @param newX The proposed new X position
+     * @param newY The proposed new Y position
+     * @return true if collision would occur, false otherwise
+     */
+    public boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY) {
+        return collisionService.wouldCauseOverlap(movingPair, newX, newY);
     }
 }
