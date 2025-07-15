@@ -2,6 +2,7 @@ package mm.controller;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
@@ -12,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import mm.model.InventoryObject;
@@ -89,6 +91,9 @@ public class InventoryObjectController {
         } else if ("circle".equalsIgnoreCase(type)) {
             visual = createCircleVisual(obj);
             body = createCircleBody(obj, world);
+        } else if ("bucket".equalsIgnoreCase(type)) {
+            visual = createBucketVisual(obj);
+            body = createBucketBody(obj, world);
         } else {
             throw new IllegalArgumentException("Unsupported shape type: " + type);
         }
@@ -243,6 +248,101 @@ public class InventoryObjectController {
         // Configure and attach fixture
         FixtureDef fixture = createFixtureDef(shape, physics);
         body.createFixture(fixture);
+
+        return body;
+    }
+
+    /**
+     * Creates a JavaFX visual representation for a U-shaped bucket using Polygon.
+     */
+    private static Polygon createBucketVisual(InventoryObject obj) {
+        float width = obj.getSize().getWidth();
+        float height = obj.getSize().getHeight();
+        float wallThickness = 10.0f;
+        
+        javafx.scene.shape.Polygon bucket = new javafx.scene.shape.Polygon();
+        
+        // Define U-shape vertices (relative to center, matching physics body)
+        Double[] points = {
+            (double)(-width/2), (double)(height/2),                                    // Bottom-left outer
+            (double)(-width/2), (double)(-height/2),                                  // Top-left outer
+            (double)(-width/2 + wallThickness), (double)(-height/2),                  // Top-left inner
+            (double)(-width/2 + wallThickness), (double)(height/2 - wallThickness),   // Bottom-left inner
+            (double)(width/2 - wallThickness), (double)(height/2 - wallThickness),    // Bottom-right inner
+            (double)(width/2 - wallThickness), (double)(-height/2),                   // Top-right inner
+            (double)(width/2), (double)(-height/2),                                   // Top-right outer
+            (double)(width/2), (double)(height/2)                                     // Bottom-right outer
+        };
+        
+        bucket.getPoints().addAll(points);
+        bucket.setFill(Color.valueOf(obj.getColour()));
+        
+        return bucket;
+    }
+
+    /**
+     * Creates a JBox2D Body for a U-shaped bucket using multiple PolygonShapes.
+     * <p>
+     * Constructs a physics body with three separate rectangular fixtures that form
+     * the left wall, right wall, and bottom of the bucket, creating a hollow container
+     * that objects can fall into. Each wall is a separate collision shape to ensure
+     * proper physics behavior.
+     * </p>
+     * <p>
+     * The body type (dynamic/static) is determined by the physics properties of the
+     * InventoryObject. Each fixture is configured with material properties such as
+     * density, friction, and restitution from the Physics object.
+     * </p>
+     *
+     * @param obj The InventoryObject containing bucket dimensions and physics properties
+     * @param world The JBox2D World in which to create the physics body
+     * @return A configured Body with three-wall collision geometry for physics simulation
+     */
+    private static Body createBucketBody(InventoryObject obj, World world) {
+        Physics physics = obj.getPhysics();
+        float width = obj.getSize().getWidth();
+        float height = obj.getSize().getHeight();
+        float wallThickness = 10.0f;
+
+        // Create body definition
+        BodyDef def = new BodyDef();
+        def.type = physics.getShape().equalsIgnoreCase("Dynamic") ? BodyType.DYNAMIC : BodyType.STATIC;
+        
+        Body body = world.createBody(def);
+        body.setUserData(obj.getName());
+
+        // Create bottom wall
+        PolygonShape bottomShape = new PolygonShape();
+        bottomShape.setAsBox(
+            width / 2 / SCALE,                           // half-width
+            wallThickness / 2 / SCALE,                   // half-height
+            new Vec2(0, (height / 2 - wallThickness / 2) / SCALE), // center position
+            0                                            // angle
+        );
+        FixtureDef bottomFixture = createFixtureDef(bottomShape, physics);
+        body.createFixture(bottomFixture);
+
+        // Create left wall
+        PolygonShape leftShape = new PolygonShape();
+        leftShape.setAsBox(
+            wallThickness / 2 / SCALE,                   // half-width
+            height / 2 / SCALE,                          // half-height
+            new Vec2((-width / 2 + wallThickness / 2) / SCALE, 0), // center position
+            0                                            // angle
+        );
+        FixtureDef leftFixture = createFixtureDef(leftShape, physics);
+        body.createFixture(leftFixture);
+
+        // Create right wall
+        PolygonShape rightShape = new PolygonShape();
+        rightShape.setAsBox(
+            wallThickness / 2 / SCALE,                   // half-width
+            height / 2 / SCALE,                          // half-height
+            new Vec2((width / 2 - wallThickness / 2) / SCALE, 0),  // center position
+            0                                            // angle
+        );
+        FixtureDef rightFixture = createFixtureDef(rightShape, physics);
+        body.createFixture(rightFixture);
 
         return body;
     }

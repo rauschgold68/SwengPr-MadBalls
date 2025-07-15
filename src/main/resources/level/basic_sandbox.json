@@ -213,6 +213,26 @@
       },
       "winning": false,
       "count": 1
+    },
+    {
+      "name": "bucket",
+      "type": "bucket",
+      "size": {
+        "width": 100.0,
+        "height": 80.0,
+        "radius": 0.0
+      },
+      "angle": 0.0,
+      "sprite": null,
+      "colour": "BROWN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false,
+      "count": 1
     }
   ]
 }
