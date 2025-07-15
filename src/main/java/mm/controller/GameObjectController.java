@@ -1,9 +1,11 @@
 package mm.controller;
 
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import javafx.scene.image.Image;
 import mm.model.GameObject;
 import mm.model.Physics;
 import mm.model.PhysicsVisualPair;
@@ -14,26 +16,35 @@ import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.dynamics.*;
 
 /**
- * Utility class for converting {@link GameObject} instances into their corresponding
- * JavaFX visual representations and Box2D physics bodies for use in the simulation.
+ * Utility class for converting {@link GameObject} instances into their
+ * corresponding
+ * JavaFX visual representations and Box2D physics bodies for use in the
+ * simulation.
  * <p>
- * This class provides a static method to convert a {@code GameObject} into a {@link PhysicsVisualPair},
- * which contains both the JavaFX {@link Shape} for rendering and the JBox2D {@link Body} for physics simulation.
- * The conversion process uses the properties of the {@code GameObject} (such as type, size, position, color, and physics)
+ * This class provides a static method to convert a {@code GameObject} into a
+ * {@link PhysicsVisualPair},
+ * which contains both the JavaFX {@link Shape} for rendering and the JBox2D
+ * {@link Body} for physics simulation.
+ * The conversion process uses the properties of the {@code GameObject} (such as
+ * type, size, position, color, and physics)
  * to create the appropriate visual and physical representations.
  * </p>
  * <b>Supported types:</b>
  * <ul>
- *   <li>Rectangle</li>
- *   <li>Circle</li>
+ * <li>Rectangle</li>
+ * <li>Circle</li>
  * </ul>
  * <b>Special names:</b>
  * <ul>
- *   <li>"winZone": Rendered with a special pattern and created as a static sensor body.</li>
- *   <li>"noPlaceZone": Rendered with a special pattern and created as a static sensor body.</li>
+ * <li>"winZone": Rendered with a special pattern and created as a static sensor
+ * body.</li>
+ * <li>"noPlaceZone": Rendered with a special pattern and created as a static
+ * sensor body.</li>
  * </ul>
- * <b>Other objects</b> are rendered and simulated according to their properties.
+ * <b>Other objects</b> are rendered and simulated according to their
+ * properties.
  * <b>Usage example:</b>
+ * 
  * <pre>
  *     GameObject obj = ...;
  *     World world = ...;
@@ -42,23 +53,31 @@ import org.jbox2d.dynamics.*;
  */
 public class GameObjectController {
     /**
-     * Scale factor for converting between game units (pixels) and physics world units (meters).
+     * Scale factor for converting between game units (pixels) and physics world
+     * units (meters).
      * Used to ensure consistency between the visual and physical representations.
      */
     private static final float SCALE = 50.0f;
 
     /**
-     * Converts a {@link GameObject} to a {@link PhysicsVisualPair}, which contains both the JavaFX visual
+     * Converts a {@link GameObject} to a {@link PhysicsVisualPair}, which contains
+     * both the JavaFX visual
      * representation and the Box2D physics body.
      * <p>
-     * Supports rectangle and circle shapes. The created visual and body are configured
-     * according to the {@code GameObject}'s properties. Special handling is provided for objects
-     * named "winZone" and "noPlaceZone", which are rendered with custom patterns and created as static sensor bodies.
+     * Supports rectangle and circle shapes. The created visual and body are
+     * configured
+     * according to the {@code GameObject}'s properties. Special handling is
+     * provided for objects
+     * named "winZone" and "noPlaceZone", which are rendered with custom patterns
+     * and created as static sensor bodies.
      * </p>
      *
-     * @param obj   The {@link GameObject} to be converted. Must not be {@code null}.
-     * @param world The Box2D {@link World} where the body is created. Must not be {@code null}.
-     * @return      A {@link PhysicsVisualPair} containing the JavaFX visual and physics body.
+     * @param obj   The {@link GameObject} to be converted. Must not be
+     *              {@code null}.
+     * @param world The Box2D {@link World} where the body is created. Must not be
+     *              {@code null}.
+     * @return A {@link PhysicsVisualPair} containing the JavaFX visual and physics
+     *         body.
      * @throws IllegalArgumentException if the object type is not supported
      */
     public static PhysicsVisualPair convert(GameObject obj, World world) {
@@ -83,39 +102,56 @@ public class GameObjectController {
     }
 
     /**
-     * Creates a JavaFX Rectangle visual representation for a rectangular GameObject.
+     * Creates a JavaFX Rectangle visual representation for a rectangular
+     * GameObject.
      * <p>
-     * Handles special cases for "noPlaceZone" (red pattern) and "winZone" (green pattern),
-     * while regular rectangles use the object's specified color. The rectangle is positioned
+     * Handles special cases for "noPlaceZone" (red pattern) and "winZone" (green
+     * pattern),
+     * while regular rectangles use the object's specified color. The rectangle is
+     * positioned
      * and rotated according to the GameObject's position and angle.
      * </p>
      *
      * @param obj The GameObject containing rectangle properties and position
-     * @return A configured Rectangle shape positioned and rotated for visual rendering
+     * @return A configured Rectangle shape positioned and rotated for visual
+     *         rendering
      */
     private static Rectangle createRectangleVisual(GameObject obj) {
         float width = obj.getSize().getWidth();
         float height = obj.getSize().getHeight();
         float x = obj.getPosition().getX();
         float y = obj.getPosition().getY();
-        
+
         Rectangle rect = new Rectangle(width, height);
-        
-        // Apply special patterns for zone objects
-        if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
+
+        if (obj.getSprite() != null) {
+            Image image = null;
+            try {
+                image = new Image(GameObjectController.class.getResource(obj.getSprite()).toExternalForm());
+            } catch (Exception ignored) {
+            }
+            if (image != null && !image.isError()) {
+                rect.setFill(new ImagePattern(image));
+            } else if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
+                rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.RED));
+            } else if (obj.getName().equalsIgnoreCase("winZone")) {
+                rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.GREEN));
+            } else {
+                rect.setFill(Color.valueOf(obj.getColour()));
+            }
+        } else if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
             rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.RED));
         } else if (obj.getName().equalsIgnoreCase("winZone")) {
             rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.GREEN));
         } else {
             rect.setFill(Color.valueOf(obj.getColour()));
-            // TODO: Add sprite code implementation here for textured objects
         }
-        
+
         // Position and rotate the rectangle in the scene
         rect.setTranslateX(x);
         rect.setTranslateY(y);
         rect.setRotate(obj.getAngle()); // Apply the rotation from the GameObject
-        
+
         return rect;
     }
 
@@ -128,7 +164,8 @@ public class GameObjectController {
      * The body position is calculated with proper center offset for rectangles.
      * </p>
      *
-     * @param obj The GameObject containing rectangle, physics, and position properties
+     * @param obj   The GameObject containing rectangle, physics, and position
+     *              properties
      * @param world The JBox2D World in which to create the body
      * @return A configured Body for physics simulation
      */
@@ -145,7 +182,7 @@ public class GameObjectController {
         // Position at center of rectangle for proper physics simulation
         def.position.set((x + width / 2) / SCALE, (y + height / 2) / SCALE);
         def.angle = (float) Math.toRadians(obj.getAngle());
-        
+
         Body body = world.createBody(def);
         body.setUserData(obj.getName());
 
@@ -155,12 +192,12 @@ public class GameObjectController {
 
         // Configure fixture with physics properties
         FixtureDef fixture = createFixtureDef(shape, physics);
-        
+
         // Set sensor flag for special zone objects
         if (isZoneObject(obj.getName())) {
             fixture.isSensor = true;
         }
-        
+
         body.createFixture(fixture);
         return body;
     }
@@ -180,11 +217,29 @@ public class GameObjectController {
         float x = obj.getPosition().getX();
         float y = obj.getPosition().getY();
 
-        Circle circ = new Circle(radius, Color.valueOf(obj.getColour()));
+        Circle circ = new Circle(radius);
+
+        String sprite = obj.getSprite();
+        if (sprite != null) {
+            Image img = null;
+            try {
+                img = new Image(GameObjectController.class.getResourceAsStream(sprite));
+            } catch (Exception e) {
+                System.err.println(e);
+            }
+            if (img != null && !img.isError()) {
+                circ.setFill(new ImagePattern(img));
+            } else {
+                circ.setFill(Color.valueOf(obj.getColour()));
+            }
+        } else {
+            circ.setFill(Color.valueOf(obj.getColour()));
+        }
+
         circ.setTranslateX(x);
         circ.setTranslateY(y);
         circ.setRotate(obj.getAngle()); // Apply the rotation from the GameObject
-        
+
         return circ;
     }
 
@@ -196,7 +251,8 @@ public class GameObjectController {
      * The body is positioned directly at the GameObject's coordinates.
      * </p>
      *
-     * @param obj The GameObject containing circle, physics, and position properties
+     * @param obj   The GameObject containing circle, physics, and position
+     *              properties
      * @param world The JBox2D World in which to create the body
      * @return A configured Body for physics simulation
      */
@@ -211,7 +267,7 @@ public class GameObjectController {
         def.type = physics.getShape().equalsIgnoreCase("DYNAMIC") ? BodyType.DYNAMIC : BodyType.STATIC;
         def.position.set(x / SCALE, y / SCALE);
         def.angle = (float) Math.toRadians(obj.getAngle());
-        
+
         Body body = world.createBody(def);
         body.setUserData(obj.getName());
 
@@ -222,7 +278,7 @@ public class GameObjectController {
         // Configure and attach fixture
         FixtureDef fixture = createFixtureDef(shape, physics);
         body.createFixture(fixture);
-        
+
         return body;
     }
 
@@ -233,7 +289,7 @@ public class GameObjectController {
      * setting density, friction, and restitution from the Physics object.
      * </p>
      *
-     * @param shape The JBox2D shape (CircleShape or PolygonShape)
+     * @param shape   The JBox2D shape (CircleShape or PolygonShape)
      * @param physics The Physics object containing material properties
      * @return A configured FixtureDef ready for body attachment
      */
@@ -263,7 +319,8 @@ public class GameObjectController {
     /**
      * Applies special naming logic for winning objects and platform objects.
      * <p>
-     * Objects marked as winning (except winPlat and winZone) are renamed to "winObject"
+     * Objects marked as winning (except winPlat and winZone) are renamed to
+     * "winObject"
      * for collision detection purposes. This method handles the complex logic for
      * determining when to apply the winning object naming convention.
      * </p>
@@ -272,7 +329,7 @@ public class GameObjectController {
      * Current implementation preserves original behavior but may need review.
      * </p>
      *
-     * @param obj The GameObject to check for winning status
+     * @param obj  The GameObject to check for winning status
      * @param body The JBox2D Body to potentially rename
      */
     private static void applyWinningObjectLogic(GameObject obj, Body body) {

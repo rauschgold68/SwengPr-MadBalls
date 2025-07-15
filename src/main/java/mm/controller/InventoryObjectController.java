@@ -8,7 +8,9 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
@@ -18,26 +20,35 @@ import mm.model.PhysicsVisualPair;
 import mm.view.PatternViewFactory;
 
 /**
- * Utility class for converting {@link InventoryObject} instances into their corresponding
- * JavaFX visual representations and Box2D physics bodies for use in the inventory system.
+ * Utility class for converting {@link InventoryObject} instances into their
+ * corresponding
+ * JavaFX visual representations and Box2D physics bodies for use in the
+ * inventory system.
  * <p>
- * This class provides a static method to convert an {@code InventoryObject} into a {@link PhysicsVisualPair},
- * which contains both the JavaFX {@link Shape} for rendering and the JBox2D {@link Body} for physics simulation.
- * The conversion process uses the properties of the {@code InventoryObject} (such as type, size, color, and physics)
+ * This class provides a static method to convert an {@code InventoryObject}
+ * into a {@link PhysicsVisualPair},
+ * which contains both the JavaFX {@link Shape} for rendering and the JBox2D
+ * {@link Body} for physics simulation.
+ * The conversion process uses the properties of the {@code InventoryObject}
+ * (such as type, size, color, and physics)
  * to create the appropriate visual and physical representations.
  * </p>
  * <b>Supported types:</b>
  * <ul>
- *   <li>Rectangle</li>
- *   <li>Circle</li>
+ * <li>Rectangle</li>
+ * <li>Circle</li>
  * </ul>
  * <b>Special names:</b>
  * <ul>
- *   <li>"winZone": Rendered with a special pattern and created as a static sensor body.</li>
- *   <li>"noPlaceZone": Rendered with a special pattern and created as a static sensor body.</li>
+ * <li>"winZone": Rendered with a special pattern and created as a static sensor
+ * body.</li>
+ * <li>"noPlaceZone": Rendered with a special pattern and created as a static
+ * sensor body.</li>
  * </ul>
- * <b>Other objects</b> are rendered and simulated according to their properties.
+ * <b>Other objects</b> are rendered and simulated according to their
+ * properties.
  * <b>Usage example:</b>
+ * 
  * <pre>
  *     InventoryObject obj = ...;
  *     World world = ...;
@@ -47,19 +58,25 @@ import mm.view.PatternViewFactory;
 public class InventoryObjectController {
     /** Scale factor for converting between game units and physics world units */
     private static final float SCALE = 50.0f;
-    
+
     /**
-     * Converts an {@link InventoryObject} to a {@link PhysicsVisualPair}, which contains both the JavaFX visual
+     * Converts an {@link InventoryObject} to a {@link PhysicsVisualPair}, which
+     * contains both the JavaFX visual
      * representation and the Box2D physics body.
      * <p>
-     * Supports rectangle and circle shapes. The created visual and body are configured
-     * according to the {@code InventoryObject}'s properties. Special handling is provided for objects
-     * named "winZone" and "noPlaceZone", which are rendered with custom patterns and created as static sensor bodies.
+     * Supports rectangle and circle shapes. The created visual and body are
+     * configured
+     * according to the {@code InventoryObject}'s properties. Special handling is
+     * provided for objects
+     * named "winZone" and "noPlaceZone", which are rendered with custom patterns
+     * and created as static sensor bodies.
      * </p>
      *
-     * @param obj   The individual {@link InventoryObject} to be converted. Must not be {@code null}.
-     * @param world The Box2D {@link World} where the body is created. Must not be {@code null}.
-     * @return      A {@link PhysicsVisualPair} containing the visual and physics body.
+     * @param obj   The individual {@link InventoryObject} to be converted. Must not
+     *              be {@code null}.
+     * @param world The Box2D {@link World} where the body is created. Must not be
+     *              {@code null}.
+     * @return A {@link PhysicsVisualPair} containing the visual and physics body.
      */
     public static PhysicsVisualPair convert(InventoryObject obj, World world) {
         String type = obj.getType();
@@ -80,9 +97,11 @@ public class InventoryObjectController {
     }
 
     /**
-     * Creates a JavaFX Rectangle visual representation for a rectangular InventoryObject.
+     * Creates a JavaFX Rectangle visual representation for a rectangular
+     * InventoryObject.
      * <p>
-     * Handles special cases for "noPlaceZone" (red pattern) and "winZone" (green pattern),
+     * Handles special cases for "noPlaceZone" (red pattern) and "winZone" (green
+     * pattern),
      * while regular rectangles use the object's specified color.
      * </p>
      *
@@ -92,19 +111,32 @@ public class InventoryObjectController {
     private static Rectangle createRectangleVisual(InventoryObject obj) {
         float width = obj.getSize().getWidth();
         float height = obj.getSize().getHeight();
-        
+
         Rectangle rect = new Rectangle(width, height);
-        
-        // Apply special patterns for zone objects
-        if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
+
+        if (obj.getSprite() != null) {
+            Image image = null;
+            try {
+                image = new Image(InventoryObjectController.class.getResource(obj.getSprite()).toExternalForm());
+            } catch (Exception ignored) {
+            }
+            if (image != null && !image.isError()) {
+                rect.setFill(new ImagePattern(image));
+            } else if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
+                rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.RED));
+            } else if (obj.getName().equalsIgnoreCase("winZone")) {
+                rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.GREEN));
+            } else {
+                rect.setFill(Color.valueOf(obj.getColour()));
+            }
+        } else if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
             rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.RED));
         } else if (obj.getName().equalsIgnoreCase("winZone")) {
             rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.GREEN));
         } else {
             rect.setFill(Color.valueOf(obj.getColour()));
-            // TODO: Add sprite code implementation here for textured objects
         }
-        
+
         return rect;
     }
 
@@ -116,7 +148,7 @@ public class InventoryObjectController {
      * properties including special sensor configuration for zone objects.
      * </p>
      *
-     * @param obj The InventoryObject containing rectangle and physics properties
+     * @param obj   The InventoryObject containing rectangle and physics properties
      * @param world The JBox2D World in which to create the body
      * @return A configured Body for physics simulation
      */
@@ -128,7 +160,7 @@ public class InventoryObjectController {
         // Create body definition with appropriate type
         BodyDef def = new BodyDef();
         def.type = physics.getShape().equalsIgnoreCase("Dynamic") ? BodyType.DYNAMIC : BodyType.STATIC;
-        
+
         Body body = world.createBody(def);
         body.setUserData(obj.getName());
 
@@ -138,12 +170,12 @@ public class InventoryObjectController {
 
         // Configure fixture with physics properties
         FixtureDef fixture = createFixtureDef(shape, physics);
-        
+
         // Set sensor flag for special zone objects
         if (isZoneObject(obj.getName())) {
             fixture.isSensor = true;
         }
-        
+
         body.createFixture(fixture);
         return body;
     }
@@ -151,7 +183,8 @@ public class InventoryObjectController {
     /**
      * Creates a JavaFX Circle visual representation for a circular InventoryObject.
      * <p>
-     * Creates a circle with the specified radius and color from the InventoryObject.
+     * Creates a circle with the specified radius and color from the
+     * InventoryObject.
      * Currently does not handle special zone patterns for circles.
      * </p>
      *
@@ -160,7 +193,25 @@ public class InventoryObjectController {
      */
     private static Circle createCircleVisual(InventoryObject obj) {
         float radius = obj.getSize().getRadius();
-        return new Circle(radius, Color.valueOf(obj.getColour()));
+
+        Circle circ = new Circle(radius);
+
+        if (obj.getSprite() != null) {
+            Image image = null;
+            try {
+                image = new Image(InventoryObjectController.class.getResource(obj.getSprite()).toExternalForm());
+            } catch (Exception ignored) {
+            }
+            if (image != null && !image.isError()) {
+                circ.setFill(new ImagePattern(image));
+            } else {
+                circ.setFill(Color.valueOf(obj.getColour()));
+            }
+        } else {
+            circ.setFill(Color.valueOf(obj.getColour()));
+        }
+
+        return circ;
     }
 
     /**
@@ -170,7 +221,7 @@ public class InventoryObjectController {
      * shape with appropriate radius, and sets up fixture properties.
      * </p>
      *
-     * @param obj The InventoryObject containing circle and physics properties
+     * @param obj   The InventoryObject containing circle and physics properties
      * @param world The JBox2D World in which to create the body
      * @return A configured Body for physics simulation
      */
@@ -181,7 +232,7 @@ public class InventoryObjectController {
         // Create body definition with appropriate type
         BodyDef def = new BodyDef();
         def.type = physics.getShape().equals("DYNAMIC") ? BodyType.DYNAMIC : BodyType.STATIC;
-        
+
         Body body = world.createBody(def);
         body.setUserData(obj.getName());
 
@@ -192,7 +243,7 @@ public class InventoryObjectController {
         // Configure and attach fixture
         FixtureDef fixture = createFixtureDef(shape, physics);
         body.createFixture(fixture);
-        
+
         return body;
     }
 
@@ -203,7 +254,7 @@ public class InventoryObjectController {
      * setting density, friction, and restitution from the Physics object.
      * </p>
      *
-     * @param shape The JBox2D shape (CircleShape or PolygonShape)
+     * @param shape   The JBox2D shape (CircleShape or PolygonShape)
      * @param physics The Physics object containing material properties
      * @return A configured FixtureDef ready for body attachment
      */
