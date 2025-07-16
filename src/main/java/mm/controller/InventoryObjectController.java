@@ -254,6 +254,19 @@ public class InventoryObjectController {
 
     /**
      * Creates a JavaFX visual representation for a U-shaped bucket using Polygon.
+     * <p>
+     * Constructs a U-shaped polygon by defining 8 vertices that form the outer and inner
+     * boundaries of the bucket. The wall thickness is fixed at 10.0 units.
+     * </p>
+     * <p>
+     * The U-shape is defined by vertices in clockwise order starting from the bottom-left
+     * outer corner, creating a hollow container shape suitable for catching falling objects.
+     * The vertices are defined relative to the top-left corner for consistent positioning
+     * with other shape types.
+     * </p>
+     *
+     * @param obj The InventoryObject containing bucket properties including width, height, and color
+     * @return A configured Polygon shape representing the U-shaped bucket for visual rendering
      */
     private static Polygon createBucketVisual(InventoryObject obj) {
         float width = obj.getSize().getWidth();
@@ -262,16 +275,16 @@ public class InventoryObjectController {
         
         Polygon bucket = new Polygon();
         
-        // Define U-shape vertices (relative to center, matching physics body)
+        // Define U-shape vertices (relative to top-left, matching other shapes)
         Double[] points = {
-            (double)(-width/2), (double)(height/2),                                    // Bottom-left outer
-            (double)(-width/2), (double)(-height/2),                                  // Top-left outer
-            (double)(-width/2 + wallThickness), (double)(-height/2),                  // Top-left inner
-            (double)(-width/2 + wallThickness), (double)(height/2 - wallThickness),   // Bottom-left inner
-            (double)(width/2 - wallThickness), (double)(height/2 - wallThickness),    // Bottom-right inner
-            (double)(width/2 - wallThickness), (double)(-height/2),                   // Top-right inner
-            (double)(width/2), (double)(-height/2),                                   // Top-right outer
-            (double)(width/2), (double)(height/2)                                     // Bottom-right outer
+            (double)(0), (double)(height),                                    // Bottom-left outer
+            (double)(0), (double)(0),                                         // Top-left outer
+            (double)(wallThickness), (double)(0),                            // Top-left inner
+            (double)(wallThickness), (double)(height - wallThickness),       // Bottom-left inner
+            (double)(width - wallThickness), (double)(height - wallThickness), // Bottom-right inner
+            (double)(width - wallThickness), (double)(0),                    // Top-right inner
+            (double)(width), (double)(0),                                     // Top-right outer
+            (double)(width), (double)(height)                                // Bottom-right outer
         };
         
         bucket.getPoints().addAll(points);
