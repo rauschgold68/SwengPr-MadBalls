@@ -104,6 +104,8 @@ public class CollisionDetection {
             return checkRectangleCollision(movingPair, otherPair, newX, newY);
         } else if (movingPair.visual instanceof javafx.scene.shape.Circle) {
             return checkCircleCollision(movingPair, otherPair, newX, newY);
+        } else if (movingPair.visual instanceof javafx.scene.shape.Polygon) {
+            return checkPolygonCollision(movingPair, otherPair, newX, newY);
         }
         
         return false;
@@ -120,6 +122,8 @@ public class CollisionDetection {
             return checkRectangleToRectangleCollision(movingRect, otherPair, newX, newY);
         } else if (otherPair.visual instanceof javafx.scene.shape.Circle) {
             return checkRectangleToCircleCollision(movingRect, otherPair, newX, newY);
+        } else if (otherPair.visual instanceof javafx.scene.shape.Polygon) {
+            return checkRectangleToPolygonCollision(movingRect, otherPair, newX, newY);
         }
         
         return false;
@@ -136,6 +140,8 @@ public class CollisionDetection {
             return checkCircleToCircleCollision(movingCircle, otherPair, newX, newY);
         } else if (otherPair.visual instanceof javafx.scene.shape.Rectangle) {
             return checkCircleToRectangleCollision(movingCircle, otherPair, newX, newY);
+        } else if (otherPair.visual instanceof javafx.scene.shape.Polygon) {
+            return checkCircleToPolygonCollision(movingCircle, otherPair, newX, newY);
         }
         
         return false;
@@ -252,6 +258,161 @@ public class CollisionDetection {
     }
     
     /**
+     * Checks collision between a rectangle and a polygon.
+     * Uses bounding box approximation for collision detection.
+     */
+    private boolean checkRectangleToPolygonCollision(javafx.scene.shape.Rectangle movingRect, 
+                                                    PhysicsVisualPair otherPair, double newX, double newY) {
+        javafx.scene.shape.Polygon otherPolygon = (javafx.scene.shape.Polygon) otherPair.visual;
+        
+        // Get rectangle bounds at new position
+        double rectWidth = movingRect.getWidth();
+        double rectHeight = movingRect.getHeight();
+        
+        // Get polygon bounding box
+        javafx.geometry.Bounds polygonBounds = otherPolygon.getBoundsInLocal();
+        double polygonX = otherPolygon.getTranslateX();
+        double polygonY = otherPolygon.getTranslateY();
+        double polygonWidth = polygonBounds.getWidth();
+        double polygonHeight = polygonBounds.getHeight();
+        
+        // AABB collision detection
+        return newX < polygonX + polygonWidth &&
+               newX + rectWidth > polygonX &&
+               newY < polygonY + polygonHeight &&
+               newY + rectHeight > polygonY;
+    }
+    
+    /**
+     * Checks collision between a circle and a polygon.
+     * Uses bounding box approximation for collision detection.
+     */
+    private boolean checkCircleToPolygonCollision(javafx.scene.shape.Circle movingCircle, 
+                                                 PhysicsVisualPair otherPair, double newX, double newY) {
+        javafx.scene.shape.Polygon otherPolygon = (javafx.scene.shape.Polygon) otherPair.visual;
+        
+        // Get polygon bounding box
+        javafx.geometry.Bounds polygonBounds = otherPolygon.getBoundsInLocal();
+        double polygonX = otherPolygon.getTranslateX();
+        double polygonY = otherPolygon.getTranslateY();
+        double polygonCenterX = polygonX + polygonBounds.getWidth() / 2;
+        double polygonCenterY = polygonY + polygonBounds.getHeight() / 2;
+        
+        CollisionRectangle rect = new CollisionRectangle(
+            polygonCenterX, 
+            polygonCenterY, 
+            polygonBounds.getWidth(), 
+            polygonBounds.getHeight()
+        );
+        CollisionCircle circle = new CollisionCircle(newX, newY, movingCircle.getRadius());
+        
+        return isRectangleCircleCollision(rect, circle);
+    }
+    
+    /**
+     * Checks collision when the moving object is a polygon (bucket).
+     */
+    private boolean checkPolygonCollision(PhysicsVisualPair movingPair, PhysicsVisualPair otherPair, 
+                                         double newX, double newY) {
+        javafx.scene.shape.Polygon movingPolygon = (javafx.scene.shape.Polygon) movingPair.visual;
+        
+        if (otherPair.visual instanceof javafx.scene.shape.Rectangle) {
+            return checkPolygonToRectangleCollision(movingPolygon, otherPair, newX, newY);
+        } else if (otherPair.visual instanceof javafx.scene.shape.Circle) {
+            return checkPolygonToCircleCollision(movingPolygon, otherPair, newX, newY);
+        } else if (otherPair.visual instanceof javafx.scene.shape.Polygon) {
+            return checkPolygonToPolygonCollision(movingPolygon, otherPair, newX, newY);
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Checks collision between a polygon and a rectangle.
+     * Uses bounding box approximation for polygon collision detection.
+     */
+    private boolean checkPolygonToRectangleCollision(javafx.scene.shape.Polygon movingPolygon, 
+                                                    PhysicsVisualPair otherPair, double newX, double newY) {
+        javafx.scene.shape.Rectangle otherRect = (javafx.scene.shape.Rectangle) otherPair.visual;
+        
+        // Get bounding box of polygon at new position
+        javafx.geometry.Bounds polygonBounds = movingPolygon.getBoundsInLocal();
+        double polygonX = newX;
+        double polygonY = newY;
+        double polygonWidth = polygonBounds.getWidth();
+        double polygonHeight = polygonBounds.getHeight();
+        
+        // Get rectangle bounds
+        double rectX = otherRect.getTranslateX();
+        double rectY = otherRect.getTranslateY();
+        double rectWidth = otherRect.getWidth();
+        double rectHeight = otherRect.getHeight();
+        
+        // AABB collision detection using bounding boxes
+        return polygonX < rectX + rectWidth &&
+               polygonX + polygonWidth > rectX &&
+               polygonY < rectY + rectHeight &&
+               polygonY + polygonHeight > rectY;
+    }
+    
+    /**
+     * Checks collision between a polygon and a circle.
+     * Uses bounding box approximation for polygon collision detection.
+     */
+    private boolean checkPolygonToCircleCollision(javafx.scene.shape.Polygon movingPolygon, 
+                                                 PhysicsVisualPair otherPair, double newX, double newY) {
+        javafx.scene.shape.Circle otherCircle = (javafx.scene.shape.Circle) otherPair.visual;
+        
+        // Get bounding box of polygon at new position
+        javafx.geometry.Bounds polygonBounds = movingPolygon.getBoundsInLocal();
+        double polygonCenterX = newX + polygonBounds.getWidth() / 2;
+        double polygonCenterY = newY + polygonBounds.getHeight() / 2;
+        
+        CollisionRectangle rect = new CollisionRectangle(
+            polygonCenterX, 
+            polygonCenterY, 
+            polygonBounds.getWidth(), 
+            polygonBounds.getHeight()
+        );
+        CollisionCircle circle = new CollisionCircle(
+            otherCircle.getTranslateX(), 
+            otherCircle.getTranslateY(), 
+            otherCircle.getRadius()
+        );
+        
+        return isRectangleCircleCollision(rect, circle);
+    }
+    
+    /**
+     * Checks collision between two polygons.
+     * Uses bounding box approximation for polygon collision detection.
+     */
+    private boolean checkPolygonToPolygonCollision(javafx.scene.shape.Polygon movingPolygon, 
+                                                  PhysicsVisualPair otherPair, double newX, double newY) {
+        javafx.scene.shape.Polygon otherPolygon = (javafx.scene.shape.Polygon) otherPair.visual;
+        
+        // Get bounding box of moving polygon at new position
+        javafx.geometry.Bounds movingBounds = movingPolygon.getBoundsInLocal();
+        double movingX = newX;
+        double movingY = newY;
+        double movingWidth = movingBounds.getWidth();
+        double movingHeight = movingBounds.getHeight();
+        
+        // Get bounding box of other polygon
+        javafx.geometry.Bounds otherBounds = otherPolygon.getBoundsInLocal();
+        double otherX = otherPolygon.getTranslateX();
+        double otherY = otherPolygon.getTranslateY();
+        double otherWidth = otherBounds.getWidth();
+        double otherHeight = otherBounds.getHeight();
+        
+        // AABB collision detection using bounding boxes
+        return movingX < otherX + otherWidth &&
+               movingX + movingWidth > otherX &&
+               movingY < otherY + otherHeight &&
+               movingY + movingHeight > otherY;
+    }
+    
+    /**
      * Checks if an object is located within the win zone.
      * 
      * @param pair The physics-visual pair to check
@@ -266,6 +427,12 @@ public class CollisionDetection {
         } else if (pair.visual instanceof javafx.scene.shape.Circle) {
             javafx.scene.shape.Circle circle = (javafx.scene.shape.Circle) pair.visual;
             return model.isInWinZone(circle.getTranslateX(), circle.getTranslateY());
+        } else if (pair.visual instanceof javafx.scene.shape.Polygon) {
+            javafx.scene.shape.Polygon polygon = (javafx.scene.shape.Polygon) pair.visual;
+            javafx.geometry.Bounds bounds = polygon.getBoundsInLocal();
+            double centerX = polygon.getTranslateX() + bounds.getWidth() / 2;
+            double centerY = polygon.getTranslateY() + bounds.getHeight() / 2;
+            return model.isInWinZone(centerX, centerY);
         }
         return false;
     }
