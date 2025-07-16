@@ -168,22 +168,136 @@ public class CollisionDetection {
     }
     
     /**
-     * Checks collision between two rectangles using rotated bounding box collision detection.
+     * Checks collision between two rectangles using proper OBB collision detection.
      */
     private boolean checkRectangleToRectangleCollision(Rectangle movingRect, 
-                                                      PhysicsVisualPair otherPair, double newX, double newY) {
-        Rectangle otherRect = (Rectangle) otherPair.visual;
-        
-        // Get rotated bounds for moving rectangle
-        javafx.geometry.Bounds movingBounds = getRotatedBounds(movingRect, newX, newY, movingRect.getRotate());
-        
-        // Get rotated bounds for other rectangle
-        javafx.geometry.Bounds otherBounds = getRotatedBounds(otherRect, 
-            otherRect.getTranslateX(), otherRect.getTranslateY(), otherRect.getRotate());
-        
-        // Check overlap using rotated bounding boxes
-        return movingBounds.intersects(otherBounds);
+                                                  PhysicsVisualPair otherPair, double newX, double newY) {
+    Rectangle otherRect = (Rectangle) otherPair.visual;
+    
+    // Create collision rectangles with proper center positions
+    double movingCenterX = newX + movingRect.getWidth() / 2;
+    double movingCenterY = newY + movingRect.getHeight() / 2;
+    CollisionRectangle moving = new CollisionRectangle(
+        movingCenterX, movingCenterY, 
+        movingRect.getWidth(), movingRect.getHeight(), 
+        movingRect.getRotate()
+    );
+    
+    double otherCenterX = otherRect.getTranslateX() + otherRect.getWidth() / 2;
+    double otherCenterY = otherRect.getTranslateY() + otherRect.getHeight() / 2;
+    CollisionRectangle other = new CollisionRectangle(
+        otherCenterX, otherCenterY,
+        otherRect.getWidth(), otherRect.getHeight(),
+        otherRect.getRotate()
+    );
+    
+    return checkOBBCollision(moving, other);
+}
+
+/**
+ * Checks collision between two oriented bounding boxes (OBB).
+ * Uses the Separating Axis Theorem for accurate rotated rectangle collision detection.
+ */
+private boolean checkOBBCollision(CollisionRectangle rect1, CollisionRectangle rect2) {
+    // If neither rectangle is rotated, use simpler axis-aligned check
+    if (!rect1.isRotated() && !rect2.isRotated()) {
+        return checkAxisAlignedRectangleCollision(rect1, rect2);
     }
+    
+    // Get the four corners of each rectangle
+    double[][] corners1 = getRectangleCorners(rect1);
+    double[][] corners2 = getRectangleCorners(rect2);
+    
+    // Test separation along the axes of both rectangles
+    return !isSeparated(corners1, corners2, rect1) && !isSeparated(corners1, corners2, rect2);
+}
+
+/**
+ * Checks if two rectangles are axis-aligned and colliding.
+ */
+private boolean checkAxisAlignedRectangleCollision(CollisionRectangle rect1, CollisionRectangle rect2) {
+    double left1 = rect1.centerX - rect1.width / 2;
+    double right1 = rect1.centerX + rect1.width / 2;
+    double top1 = rect1.centerY - rect1.height / 2;
+    double bottom1 = rect1.centerY + rect1.height / 2;
+    
+    double left2 = rect2.centerX - rect2.width / 2;
+    double right2 = rect2.centerX + rect2.width / 2;
+    double top2 = rect2.centerY - rect2.height / 2;
+    double bottom2 = rect2.centerY + rect2.height / 2;
+    
+    return !(right1 <= left2 || left1 >= right2 || bottom1 <= top2 || top1 >= bottom2);
+}
+
+/**
+ * Gets the four corners of a rectangle in world coordinates.
+ */
+private double[][] getRectangleCorners(CollisionRectangle rect) {
+    double halfWidth = rect.width / 2;
+    double halfHeight = rect.height / 2;
+    
+    // Local corners (relative to center)
+    double[][] localCorners = {
+        {-halfWidth, -halfHeight},
+        {halfWidth, -halfHeight},
+        {halfWidth, halfHeight},
+        {-halfWidth, halfHeight}
+    };
+    
+    double[][] worldCorners = new double[4][2];
+    double rotRad = Math.toRadians(rect.rotation);
+    double cos = Math.cos(rotRad);
+    double sin = Math.sin(rotRad);
+    
+    // Transform to world coordinates
+    for (int i = 0; i < 4; i++) {
+        double localX = localCorners[i][0];
+        double localY = localCorners[i][1];
+        
+        worldCorners[i][0] = rect.centerX + localX * cos - localY * sin;
+        worldCorners[i][1] = rect.centerY + localX * sin + localY * cos;
+    }
+    
+    return worldCorners;
+}
+
+/**
+ * Tests if two sets of corners are separated along the axes of a given rectangle.
+ */
+private boolean isSeparated(double[][] corners1, double[][] corners2, CollisionRectangle rect) {
+    double rotRad = Math.toRadians(rect.rotation);
+    
+    // Test along both axes of the rectangle
+    double[] axes = {rotRad, rotRad + Math.PI / 2}; // 0° and 90° relative to rectangle
+    
+    for (double axisAngle : axes) {
+        double axisX = Math.cos(axisAngle);
+        double axisY = Math.sin(axisAngle);
+        
+        // Project all corners onto this axis
+        double min1 = Double.MAX_VALUE, max1 = -Double.MAX_VALUE;
+        double min2 = Double.MAX_VALUE, max2 = -Double.MAX_VALUE;
+        
+        for (double[] corner : corners1) {
+            double projection = corner[0] * axisX + corner[1] * axisY;
+            min1 = Math.min(min1, projection);
+            max1 = Math.max(max1, projection);
+        }
+        
+        for (double[] corner : corners2) {
+            double projection = corner[0] * axisX + corner[1] * axisY;
+            min2 = Math.min(min2, projection);
+            max2 = Math.max(max2, projection);
+        }
+        
+        // Check if projections are separated
+        if (max1 < min2 || max2 < min1) {
+            return true; // Separated along this axis
+        }
+    }
+    
+    return false; // Not separated
+}
     
     /**
      * Checks collision between a rectangle and a circle.
