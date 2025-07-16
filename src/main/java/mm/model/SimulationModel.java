@@ -702,4 +702,18 @@ public class SimulationModel {
     public boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY) {
         return collisionService.wouldCauseOverlap(movingPair, newX, newY);
     }
+
+    /**
+     * Checks if moving an object would cause a collision.
+     * Delegates to the collision detection service.
+     * 
+     * @param movingPair The physics-visual pair being moved
+     * @param newX The proposed new X position
+     * @param newY The proposed new Y position
+     * @param newAngle The proposed new angle
+     * @return true if collision would occur, false otherwise
+     */
+    public boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY, float newAngle) {
+        return collisionService.wouldCauseOverlap(movingPair, newX, newY, newAngle);
+    }
 }

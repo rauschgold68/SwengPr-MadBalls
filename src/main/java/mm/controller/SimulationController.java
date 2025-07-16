@@ -496,7 +496,7 @@ public class SimulationController {
                         pair.visual.setRotate(simObj.getAngle());
                         
                         // Check for collision before placing the object
-                        if (!wouldCauseOverlap(pair, simObj.getPosition().getX(), simObj.getPosition().getY())) {
+                        if (!wouldCauseOverlap(pair, simObj.getPosition().getX(), simObj.getPosition().getY(), simObj.getAngle())) {
                             // Create parameter object for AddObjectController
                             AddObjectController.AddObjectParams params = new AddObjectController.AddObjectParams(
                                 model, simSpace, gameObjectToPairMap, this::refreshInventoryDisplay
@@ -821,7 +821,7 @@ public class SimulationController {
             double newY = event.getSceneY() - dragDelta[1];
 
             // Check for collision before allowing the move
-            if (!wouldCauseOverlap(pair, newX, newY)) {
+            if (!wouldCauseOverlap(pair, newX, newY, simObj.getAngle())) {
                 visual.setTranslateX(newX);
                 visual.setTranslateY(newY);
 
@@ -893,49 +893,52 @@ public class SimulationController {
                 event.consume();
                 return;
             }
-            
-            // Store starting angle for undo
+
             float startAngle = simObj.getAngle();
             Position currentPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
-            
             float newAngle = startAngle + 15;
 
-            // Update visual rotation
-            pair.visual.setRotate(newAngle);
-            
-            // Update GameObject angle
-            simObj.setAngle(newAngle);
+            // Check for collision before allowing the rotation
+            if (!wouldCauseOverlap(pair, currentPosition.getX(), currentPosition.getY(), newAngle)) {
+                // Update visual rotation
+                pair.visual.setRotate(newAngle);
 
-            // Update physics body rotation
-            pair.body.setTransform(
-                pair.body.getPosition(), 
-                (float) Math.toRadians(newAngle)
-            );
-            
-            // Create move command for rotation
-            MoveObjectController.MoveObjectParams rotateParams = new MoveObjectController.MoveObjectParams.Builder()
-                .setGameObject(simObj)
-                .setPair(pair)
-                .setPositions(currentPosition, currentPosition)
-                .setAngles(startAngle, newAngle)
-                .build();
-            MoveObjectController rotateCommand = new MoveObjectController(rotateParams);
-            model.getUndoRedoManager().executeCommand(rotateCommand);
-            
+                // Update GameObject angle
+                simObj.setAngle(newAngle);
+
+                // Update physics body rotation
+                pair.body.setTransform(
+                    pair.body.getPosition(),
+                    (float) Math.toRadians(newAngle)
+                );
+
+                // Create move command for rotation
+                MoveObjectController.MoveObjectParams rotateParams = new MoveObjectController.MoveObjectParams.Builder()
+                    .setGameObject(simObj)
+                    .setPair(pair)
+                    .setPositions(currentPosition, currentPosition)
+                    .setAngles(startAngle, newAngle)
+                    .build();
+                MoveObjectController rotateCommand = new MoveObjectController(rotateParams);
+                model.getUndoRedoManager().executeCommand(rotateCommand);
+            }
+            // If collision would occur, do nothing (deny rotation)
+
             event.consume();
         });
     }
 
     /**
-     * Checks if moving an object to a new position would cause it to overlap with other objects.
+     * Checks if moving or rotating an object to a new position/angle would cause it to overlap with other objects.
      * Delegates to the model's collision detection service.
-     * 
+     *
      * @param movingPair The physics-visual pair being moved
      * @param newX The proposed new X position
      * @param newY The proposed new Y position
-     * @return true if the new position would cause an overlap, false otherwise
+     * @param newAngle The proposed new angle (in degrees)
+     * @return true if the new transform would cause an overlap, false otherwise
      */
-    private boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY) {
-        return model.wouldCauseOverlap(movingPair, newX, newY);
+    private boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY, float newAngle) {
+        return model.wouldCauseOverlap(movingPair, newX, newY, newAngle);
     }
 }

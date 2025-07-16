@@ -93,6 +93,30 @@ public class CollisionDetection {
         return false;
     }
     
+    public boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY, float newAngle) {
+        List<PhysicsVisualPair> allPairs = model.getPairs();
+
+        // Save original angle
+        double originalAngle = movingPair.visual.getRotate();
+        movingPair.visual.setRotate(newAngle);
+
+        boolean overlap = false;
+        for (PhysicsVisualPair otherPair : allPairs) {
+            if (shouldSkipCollisionCheck(movingPair, otherPair)) {
+                continue;
+            }
+            if (hasCollision(movingPair, otherPair, newX, newY)) {
+                overlap = true;
+                break;
+            }
+        }
+
+        // Restore original angle
+        movingPair.visual.setRotate(originalAngle);
+
+        return overlap;
+    }
+    
     /**
      * Determines if collision checking should be skipped for a pair of objects.
      * 
@@ -609,4 +633,6 @@ private boolean isSeparated(double[][] corners1, double[][] corners2, CollisionR
         }
         return false;
     }
+
+    
 }
