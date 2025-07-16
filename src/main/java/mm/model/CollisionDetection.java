@@ -101,7 +101,7 @@ public class CollisionDetection {
      * @return true if collision check should be skipped, false otherwise
      */
     private boolean shouldSkipCollisionCheck(PhysicsVisualPair movingPair, PhysicsVisualPair otherPair) {
-        return otherPair == movingPair || isObjectInWinZone(otherPair);
+        return otherPair == movingPair || isObjectInWinZone(otherPair) || isWinZone(otherPair);
     }
     
     /**
@@ -124,6 +124,11 @@ public class CollisionDetection {
         }
         
         return false;
+    }
+
+    private boolean isWinZone(PhysicsVisualPair pair){
+        Object userData = pair.body.getUserData();
+        return "winzone".equals(userData) || "winPlat".equals(userData) || "winObject".equals(userData);
     }
     
     /**
@@ -506,22 +511,21 @@ private boolean isSeparated(double[][] corners1, double[][] corners2, CollisionR
     private boolean checkPolygonToRectangleCollision(Polygon movingPolygon, 
                                                     PhysicsVisualPair otherPair, double newX, double newY) {
         Rectangle otherRect = (Rectangle) otherPair.visual;
-        
-        // Create temporary polygon at new position to get its bounds
+
+        // Move polygon to new position
         Polygon tempPolygon = new Polygon();
         tempPolygon.getPoints().addAll(movingPolygon.getPoints());
         tempPolygon.setTranslateX(newX);
         tempPolygon.setTranslateY(newY);
         tempPolygon.setRotate(movingPolygon.getRotate());
-        
-        javafx.geometry.Bounds polygonBounds = tempPolygon.getBoundsInParent();
-        
-        // Get rotated bounds for other rectangle
-        javafx.geometry.Bounds rectBounds = getRotatedBounds(otherRect, 
-            otherRect.getTranslateX(), otherRect.getTranslateY(), otherRect.getRotate());
-        
-        // Check overlap using bounding boxes
-        return polygonBounds.intersects(rectBounds);
+
+        Rectangle tempRect = new Rectangle(otherRect.getWidth(), otherRect.getHeight());
+        tempRect.setTranslateX(otherRect.getTranslateX());
+        tempRect.setTranslateY(otherRect.getTranslateY());
+        tempRect.setRotate(otherRect.getRotate());
+
+        javafx.scene.shape.Shape intersection = javafx.scene.shape.Shape.intersect(tempPolygon, tempRect);
+        return intersection.getBoundsInLocal().getWidth() > 0 && intersection.getBoundsInLocal().getHeight() > 0;
     }
     
     /**
