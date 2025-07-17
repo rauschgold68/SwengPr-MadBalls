@@ -7,7 +7,10 @@ import mm.model.Position;
 import mm.model.Size;
 
 import javafx.scene.shape.*;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
+
 import org.jbox2d.dynamics.*;
 
 /**
@@ -45,10 +48,11 @@ public class FxToGameObjectController {
     public static GameObject convertBack(PhysicsVisualPair pair) {
         String name = (String) pair.body.getUserData();
         float angle = (float) Math.toDegrees(pair.body.getAngle());
-        boolean winning = pair.body.getUserData().equals("winObject");
+        boolean winning = "winObject".equalsIgnoreCase((String) pair.body.getUserData());
         Shape shape = pair.visual;
 
-        String colour = extractColour(pair, shape);
+        String sprite = extractSprite(pair, shape);
+        String colour = (String.class != null) ? "BLACK" : extractColour(pair, shape);
         Position position = new Position(0, 0);
         Size size = new Size();
         String type = extractShapeProperties(shape, position, size);
@@ -85,6 +89,30 @@ public class FxToGameObjectController {
         }
         Color tmp = (Color) shape.getFill();
         return (tmp != null) ? tmp.toString() : "BLACK";
+    }
+
+    /**
+     * Extracts the color from the shape, handling special cases for certain object types.
+     * <p>
+     * This method handles the color extraction logic with special consideration for certain
+     * object types that should not have their color extracted (winZone and noPlaceZone).
+     * For regular objects, it extracts the fill color from the JavaFX Shape and converts
+     * it to a string representation, defaulting to "BLACK" if no color is set.
+     * </p>
+     * 
+     * @param pair The PhysicsVisualPair containing the body with user data
+     * @param shape The JavaFX Shape from which to extract the color
+     * @return The color as a string representation, null for special zones, or "BLACK" as default
+     */
+    private static String extractSprite(PhysicsVisualPair pair, Shape shape) {
+        String type = (String) pair.body.getUserData();
+        if (type.equalsIgnoreCase("winZone") || type.equalsIgnoreCase("noPlaceZone") || type.equalsIgnoreCase("winPlat") || type.equalsIgnoreCase("bucket")) {
+            return null;
+        }
+        ImagePattern pattern = (ImagePattern) shape.getFill();
+        Image tmp = pattern.getImage();
+        String sprite = tmp.getUrl();
+        return (sprite == null) ? null : sprite.substring(sprite.lastIndexOf('/')+1, sprite.length());
     }
 
     /**

@@ -287,7 +287,7 @@ public class GameObjectController {
         if (sprite != null) {
             Image img = null;
             try {
-                img = new Image(GameObjectController.class.getResourceAsStream(sprite));
+                img = new Image(GameObjectController.class.getResource(obj.getSprite()).toExternalForm());
             } catch (Exception e) {
                 System.err.println(e);
             }
