@@ -896,7 +896,7 @@ public class SimulationController {
 
             float startAngle = simObj.getAngle();
             Position currentPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
-            float newAngle = startAngle + 15;
+            float newAngle = startAngle + 5;
 
             // Check for collision before allowing the rotation
             if (!wouldCauseOverlap(pair, currentPosition.getX(), currentPosition.getY(), newAngle)) {
