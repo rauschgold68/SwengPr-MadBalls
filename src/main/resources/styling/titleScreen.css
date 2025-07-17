@@ -75,3 +75,26 @@
 .start-btn:hover {
   -fx-background-color: #788be0;
 }
+
+.save-btn {
+  -fx-background-color: #5e73c2;
+  -fx-text-fill: white;
+  -fx-font-weight: bold;
+  -fx-padding: 6 12;
+  -fx-background-radius: 8;
+  -fx-cursor: hand;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 2, 0, 0, 1);
+}
+
+.save-btn:hover {
+  -fx-background-color: #788be0;
+  -fx-scale-x: 1.05;
+  -fx-scale-y: 1.05;
+}
+
+.save-btn:pressed {
+  -fx-background-color: #4a5ba0;
+  -fx-scale-x: 0.95;
+  -fx-scale-y: 0.95;
+  -fx-translate-y: 1px;
+}

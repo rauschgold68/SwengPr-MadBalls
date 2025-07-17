@@ -376,8 +376,7 @@ public class TitleScreenView {
 
         // Save-Button
         btnSaveSkin = new Button("Save");
-        btnSaveSkin.setStyle(
-                "-fx-background-color: #5e73c2; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 12; -fx-background-radius: 8;");
+        btnSaveSkin.getStyleClass().add("save-btn");
 
         btnSaveSkin.setOnAction(e -> {
             skinManager.setSelectedSkin(skinChoiceBox.getValue());
