@@ -122,8 +122,10 @@ public class InventoryObjectController {
         if (obj.getSprite() != null) {
             Image image = null;
             try {
-                image = new Image(InventoryObjectController.class.getResource(obj.getSprite()).toExternalForm());
-            } catch (Exception ignored) {
+                String spritePath = obj.getSprite();
+                image = new Image(InventoryObjectController.class.getResource(spritePath).toExternalForm());
+            } catch (Exception e) {
+                // Image loading failed, fall back to color fill
             }
             if (image != null && !image.isError()) {
                 rect.setFill(new ImagePattern(image));
@@ -204,8 +206,10 @@ public class InventoryObjectController {
         if (obj.getSprite() != null) {
             Image image = null;
             try {
-                image = new Image(InventoryObjectController.class.getResource(obj.getSprite()).toExternalForm());
-            } catch (Exception ignored) {
+                String spritePath = obj.getSprite();
+                image = new Image(InventoryObjectController.class.getResource(spritePath).toExternalForm());
+            } catch (Exception e) {
+                // Image loading failed, fall back to color fill
             }
             if (image != null && !image.isError()) {
                 circ.setFill(new ImagePattern(image));
@@ -259,24 +263,24 @@ public class InventoryObjectController {
         float width = obj.getSize().getWidth();
         float height = obj.getSize().getHeight();
         float wallThickness = 10.0f;
-        
+
         Polygon bucket = new Polygon();
-        
+
         // Define U-shape vertices (relative to center, matching physics body)
         Double[] points = {
-            (double)(-width/2), (double)(height/2),                                    // Bottom-left outer
-            (double)(-width/2), (double)(-height/2),                                  // Top-left outer
-            (double)(-width/2 + wallThickness), (double)(-height/2),                  // Top-left inner
-            (double)(-width/2 + wallThickness), (double)(height/2 - wallThickness),   // Bottom-left inner
-            (double)(width/2 - wallThickness), (double)(height/2 - wallThickness),    // Bottom-right inner
-            (double)(width/2 - wallThickness), (double)(-height/2),                   // Top-right inner
-            (double)(width/2), (double)(-height/2),                                   // Top-right outer
-            (double)(width/2), (double)(height/2)                                     // Bottom-right outer
+                (double) (-width / 2), (double) (height / 2), // Bottom-left outer
+                (double) (-width / 2), (double) (-height / 2), // Top-left outer
+                (double) (-width / 2 + wallThickness), (double) (-height / 2), // Top-left inner
+                (double) (-width / 2 + wallThickness), (double) (height / 2 - wallThickness), // Bottom-left inner
+                (double) (width / 2 - wallThickness), (double) (height / 2 - wallThickness), // Bottom-right inner
+                (double) (width / 2 - wallThickness), (double) (-height / 2), // Top-right inner
+                (double) (width / 2), (double) (-height / 2), // Top-right outer
+                (double) (width / 2), (double) (height / 2) // Bottom-right outer
         };
-        
+
         bucket.getPoints().addAll(points);
         bucket.setFill(Color.valueOf(obj.getColour()));
-        
+
         return bucket;
     }
 
@@ -284,7 +288,8 @@ public class InventoryObjectController {
      * Creates a JBox2D Body for a U-shaped bucket using multiple PolygonShapes.
      * <p>
      * Constructs a physics body with three separate rectangular fixtures that form
-     * the left wall, right wall, and bottom of the bucket, creating a hollow container
+     * the left wall, right wall, and bottom of the bucket, creating a hollow
+     * container
      * that objects can fall into. Each wall is a separate collision shape to ensure
      * proper physics behavior.
      * </p>
@@ -294,9 +299,11 @@ public class InventoryObjectController {
      * density, friction, and restitution from the Physics object.
      * </p>
      *
-     * @param obj The InventoryObject containing bucket dimensions and physics properties
+     * @param obj   The InventoryObject containing bucket dimensions and physics
+     *              properties
      * @param world The JBox2D World in which to create the physics body
-     * @return A configured Body with three-wall collision geometry for physics simulation
+     * @return A configured Body with three-wall collision geometry for physics
+     *         simulation
      */
     private static Body createBucketBody(InventoryObject obj, World world) {
         Physics physics = obj.getPhysics();
@@ -307,17 +314,17 @@ public class InventoryObjectController {
         // Create body definition
         BodyDef def = new BodyDef();
         def.type = physics.getShape().equalsIgnoreCase("Dynamic") ? BodyType.DYNAMIC : BodyType.STATIC;
-        
+
         Body body = world.createBody(def);
         body.setUserData(obj.getName());
 
         // Create bottom wall
         PolygonShape bottomShape = new PolygonShape();
         bottomShape.setAsBox(
-            width / 2 / SCALE,                           // half-width
-            wallThickness / 2 / SCALE,                   // half-height
-            new Vec2(0, (height / 2 - wallThickness / 2) / SCALE), // center position
-            0                                            // angle
+                width / 2 / SCALE, // half-width
+                wallThickness / 2 / SCALE, // half-height
+                new Vec2(0, (height / 2 - wallThickness / 2) / SCALE), // center position
+                0 // angle
         );
         FixtureDef bottomFixture = createFixtureDef(bottomShape, physics);
         body.createFixture(bottomFixture);
@@ -325,10 +332,10 @@ public class InventoryObjectController {
         // Create left wall
         PolygonShape leftShape = new PolygonShape();
         leftShape.setAsBox(
-            wallThickness / 2 / SCALE,                   // half-width
-            height / 2 / SCALE,                          // half-height
-            new Vec2((-width / 2 + wallThickness / 2) / SCALE, 0), // center position
-            0                                            // angle
+                wallThickness / 2 / SCALE, // half-width
+                height / 2 / SCALE, // half-height
+                new Vec2((-width / 2 + wallThickness / 2) / SCALE, 0), // center position
+                0 // angle
         );
         FixtureDef leftFixture = createFixtureDef(leftShape, physics);
         body.createFixture(leftFixture);
@@ -336,10 +343,10 @@ public class InventoryObjectController {
         // Create right wall
         PolygonShape rightShape = new PolygonShape();
         rightShape.setAsBox(
-            wallThickness / 2 / SCALE,                   // half-width
-            height / 2 / SCALE,                          // half-height
-            new Vec2((width / 2 - wallThickness / 2) / SCALE, 0),  // center position
-            0                                            // angle
+                wallThickness / 2 / SCALE, // half-width
+                height / 2 / SCALE, // half-height
+                new Vec2((width / 2 - wallThickness / 2) / SCALE, 0), // center position
+                0 // angle
         );
         FixtureDef rightFixture = createFixtureDef(rightShape, physics);
         body.createFixture(rightFixture);

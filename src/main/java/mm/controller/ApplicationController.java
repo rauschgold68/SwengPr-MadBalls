@@ -8,15 +8,18 @@ import mm.model.Level;
 /**
  * Entry point for the MadBalls application.
  * <p>
- * This class initializes and launches the JavaFX application, setting up the primary stage
+ * This class initializes and launches the JavaFX application, setting up the
+ * primary stage
  * with the title screen and configuring the main window properties.
  * </p>
  * <p>
- * The {@link #loadedLevel} static field holds the currently loaded level, which can be accessed
+ * The {@link #loadedLevel} static field holds the currently loaded level, which
+ * can be accessed
  * and modified throughout the application's lifecycle.
  * </p>
  * <p>
- * The {@link #main(String[])} method starts the JavaFX runtime, and the {@link #start(Stage)} method
+ * The {@link #main(String[])} method starts the JavaFX runtime, and the
+ * {@link #start(Stage)} method
  * sets up the initial scene and window configuration.
  * </p>
  */
@@ -29,17 +32,28 @@ public class ApplicationController extends Application {
     public static Level loadedLevel;
 
     /**
+     * The shared title screen controller instance to maintain state.
+     */
+    public static TitleScreenController titleScreenController;
+
+    /**
+     * The current simulation controller (if any).
+     */
+    public static SimulationController currentSimulationController;
+
+    /**
      * Initializes the primary stage of the application.
      * <p>
-     * Sets the window title, loads the title screen, and configures the window size and properties.
+     * Sets the window title, loads the title screen, and configures the window size
+     * and properties.
      * </p>
      *
      * @param primaryStage the primary stage provided by the JavaFX runtime
      */
     @Override
     public void start(Stage primaryStage) {
-        TitleScreenController titleController = new TitleScreenController(primaryStage);
-        Scene titleScene = titleController.getScene();
+        titleScreenController = new TitleScreenController(primaryStage);
+        Scene titleScene = titleScreenController.getScene();
         primaryStage.setTitle("MadBalls©");
         primaryStage.setScene(titleScene);
 

@@ -64,6 +64,7 @@ import java.io.File;
  * @author MadBalls
  */
 public class SimulationController {
+    private String selectedSkin = "Default";
 
     private final SimulationModel model;
     private final SimulationView view;
@@ -84,10 +85,23 @@ public class SimulationController {
      * @param primaryStage the primary stage of the application
      * @param levelPath    the resource path to the level JSON file
      */
-    public SimulationController(Stage primaryStage, String levelPath, boolean isPuzzleMode, boolean atPuzzlesEnd) {
+
+    /**
+     * Constructs the SimulationController, sets up the model and view, and wires up
+     * event handlers. Accepts a skin selection for inventory sprites.
+     *
+     * @param primaryStage the primary stage of the application
+     * @param levelPath    the resource path to the level JSON file
+     * @param isPuzzleMode whether puzzle mode is enabled
+     * @param atPuzzlesEnd whether at the end of puzzles
+     * @param selectedSkin the selected skin ("Default" or "Legacy")
+     */
+    public SimulationController(Stage primaryStage, String levelPath, boolean isPuzzleMode, boolean atPuzzlesEnd,
+            String selectedSkin) {
         this.primaryStage = primaryStage;
         this.model = new SimulationModel(levelPath);
         this.view = new SimulationView(primaryStage, isPuzzleMode, atPuzzlesEnd);
+        this.selectedSkin = selectedSkin != null ? selectedSkin : "Default";
 
         // Set win listener
         this.model.setWinListener(() -> {
@@ -96,10 +110,49 @@ public class SimulationController {
 
         setupSimulation();
         setupInventory(true); // Load data from file on initial setup
+        updateInventorySpritesForSkin(); // Update sprites AFTER inventory is loaded
+        refreshInventoryDisplay(); // Refresh the display with updated sprite paths
         setupDragAndDrop();
         setupMenuButtons();
         setupOverlayToggle();
         setupWinNextLevel();
+    }
+
+    /**
+     * Updates all inventory object sprite paths to use the selected skin folder.
+     */
+    private void updateInventorySpritesForSkin() {
+        String skinFolder = "/objectSkins/" + selectedSkin + "/";
+
+        for (InventoryObject obj : model.getInventoryObjects()) {
+            String originalSprite = obj.getSprite();
+
+            if (originalSprite != null && !originalSprite.trim().isEmpty()) {
+                String newSprite;
+                // If sprite already contains full path, replace the skin folder
+                if (originalSprite.contains("/objectSkins/")) {
+                    newSprite = originalSprite.replaceAll("/objectSkins/[^/]+/", skinFolder);
+                } else {
+                    // If sprite is just filename, prepend with skin folder
+                    newSprite = skinFolder + originalSprite;
+                }
+                obj.setSprite(newSprite);
+            }
+        }
+    }
+
+    /**
+     * Updates the skin choice and refreshes the inventory display.
+     * This method should be called when returning from the title screen.
+     */
+    public void updateSkinChoice() {
+        String currentSkin = SkinManager.getInstance().getSelectedSkin();
+
+        if (!currentSkin.equals(this.selectedSkin)) {
+            this.selectedSkin = currentSkin;
+            updateInventorySpritesForSkin();
+            refreshInventoryDisplay();
+        }
     }
 
     /**
@@ -128,22 +181,24 @@ public class SimulationController {
         // Add visuals to simSpace and restore angles for dropped objects
         List<GameObject> dropped = model.getDroppedObjects();
         List<PhysicsVisualPair> pairs = model.getPairs();
-        
+
         // Clear the mapping and rebuild it during setup
         gameObjectToPairMap.clear();
-        
+
         for (PhysicsVisualPair pair : pairs) {
             if (pair.visual != null) {
-                // Try to find the corresponding dropped object by matching the physics body's position
-                // with the stored GameObject position (since both should be in sync after creation)
+                // Try to find the corresponding dropped object by matching the physics body's
+                // position
+                // with the stored GameObject position (since both should be in sync after
+                // creation)
                 GameObject matchedDroppedObject = null;
-                
+
                 for (GameObject obj : dropped) {
                     if (obj.getName().equals(pair.body.getUserData())) {
                         // Get the physics body position (converted back to visual coordinates)
                         org.jbox2d.common.Vec2 bodyPos = pair.body.getPosition();
                         float expectedVisualX, expectedVisualY;
-                        
+
                         // Convert physics position back to expected visual position
                         if (pair.visual instanceof javafx.scene.shape.Rectangle) {
                             javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
@@ -153,25 +208,26 @@ public class SimulationController {
                             expectedVisualX = bodyPos.x * 50.0f;
                             expectedVisualY = bodyPos.y * 50.0f;
                         }
-                        
+
                         // Check if this GameObject's position matches the physics body position
                         float tolerance = 1.0f; // Small tolerance for floating point precision
                         if (Math.abs(obj.getPosition().getX() - expectedVisualX) < tolerance &&
-                            Math.abs(obj.getPosition().getY() - expectedVisualY) < tolerance) {
+                                Math.abs(obj.getPosition().getY() - expectedVisualY) < tolerance) {
                             matchedDroppedObject = obj;
                             break;
                         }
                     }
                 }
-                
-                // If we found a matching dropped object, restore its properties and add handlers
+
+                // If we found a matching dropped object, restore its properties and add
+                // handlers
                 if (matchedDroppedObject != null) {
                     pair.visual.setRotate(matchedDroppedObject.getAngle());
 
                     addMoveHandlersToDroppedVisual(pair, matchedDroppedObject);
                     gameObjectToPairMap.put(matchedDroppedObject, pair);
                 }
-                
+
                 simSpace.getChildren().add(pair.visual);
             }
         }
@@ -184,7 +240,7 @@ public class SimulationController {
      * and creates drag sources for each item.
      * </p>
      * 
-     * @param reloadData if true, reloads inventory data from JSON file; 
+     * @param reloadData if true, reloads inventory data from JSON file;
      *                   if false, uses existing data with current counts
      */
     private void setupInventory(boolean reloadData) {
@@ -214,7 +270,8 @@ public class SimulationController {
     /**
      * Creates a wrapper for an inventory item with visual styling.
      * <p>
-     * This is a temporary helper method that should eventually be moved to the view layer
+     * This is a temporary helper method that should eventually be moved to the view
+     * layer
      * for better MVC compliance.
      * </p>
      * 
@@ -226,9 +283,9 @@ public class SimulationController {
         if (pair.visual == null) {
             return null;
         }
-        
+
         pair.visual.setRotate(obj.getAngle());
-        
+
         // Dynamically adjust wrapper size based on rotated dimensions
         double rotatedWidth = pair.visual.getBoundsInParent().getWidth();
         double rotatedHeight = pair.visual.getBoundsInParent().getHeight();
@@ -238,7 +295,7 @@ public class SimulationController {
 
         Label countLabel = new Label(Integer.toString(obj.getCount()));
         countLabel.setMouseTransparent(true);
-        
+
         // Apply appropriate CSS class based on count
         if (obj.getCount() <= 0) {
             countLabel.getStyleClass().add("item-count-no");
@@ -247,10 +304,10 @@ public class SimulationController {
             countLabel.getStyleClass().add("item-count-yes");
             wrapper.setStyle("");
         }
-        
+
         wrapper.getChildren().add(countLabel);
         StackPane.setAlignment(countLabel, javafx.geometry.Pos.CENTER_RIGHT);
-        
+
         return wrapper;
     }
 
@@ -262,7 +319,7 @@ public class SimulationController {
      * </p>
      * 
      * @param wrapper the inventory item wrapper
-     * @param obj the inventory object associated with this wrapper
+     * @param obj     the inventory object associated with this wrapper
      */
     private void setupInventoryItemHandlers(StackPane wrapper, InventoryObject obj) {
         wrapper.setOnDragDetected(event -> {
@@ -271,12 +328,12 @@ public class SimulationController {
                 event.consume();
                 return;
             }
-            
+
             // Delegate drag setup to helper method
             startInventoryItemDrag(wrapper, obj, event);
         });
     }
-    
+
     /**
      * Determines if dragging/moving is allowed based on simulation state.
      * <p>
@@ -289,7 +346,7 @@ public class SimulationController {
         PhysicsAnimationController timer = model.getTimer();
         return timer == null || !timer.isRunning();
     }
-    
+
     /**
      * Determines if an inventory item can be dragged.
      * <p>
@@ -302,7 +359,7 @@ public class SimulationController {
     private boolean isDragAllowed(InventoryObject obj) {
         return isInteractionAllowed() && obj.getCount() > 0;
     }
-    
+
     /**
      * Starts the drag operation for an inventory item.
      * <p>
@@ -320,7 +377,7 @@ public class SimulationController {
         javafx.scene.SnapshotParameters snapshotParameters = new javafx.scene.SnapshotParameters();
         snapshotParameters.setFill(javafx.scene.paint.Color.TRANSPARENT);
         javafx.scene.image.WritableImage snapshot = visual.snapshot(snapshotParameters, null);
-        
+
         db.setDragView(snapshot, snapshot.getWidth() / 2, snapshot.getHeight() / 2);
         event.consume();
     }
@@ -403,38 +460,36 @@ public class SimulationController {
                 if (template != null) {
                     // Create the GameObject but don't modify inventory count yet
                     GameObject simObj = new GameObject(
-                        template.getName(),
-                        template.getType(),
-                        new Position((float) x - template.getSize().getWidth() / 2, 
-                                   (float) y - template.getSize().getHeight() / 2),
-                        template.getSize()
-                    );
-                    
+                            template.getName(),
+                            template.getType(),
+                            new Position((float) x - template.getSize().getWidth() / 2,
+                                    (float) y - template.getSize().getHeight() / 2),
+                            template.getSize());
+
                     // Set additional properties
                     simObj.setPhysics(template.getPhysics());
                     simObj.setAngle(template.getAngle());
                     simObj.setColour(template.getColour());
                     simObj.setSprite(template.getSprite());
                     simObj.setWinning(template.isWinning());
-                    
+
                     PhysicsVisualPair pair = mm.controller.GameObjectController.convert(simObj, model.getWorld());
                     if (pair.visual != null) {
                         // Position the visual at the calculated position
                         pair.visual.setTranslateX(simObj.getPosition().getX());
                         pair.visual.setTranslateY(simObj.getPosition().getY());
                         pair.visual.setRotate(simObj.getAngle());
-                        
+
                         // Check for collision before placing the object
                         if (!wouldCauseOverlap(pair, simObj.getPosition().getX(), simObj.getPosition().getY())) {
                             // Create parameter object for AddObjectController
                             AddObjectController.AddObjectParams params = new AddObjectController.AddObjectParams(
-                                model, simSpace, gameObjectToPairMap, this::refreshInventoryDisplay
-                            );
-                            
+                                    model, simSpace, gameObjectToPairMap, this::refreshInventoryDisplay);
+
                             // Create and execute add command
                             AddObjectController addCommand = new AddObjectController(params, simObj, pair);
                             model.getUndoRedoManager().executeCommand(addCommand);
-                            
+
                             addMoveHandlersToDroppedVisual(pair, simObj);
                             success = true;
                         }
@@ -457,7 +512,7 @@ public class SimulationController {
     private void setupMenuButtons() {
         // Get button groups from the refactored view
         SimulationView.SimulationButtons simButtons = view.getSimulationButtons();
-        
+
         setupPlayButton(simButtons);
         setupStopButton(simButtons);
         setupSettingsButton(simButtons);
@@ -466,7 +521,7 @@ public class SimulationController {
         setupFileButtons(simButtons);
         setupCrownButton(simButtons);
     }
-    
+
     /**
      * Sets up the play button action.
      */
@@ -481,7 +536,7 @@ public class SimulationController {
             });
         }
     }
-    
+
     /**
      * Sets up the stop button action.
      */
@@ -492,10 +547,11 @@ public class SimulationController {
                 if (timer != null && timer.isRunning()) {
                     timer.stop();
                     timer.reset();
-                    
-                    // Clear undo/redo history when stopping simulation to prevent inconsistent state
+
+                    // Clear undo/redo history when stopping simulation to prevent inconsistent
+                    // state
                     model.getUndoRedoManager().clear();
-                    
+
                     // Reset simulation to state before play was pressed
                     model.setDroppedObjects(model.getDroppedObjects());
                     model.setDroppedVisualPairs(model.getDroppedPhysicsVisualPairs());
@@ -507,7 +563,7 @@ public class SimulationController {
             });
         }
     }
-    
+
     /**
      * Sets up the settings button action.
      */
@@ -522,7 +578,7 @@ public class SimulationController {
             });
         }
     }
-    
+
     /**
      * Sets up the undo and redo button actions.
      */
@@ -534,7 +590,7 @@ public class SimulationController {
                 }
             });
         }
-        
+
         if (simButtons.redoButton != null) {
             simButtons.redoButton.setOnAction(e -> {
                 if (isInteractionAllowed()) {
@@ -543,7 +599,7 @@ public class SimulationController {
             });
         }
     }
-    
+
     /**
      * Sets up the delete button action.
      */
@@ -552,10 +608,10 @@ public class SimulationController {
             simButtons.deleteButton.setOnAction(e -> {
                 // Clear undo/redo history when deleting all objects
                 model.getUndoRedoManager().clear();
-                
+
                 // Restore inventory counts before clearing objects
                 model.restoreInventoryCounts();
-                
+
                 model.setDroppedObjects(new ArrayList<>());
                 model.setDroppedVisualPairs(new ArrayList<>());
                 gameObjectToPairMap.clear();
@@ -565,7 +621,7 @@ public class SimulationController {
             });
         }
     }
-    
+
     /**
      * Sets up the import and save button actions.
      */
@@ -584,7 +640,7 @@ public class SimulationController {
                 setupInventory(true); // Reload data when importing new level
             });
         }
-        
+
         if (simButtons.saveButton != null) {
             simButtons.saveButton.setOnAction(e -> {
                 PhysicsAnimationController timer = model.getTimer();
@@ -594,7 +650,7 @@ public class SimulationController {
             });
         }
     }
-    
+
     /**
      * Sets up the crown button action.
      */
@@ -633,10 +689,10 @@ public class SimulationController {
         });
 
         overlayButtons.overlayBackButton.setOnAction(e -> {
-            // Hide the overlay before switching scenes to avoid overlay showing on title screen
+            // Hide the overlay before switching scenes to avoid overlay showing on title
+            // screen
             view.getOverlaySettings().setVisible(false);
-            TitleScreenController titleScreenView = new TitleScreenController(primaryStage);
-            Scene newScreen = titleScreenView.getScene();
+            Scene newScreen = ApplicationController.titleScreenController.getScene();
             primaryStage.setScene(newScreen);
             primaryStage.setWidth(scene.getWidth());
             primaryStage.setHeight(scene.getHeight());
@@ -649,8 +705,7 @@ public class SimulationController {
         // win screen overlay functions
         winButtons.btnWinHome.setOnAction(e -> {
             view.getWinScreenOverlay().setVisible(false);
-            TitleScreenController titleScreenView = new TitleScreenController(primaryStage);
-            Scene newScreen = titleScreenView.getScene();
+            Scene newScreen = ApplicationController.titleScreenController.getScene();
             primaryStage.setScene(newScreen);
             primaryStage.setWidth(scene.getWidth());
             primaryStage.setHeight(scene.getHeight());
@@ -707,7 +762,7 @@ public class SimulationController {
         if (view.getWinScreenButtons().btnWinNext != null) {
             view.getWinScreenButtons().btnWinNext.setOnAction(e -> {
                 SimulationController simController = new SimulationController(primaryStage, nextLevelPath,
-                        true, atPuzzlesEnd);
+                        true, atPuzzlesEnd, selectedSkin);
                 Scene simScene = simController.getScene();
                 primaryStage.setScene(simScene);
                 primaryStage.sizeToScene();
@@ -716,7 +771,8 @@ public class SimulationController {
     }
 
     /**
-     * Adds mouse event handlers to a dropped object's visual node to enable moving it within the simulation area.
+     * Adds mouse event handlers to a dropped object's visual node to enable moving
+     * it within the simulation area.
      */
     private void addMoveHandlersToDroppedVisual(PhysicsVisualPair pair, GameObject simObj) {
         javafx.scene.Node visual = pair.visual;
@@ -730,11 +786,11 @@ public class SimulationController {
                 event.consume();
                 return;
             }
-            
+
             // Store starting position and angle for undo
             dragStartPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
             dragStartAngle = simObj.getAngle();
-            
+
             dragDelta[0] = event.getSceneX() - visual.getTranslateX();
             dragDelta[1] = event.getSceneY() - visual.getTranslateY();
             event.consume();
@@ -745,7 +801,7 @@ public class SimulationController {
                 event.consume();
                 return;
             }
-            
+
             double newX = event.getSceneX() - dragDelta[0];
             double newY = event.getSceneY() - dragDelta[1];
 
@@ -764,46 +820,45 @@ public class SimulationController {
                     float centerX = (float) (newX + rect.getWidth() / 2);
                     float centerY = (float) (newY + rect.getHeight() / 2);
                     pair.body.setTransform(
-                        new org.jbox2d.common.Vec2(centerX / 50.0f, centerY / 50.0f), 
-                        pair.body.getAngle()
-                    );
+                            new org.jbox2d.common.Vec2(centerX / 50.0f, centerY / 50.0f),
+                            pair.body.getAngle());
                 } else if (visual instanceof javafx.scene.shape.Circle) {
                     pair.body.setTransform(
-                        new org.jbox2d.common.Vec2((float) (newX / 50.0), (float) (newY / 50.0)), 
-                        pair.body.getAngle()
-                    );
+                            new org.jbox2d.common.Vec2((float) (newX / 50.0), (float) (newY / 50.0)),
+                            pair.body.getAngle());
                 }
             }
-            // If collision would occur, simply don't update the position - object stays in place
+            // If collision would occur, simply don't update the position - object stays in
+            // place
 
             event.consume();
         });
-        
+
         visual.setOnMouseReleased(event -> {
             if (!isInteractionAllowed()) {
                 event.consume();
                 return;
             }
-            
+
             // Create move command if position or angle changed
             Position currentPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
             float currentAngle = simObj.getAngle();
-            
-            if (dragStartPosition != null && 
-                (Math.abs(dragStartPosition.getX() - currentPosition.getX()) > 1.0f ||
-                 Math.abs(dragStartPosition.getY() - currentPosition.getY()) > 1.0f ||
-                 Math.abs(dragStartAngle - currentAngle) > 1.0f)) {
-        
+
+            if (dragStartPosition != null &&
+                    (Math.abs(dragStartPosition.getX() - currentPosition.getX()) > 1.0f ||
+                            Math.abs(dragStartPosition.getY() - currentPosition.getY()) > 1.0f ||
+                            Math.abs(dragStartAngle - currentAngle) > 1.0f)) {
+
                 MoveObjectController.MoveObjectParams moveParams = new MoveObjectController.MoveObjectParams.Builder()
-                    .setGameObject(simObj)
-                    .setPair(pair)
-                    .setPositions(dragStartPosition, currentPosition)
-                    .setAngles(dragStartAngle, currentAngle)
-                    .build();
+                        .setGameObject(simObj)
+                        .setPair(pair)
+                        .setPositions(dragStartPosition, currentPosition)
+                        .setAngles(dragStartAngle, currentAngle)
+                        .build();
                 MoveObjectController moveCommand = new MoveObjectController(moveParams);
                 model.getUndoRedoManager().executeCommand(moveCommand);
             }
-            
+
             event.consume();
         });
 
@@ -812,46 +867,46 @@ public class SimulationController {
                 event.consume();
                 return;
             }
-            
+
             // Store starting angle for undo
             float startAngle = simObj.getAngle();
             Position currentPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
-            
+
             float newAngle = startAngle + 15;
 
             // Update visual rotation
             pair.visual.setRotate(newAngle);
-            
+
             // Update GameObject angle
             simObj.setAngle(newAngle);
 
             // Update physics body rotation
             pair.body.setTransform(
-                pair.body.getPosition(), 
-                (float) Math.toRadians(newAngle)
-            );
-            
+                    pair.body.getPosition(),
+                    (float) Math.toRadians(newAngle));
+
             // Create move command for rotation
             MoveObjectController.MoveObjectParams rotateParams = new MoveObjectController.MoveObjectParams.Builder()
-                .setGameObject(simObj)
-                .setPair(pair)
-                .setPositions(currentPosition, currentPosition)
-                .setAngles(startAngle, newAngle)
-                .build();
+                    .setGameObject(simObj)
+                    .setPair(pair)
+                    .setPositions(currentPosition, currentPosition)
+                    .setAngles(startAngle, newAngle)
+                    .build();
             MoveObjectController rotateCommand = new MoveObjectController(rotateParams);
             model.getUndoRedoManager().executeCommand(rotateCommand);
-            
+
             event.consume();
         });
     }
 
     /**
-     * Checks if moving an object to a new position would cause it to overlap with other objects.
+     * Checks if moving an object to a new position would cause it to overlap with
+     * other objects.
      * Delegates to the model's collision detection service.
      * 
      * @param movingPair The physics-visual pair being moved
-     * @param newX The proposed new X position
-     * @param newY The proposed new Y position
+     * @param newX       The proposed new X position
+     * @param newY       The proposed new Y position
      * @return true if the new position would cause an overlap, false otherwise
      */
     private boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY) {

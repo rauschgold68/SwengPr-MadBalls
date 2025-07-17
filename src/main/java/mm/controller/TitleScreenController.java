@@ -67,10 +67,15 @@ public class TitleScreenController {
 
     /**
      * Returns the main menu scene to be set on the primary stage.
+     * Updates the current simulation controller's skin if it exists.
      * 
      * @return the JavaFX Scene for the title screen
      */
     public Scene getScene() {
+        // Update skin in current simulation if it exists
+        if (ApplicationController.currentSimulationController != null) {
+            ApplicationController.currentSimulationController.updateSkinChoice();
+        }
         return view.scene;
     }
 
@@ -87,9 +92,12 @@ public class TitleScreenController {
         view.menuButtons.btnPuzzle.setOnAction(e -> view.overlayBackgroundPuzzle.setVisible(true));
 
         // Start sandbox mode
+
         view.menuButtons.btnSandbox.setOnAction(e -> {
+            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/basic_sandbox.json",
-                    false, false);
+                    false, false, selectedSkin);
+            ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
             primaryStage.sizeToScene();
@@ -107,22 +115,28 @@ public class TitleScreenController {
 
         // Level card click handlers
         view.levelCards.levelCard1.setOnMouseClicked(e -> {
+            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/level1.json", true,
-                    false);
+                    false, selectedSkin);
+            ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
             primaryStage.sizeToScene();
         });
         view.levelCards.levelCard2.setOnMouseClicked(e -> {
+            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/level2.json", true,
-                    false);
+                    false, selectedSkin);
+            ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
             primaryStage.sizeToScene();
         });
         view.levelCards.levelCard3.setOnMouseClicked(e -> {
+            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/level3.json", true,
-                    true);
+                    true, selectedSkin);
+            ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
             primaryStage.sizeToScene();

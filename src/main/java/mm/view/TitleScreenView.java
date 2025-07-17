@@ -7,57 +7,73 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import mm.controller.SkinManager;
 
 /**
- * The {@code TitleScreenView} class constructs and exposes all JavaFX UI components
+ * The {@code TitleScreenView} class constructs and exposes all JavaFX UI
+ * components
  * for the main menu (title screen) of the MadBalls game.
  * <p>
- * This class is responsible for building the visual layout and structure of the title screen,
- * including the main menu buttons, logo, background images, overlays for options and level selection,
- * and decorative elements. It does not contain any event handling or navigation logic; all such logic
+ * This class is responsible for building the visual layout and structure of the
+ * title screen,
+ * including the main menu buttons, logo, background images, overlays for
+ * options and level selection,
+ * and decorative elements. It does not contain any event handling or navigation
+ * logic; all such logic
  * should be managed by the controller.
  * </p>
  *
  * <h2>Responsibilities:</h2>
  * <ul>
- *   <li>Builds and arranges the main menu layout, including logo, board, and menu buttons.</li>
- *   <li>Creates overlays for options and puzzle/level selection, exposing them for controller use.</li>
- *   <li>Provides utility methods for constructing decorative UI elements (pins, cards).</li>
- *   <li>Exposes all relevant UI components as public fields for the controller to attach event handlers.</li>
+ * <li>Builds and arranges the main menu layout, including logo, board, and menu
+ * buttons.</li>
+ * <li>Creates overlays for options and puzzle/level selection, exposing them
+ * for controller use.</li>
+ * <li>Provides utility methods for constructing decorative UI elements (pins,
+ * cards).</li>
+ * <li>Exposes all relevant UI components as public fields for the controller to
+ * attach event handlers.</li>
  * </ul>
  *
  * <h2>UI Structure:</h2>
  * <ul>
- *   <li>{@code btnPuzzle, btnSandbox, btnOptions, btnQuit} - Main menu buttons.</li>
- *   <li>{@code btnCloseOptions, btnClosePuzzle} - Close buttons for overlays.</li>
- *   <li>{@code btnUploadTexture} - Button for uploading a texture pack in the options overlay.</li>
- *   <li>{@code overlayBackgroundOptions, overlayBackgroundPuzzle} - Overlays for options and level selection.</li>
- *   <li>{@code optionsWindow} - The options overlay window container.</li>
- *   <li>{@code root} - The root StackPane containing all layers.</li>
- *   <li>{@code scene} - The JavaFX Scene for the title screen.</li>
+ * <li>{@code btnPuzzle, btnSandbox, btnOptions, btnQuit} - Main menu
+ * buttons.</li>
+ * <li>{@code btnCloseOptions, btnClosePuzzle} - Close buttons for
+ * overlays.</li>
+ * <li>{@code btnUploadTexture} - Button for uploading a texture pack in the
+ * options overlay.</li>
+ * <li>{@code overlayBackgroundOptions, overlayBackgroundPuzzle} - Overlays for
+ * options and level selection.</li>
+ * <li>{@code optionsWindow} - The options overlay window container.</li>
+ * <li>{@code root} - The root StackPane containing all layers.</li>
+ * <li>{@code scene} - The JavaFX Scene for the title screen.</li>
  * </ul>
  *
  * <h2>Notes:</h2>
  * <ul>
- *   <li>This class should not contain any event handling or navigation logic.</li>
- *   <li>All UI elements that need interaction should be exposed as public fields for the controller.</li>
- *   <li>Level card click handlers should be set by the controller.</li>
+ * <li>This class should not contain any event handling or navigation
+ * logic.</li>
+ * <li>All UI elements that need interaction should be exposed as public fields
+ * for the controller.</li>
+ * <li>Level card click handlers should be set by the controller.</li>
  * </ul>
  */
 public class TitleScreenView {
 
-/** Main menu navigation buttons. */
+    /** Main menu navigation buttons. */
     public MenuButtons menuButtons = new MenuButtons();
     /** Overlay control buttons. */
     public OverlayButtons overlayButtons = new OverlayButtons();
     /** Level selection cards. */
     public LevelCards levelCards = new LevelCards();
-    
+
     /** Overlay background for options/settings screen. */
     public StackPane overlayBackgroundOptions;
     /** Overlay background for puzzle/level selection screen. */
@@ -68,8 +84,10 @@ public class TitleScreenView {
     public StackPane root;
     /** The JavaFX Scene for the title screen. */
     public Scene scene;
-    
-    /** CSS class name for title screen buttons to avoid duplicate string literals. */
+
+    /**
+     * CSS class name for title screen buttons to avoid duplicate string literals.
+     */
     private static final String BUTTON_STYLE_CLASS = "btnTS";
 
     /**
@@ -110,6 +128,18 @@ public class TitleScreenView {
         public VBox levelCard3;
     }
 
+    // Skin-Auswahl persistent speichern
+    private SkinManager skinManager = SkinManager.getInstance();
+    public ChoiceBox<String> skinChoiceBox;
+    public Button btnSaveSkin;
+
+    /**
+     * Returns the currently saved skin choice ("Default" or "Legacy").
+     */
+    public String getSavedSkinChoice() {
+        return skinManager.getSelectedSkin();
+    }
+
     /**
      * Constructs the title screen view and builds the UI layout.
      * All event handling and navigation logic should be managed by the controller.
@@ -118,17 +148,19 @@ public class TitleScreenView {
         initializeMenuButtons();
         VBox buttonLayer = createButtonLayout();
         VBox logoANDBoard = createLogoAndBoard(buttonLayer);
-        
+
         createOptionsOverlay();
         createPuzzleOverlay();
-        
+
         setupButtonStyles();
         setupRootAndScene(logoANDBoard);
     }
-    
+
     /**
-     * Initializes the main menu buttons with their display text and rotation angles.
-     * Sets up the four main navigation buttons: Puzzles, Sandbox, Options, and Quit.
+     * Initializes the main menu buttons with their display text and rotation
+     * angles.
+     * Sets up the four main navigation buttons: Puzzles, Sandbox, Options, and
+     * Quit.
      * Each button is given a slight rotation for visual appeal.
      */
     private void initializeMenuButtons() {
@@ -142,10 +174,11 @@ public class TitleScreenView {
         menuButtons.btnOptions.setRotate(5);
         menuButtons.btnQuit.setRotate(-3);
     }
-    
+
     /**
      * Creates the button layout with decorative pins and arranges them in rows.
-     * Arranges the main menu buttons in two rows: top row contains Puzzles, Sandbox, 
+     * Arranges the main menu buttons in two rows: top row contains Puzzles,
+     * Sandbox,
      * and Options buttons, while the bottom row contains only the Quit button.
      * Each button is decorated with a colored pin for visual appeal.
      * 
@@ -166,14 +199,15 @@ public class TitleScreenView {
         // Stack button rows vertically
         VBox buttonLayer = new VBox(40, topRow, bottomRow);
         buttonLayer.setAlignment(Pos.CENTER);
-        
+
         return buttonLayer;
     }
-    
+
     /**
      * Creates the logo and board background layout for the main title screen.
      * Constructs the visual layout with the MadBalls logo on top and a decorative
-     * board background below it. The button layer is placed on the board background.
+     * board background below it. The button layer is placed on the board
+     * background.
      * Both backgrounds use image resources and are sized appropriately.
      * 
      * @param buttonLayer The button layout to be placed on the board background.
@@ -209,28 +243,36 @@ public class TitleScreenView {
 
         VBox logoANDBoard = new VBox(logoBox, boardBox);
         logoANDBoard.setPadding(new Insets(0, 0, 30, 0));
-        
+
         return logoANDBoard;
     }
-    
+
     /**
      * Creates the options overlay with game settings controls.
      * Builds a modal overlay containing volume sliders for music and sound effects,
      * as well as a texture pack upload button. The overlay has a semi-transparent
-     * background and is initially hidden. The overlay uses the level select background
+     * background and is initially hidden. The overlay uses the level select
+     * background
      * image and contains a styled options window with various controls.
      */
     private void createOptionsOverlay() {
         overlayBackgroundOptions = new StackPane();
         overlayBackgroundOptions.setVisible(false);
-        
+
         setupOptionsBackground();
         createOptionsWindow();
-        
+
         overlayBackgroundOptions.getChildren().add(optionsWindow);
         StackPane.setAlignment(optionsWindow, Pos.CENTER);
+
+        // Reset ChoiceBox auf gespeicherten Wert, wenn Overlay geschlossen wird
+        overlayBackgroundOptions.visibleProperty().addListener((obs, wasVisible, isNowVisible) -> {
+            if (!isNowVisible) {
+                skinChoiceBox.setValue(skinManager.getSelectedSkin());
+            }
+        });
     }
-    
+
     /**
      * Sets up the background image for the options overlay.
      */
@@ -244,7 +286,7 @@ public class TitleScreenView {
                 new BackgroundSize(1920, 1080, true, true, true, true));
         overlayBackgroundOptions.setBackground(new Background(levelSelectBg));
     }
-    
+
     /**
      * Creates the options window with all settings controls.
      */
@@ -264,7 +306,7 @@ public class TitleScreenView {
 
         optionsWindow.getChildren().addAll(topBar, musicRow, soundRow, textureRow);
     }
-    
+
     /**
      * Creates the top bar with title and close button for the options window.
      * 
@@ -284,10 +326,10 @@ public class TitleScreenView {
         overlayButtons.btnCloseOptions = new Button("X");
         overlayButtons.btnCloseOptions.getStyleClass().add("close-btn");
         topBar.getChildren().addAll(lblTitleAudio, spacer, overlayButtons.btnCloseOptions);
-        
+
         return topBar;
     }
-    
+
     /**
      * Creates the music volume control row.
      * 
@@ -302,7 +344,7 @@ public class TitleScreenView {
         musicRow.setAlignment(Pos.CENTER_LEFT);
         return musicRow;
     }
-    
+
     /**
      * Creates the sound effects volume control row.
      * 
@@ -317,7 +359,7 @@ public class TitleScreenView {
         soundRow.setAlignment(Pos.CENTER_LEFT);
         return soundRow;
     }
-    
+
     /**
      * Creates the texture pack upload control row.
      * 
@@ -326,19 +368,34 @@ public class TitleScreenView {
     private HBox createTexturePackRow() {
         Label lblTexturePack = new Label("Texture Pack:");
         lblTexturePack.setStyle("-fx-text-fill: white;");
-        overlayButtons.btnUploadTexture = new Button("Upload...");
-        HBox textureRow = new HBox(20, lblTexturePack, overlayButtons.btnUploadTexture);
+
+        // ChoiceBox für Skin-Auswahl
+        skinChoiceBox = new ChoiceBox<>();
+        skinChoiceBox.getItems().addAll("Default", "Legacy");
+        skinChoiceBox.setValue(skinManager.getSelectedSkin());
+
+        // Save-Button
+        btnSaveSkin = new Button("Save");
+        btnSaveSkin.setStyle(
+                "-fx-background-color: #5e73c2; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 6 12; -fx-background-radius: 8;");
+
+        btnSaveSkin.setOnAction(e -> {
+            skinManager.setSelectedSkin(skinChoiceBox.getValue());
+        });
+
+        HBox textureRow = new HBox(20, lblTexturePack, skinChoiceBox, btnSaveSkin);
         textureRow.setAlignment(Pos.CENTER_LEFT);
         return textureRow;
     }
-    
+
     /**
      * Creates the puzzle/level selection overlay screen.
      * Builds a modal overlay displaying available game levels as cards.
      * Each level card shows a thumbnail, name, and description. The overlay
      * includes a title, level cards arranged horizontally, and a close button.
      * The overlay is initially hidden and uses the level select background image.
-     * The controller is responsible for setting up click handlers for level navigation.
+     * The controller is responsible for setting up click handlers for level
+     * navigation.
      */
     private void createPuzzleOverlay() {
         overlayBackgroundPuzzle = new StackPane();
@@ -379,7 +436,7 @@ public class TitleScreenView {
 
         overlayBackgroundPuzzle.getChildren().addAll(cardWrapper, overlayButtons.btnClosePuzzle);
     }
-    
+
     /**
      * Sets up the CSS style classes for all main menu buttons.
      * Applies the consistent button styling class to all four main menu buttons
@@ -391,14 +448,17 @@ public class TitleScreenView {
         menuButtons.btnOptions.getStyleClass().add(BUTTON_STYLE_CLASS);
         menuButtons.btnQuit.getStyleClass().add(BUTTON_STYLE_CLASS);
     }
-    
+
     /**
      * Sets up the root layout and JavaFX scene for the title screen.
-     * Creates the main StackPane root container, adds all UI layers (main content and overlays),
-     * applies the background color and CSS stylesheet, and creates the Scene object.
+     * Creates the main StackPane root container, adds all UI layers (main content
+     * and overlays),
+     * applies the background color and CSS stylesheet, and creates the Scene
+     * object.
      * Also forces a CSS and layout pass to ensure proper rendering.
      * 
-     * @param logoANDBoard The main content layout containing logo, board, and buttons.
+     * @param logoANDBoard The main content layout containing logo, board, and
+     *                     buttons.
      */
     private void setupRootAndScene(VBox logoANDBoard) {
         root = new StackPane();
@@ -434,12 +494,14 @@ public class TitleScreenView {
 
     /**
      * Wraps a button with a colored decorative pin positioned at the top center.
-     * Creates a visual effect as if the button is pinned to a board with a colored pin.
+     * Creates a visual effect as if the button is pinned to a board with a colored
+     * pin.
      * The pin is positioned above the button using StackPane alignment.
      *
      * @param btn      The button to be decorated with a pin.
      * @param pinColor The color of the decorative pin.
-     * @return A {@link StackPane} containing both the button and pin with proper alignment.
+     * @return A {@link StackPane} containing both the button and pin with proper
+     *         alignment.
      */
     private StackPane btnWithPin(Button btn, Color pinColor) {
         Circle pin = createPin(pinColor);
@@ -450,21 +512,28 @@ public class TitleScreenView {
 
     /**
      * Creates a visual card component for level selection display.
-     * Each card contains a thumbnail image, level name, and description arranged vertically.
-     * The card has rounded corners, semi-transparent background, and consistent styling.
-     * Click event handling should be implemented by the controller that uses this view.
+     * Each card contains a thumbnail image, level name, and description arranged
+     * vertically.
+     * The card has rounded corners, semi-transparent background, and consistent
+     * styling.
+     * Click event handling should be implemented by the controller that uses this
+     * view.
      * 
-     * <p>The card includes:</p>
+     * <p>
+     * The card includes:
+     * </p>
      * <ul>
-     *   <li>A thumbnail image (260x160 pixels) loaded from the specified resource path</li>
-     *   <li>A level name label with bold white text styling</li>
-     *   <li>A description label with word wrapping and smaller font size</li>
-     *   <li>Consistent padding, sizing, and background styling</li>
+     * <li>A thumbnail image (260x160 pixels) loaded from the specified resource
+     * path</li>
+     * <li>A level name label with bold white text styling</li>
+     * <li>A description label with word wrapping and smaller font size</li>
+     * <li>Consistent padding, sizing, and background styling</li>
      * </ul>
      *
      * @param levelName   The display name of the level (e.g., "Level 1").
      * @param description A brief description of the level's difficulty or features.
-     * @param imagePath   Path to the thumbnail image resource (relative to classpath).
+     * @param imagePath   Path to the thumbnail image resource (relative to
+     *                    classpath).
      * @return A {@link VBox} representing the complete level selection card.
      */
     private VBox createLevelCard(String levelName, String description, String imagePath) {
@@ -501,5 +570,7 @@ public class TitleScreenView {
      * 
      * @return The {@link Scene} object containing the complete title screen UI.
      */
-    public Scene getScene() {return scene;}
+    public Scene getScene() {
+        return scene;
+    }
 }

@@ -10,7 +10,7 @@
         "radius": 0.0
       },
       "angle": 0.0,
-      "sprite": "/objectSkins/Legacy/crazyDomino.png",
+      "sprite": "madDomino.png",
       "colour": "BROWN",
       "physics": {
         "density": 1.0,
@@ -69,7 +69,7 @@
         "height": 20.0,
         "radius": 0.0
       },
-      "sprite": "/objectSkins/Legacy/crazyPlatform.png",
+      "sprite": "madPlatform.png",
       "colour": "BLACK",
       "physics": {
         "density": 1.0,
@@ -88,7 +88,7 @@
         "height": 0.0,
         "radius": 50.0
       },
-      "sprite": "/objectSkins/Legacy/crazyLog.png",
+      "sprite": "madLog.png",
       "colour": "GREEN",
       "physics": {
         "density": 1.0,
@@ -107,7 +107,7 @@
         "height": 0.0,
         "radius": 10.0
       },
-      "sprite": "/objectSkins/Legacy/crazyTennis.png",
+      "sprite": "madTennis.png",
       "colour": "YELLOW",
       "physics": {
         "density": 0.1,
@@ -126,7 +126,7 @@
         "height": 0.0,
         "radius": 35.0
       },
-      "sprite": "/objectSkins/Legacy/crazyBowling.png",
+      "sprite": "madBowling.png",
       "colour": "GREY",
       "physics": {
         "density": 0.9,
@@ -145,7 +145,7 @@
         "height": 0.0,
         "radius": 25.0
       },
-      "sprite": "/objectSkins/Legacy/crazyBall.png",
+      "sprite": "madBall.png",
       "colour": "BLACK",
       "physics": {
         "density": 0.5,
@@ -165,7 +165,7 @@
         "height": 0.0,
         "radius": 50.0
       },
-      "sprite": "/objectSkins/Legacy/crazyBalloon.png",
+      "sprite": "madBalloon.png",
       "colour": "#800080",
       "physics": {
         "density": 0.15,
@@ -203,7 +203,7 @@
         "radius": 0.0
       },
       "angle": 0.0,
-      "sprite": "/objectSkins/Legacy/crazyBox.png",
+      "sprite": "madBox.png",
       "colour": "BROWN",
       "physics": {
         "density": 1.0,
