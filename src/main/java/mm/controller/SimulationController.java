@@ -125,58 +125,129 @@ public class SimulationController {
 
         model.setupSimulation();
 
-        // Add visuals to simSpace and restore angles for dropped objects
-        List<GameObject> dropped = model.getDroppedObjects();
-        List<PhysicsVisualPair> pairs = model.getPairs();
-        
         // Clear the mapping and rebuild it during setup
         gameObjectToPairMap.clear();
         
+        // Process all physics-visual pairs
+        List<GameObject> dropped = model.getDroppedObjects();
+        List<PhysicsVisualPair> pairs = model.getPairs();
+        
         for (PhysicsVisualPair pair : pairs) {
             if (pair.visual != null) {
-                // Try to find the corresponding dropped object by matching the physics body's position
-                // with the stored GameObject position (since both should be in sync after creation)
-                GameObject matchedDroppedObject = null;
-                
-                for (GameObject obj : dropped) {
-                    if (obj.getName().equals(pair.body.getUserData())) {
-                        // Get the physics body position (converted back to visual coordinates)
-                        org.jbox2d.common.Vec2 bodyPos = pair.body.getPosition();
-                        float expectedVisualX, expectedVisualY;
-                        
-                        // Convert physics position back to expected visual position
-                        if (pair.visual instanceof javafx.scene.shape.Rectangle) {
-                            javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
-                            expectedVisualX = (float) (bodyPos.x * 50.0f - rect.getWidth() / 2);
-                            expectedVisualY = (float) (bodyPos.y * 50.0f - rect.getHeight() / 2);
-                        } else {
-                            expectedVisualX = bodyPos.x * 50.0f;
-                            expectedVisualY = bodyPos.y * 50.0f;
-                        }
-                        
-                        // Check if this GameObject's position matches the physics body position
-                        float tolerance = 1.0f; // Small tolerance for floating point precision
-                        if (Math.abs(obj.getPosition().getX() - expectedVisualX) < tolerance &&
-                            Math.abs(obj.getPosition().getY() - expectedVisualY) < tolerance) {
-                            matchedDroppedObject = obj;
-                            break;
-                        }
-                    }
-                }
-                
-                // If we found a matching dropped object, restore its properties and add handlers
-                if (matchedDroppedObject != null) {
-                    pair.visual.setRotate(matchedDroppedObject.getAngle());
-
-                    addMoveHandlersToDroppedVisual(pair, matchedDroppedObject);
-                    gameObjectToPairMap.put(matchedDroppedObject, pair);
-                }
-                
-                simSpace.getChildren().add(pair.visual);
+                processPhysicsVisualPair(pair, dropped, simSpace);
             }
         }
     }
-
+    
+    /**
+     * Processes a single physics-visual pair, matching it with dropped objects
+     * and adding it to the simulation space.
+     */
+    private void processPhysicsVisualPair(PhysicsVisualPair pair, List<GameObject> dropped, Pane simSpace) {
+        GameObject matchedDroppedObject = findMatchingDroppedObject(pair, dropped);
+        
+        if (matchedDroppedObject != null) {
+            configureMatchedObject(pair, matchedDroppedObject);
+        }
+        
+        simSpace.getChildren().add(pair.visual);
+    }
+    
+    /**
+     * Finds a dropped object that matches the given physics-visual pair.
+     */
+    private GameObject findMatchingDroppedObject(PhysicsVisualPair pair, List<GameObject> dropped) {
+        for (GameObject obj : dropped) {
+            if (isMatchingObject(pair, obj)) {
+                return obj;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Checks if a GameObject matches a PhysicsVisualPair based on name and position.
+     */
+    private boolean isMatchingObject(PhysicsVisualPair pair, GameObject obj) {
+        Object userData = pair.body.getUserData();
+        boolean nameMatches = obj.getName().equals(userData)
+            // Also match if this is the winning object
+            || (obj.isWinning() && "winObject".equals(userData));
+        if (!nameMatches) {
+            return false;
+        }
+        ExpectedPosition expectedPos = calculateExpectedPosition(pair);
+        return isPositionMatch(obj, expectedPos);
+    }
+    
+    /**
+     * Helper class to hold expected position coordinates.
+     */
+    private static class ExpectedPosition {
+        final float x;
+        final float y;
+        
+        ExpectedPosition(float x, float y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+    
+    /**
+     * Calculates the expected visual position from the physics body position.
+     */
+    private ExpectedPosition calculateExpectedPosition(PhysicsVisualPair pair) {
+        org.jbox2d.common.Vec2 bodyPos = pair.body.getPosition();
+        
+        if (pair.visual instanceof javafx.scene.shape.Rectangle) {
+            return calculateRectanglePosition(pair, bodyPos);
+        } else if (pair.visual instanceof javafx.scene.shape.Polygon) {
+            return calculatePolygonPosition(pair, bodyPos);
+        } else {
+            // Default case for circles and other shapes
+            return new ExpectedPosition(bodyPos.x * 50.0f, bodyPos.y * 50.0f);
+        }
+    }
+    
+    /**
+     * Calculates expected position for rectangle shapes.
+     */
+    private ExpectedPosition calculateRectanglePosition(PhysicsVisualPair pair, org.jbox2d.common.Vec2 bodyPos) {
+        javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
+        float expectedX = (float) (bodyPos.x * 50.0f - rect.getWidth() / 2);
+        float expectedY = (float) (bodyPos.y * 50.0f - rect.getHeight() / 2);
+        return new ExpectedPosition(expectedX, expectedY);
+    }
+    
+    /**
+     * Calculates expected position for polygon shapes (buckets).
+     */
+    private ExpectedPosition calculatePolygonPosition(PhysicsVisualPair pair, org.jbox2d.common.Vec2 bodyPos) {
+        javafx.scene.shape.Polygon polygon = (javafx.scene.shape.Polygon) pair.visual;
+        javafx.geometry.Bounds bounds = polygon.getBoundsInLocal();
+        float expectedX = (float) (bodyPos.x * 50.0f - bounds.getWidth() / 2);
+        float expectedY = (float) (bodyPos.y * 50.0f - bounds.getHeight() / 2);
+        return new ExpectedPosition(expectedX, expectedY);
+    }
+    
+    /**
+     * Checks if a GameObject's position matches the expected position within tolerance.
+     */
+    private boolean isPositionMatch(GameObject obj, ExpectedPosition expected) {
+        float tolerance = 1.0f; // Small tolerance for floating point precision
+        return Math.abs(obj.getPosition().getX() - expected.x) < tolerance &&
+               Math.abs(obj.getPosition().getY() - expected.y) < tolerance;
+    }
+    
+    /**
+     * Configures a matched object by setting its rotation and adding handlers.
+     */
+    private void configureMatchedObject(PhysicsVisualPair pair, GameObject matchedDroppedObject) {
+        pair.visual.setRotate(matchedDroppedObject.getAngle());
+        addMoveHandlersToDroppedVisual(pair, matchedDroppedObject);
+        gameObjectToPairMap.put(matchedDroppedObject, pair);
+    }
+    
     /**
      * Initializes or refreshes the inventory area.
      * <p>
@@ -425,7 +496,7 @@ public class SimulationController {
                         pair.visual.setRotate(simObj.getAngle());
                         
                         // Check for collision before placing the object
-                        if (!wouldCauseOverlap(pair, simObj.getPosition().getX(), simObj.getPosition().getY())) {
+                        if (!wouldCauseOverlap(pair, simObj.getPosition().getX(), simObj.getPosition().getY(), simObj.getAngle())) {
                             // Create parameter object for AddObjectController
                             AddObjectController.AddObjectParams params = new AddObjectController.AddObjectParams(
                                 model, simSpace, gameObjectToPairMap, this::refreshInventoryDisplay
@@ -750,7 +821,7 @@ public class SimulationController {
             double newY = event.getSceneY() - dragDelta[1];
 
             // Check for collision before allowing the move
-            if (!wouldCauseOverlap(pair, newX, newY)) {
+            if (!wouldCauseOverlap(pair, newX, newY, simObj.getAngle())) {
                 visual.setTranslateX(newX);
                 visual.setTranslateY(newY);
 
@@ -770,6 +841,16 @@ public class SimulationController {
                 } else if (visual instanceof javafx.scene.shape.Circle) {
                     pair.body.setTransform(
                         new org.jbox2d.common.Vec2((float) (newX / 50.0), (float) (newY / 50.0)), 
+                        pair.body.getAngle()
+                    );
+                } else if (visual instanceof javafx.scene.shape.Polygon) {
+                    // Handle bucket (polygon) positioning - center like rectangles
+                    javafx.scene.shape.Polygon polygon = (javafx.scene.shape.Polygon) visual;
+                    javafx.geometry.Bounds bounds = polygon.getBoundsInLocal();
+                    float centerX = (float) (newX + bounds.getWidth() / 2);
+                    float centerY = (float) (newY + bounds.getHeight() / 2);
+                    pair.body.setTransform(
+                        new org.jbox2d.common.Vec2(centerX / 50.0f, centerY / 50.0f), 
                         pair.body.getAngle()
                     );
                 }
@@ -812,49 +893,52 @@ public class SimulationController {
                 event.consume();
                 return;
             }
-            
-            // Store starting angle for undo
+
             float startAngle = simObj.getAngle();
             Position currentPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
-            
-            float newAngle = startAngle + 15;
+            float newAngle = startAngle + 5;
 
-            // Update visual rotation
-            pair.visual.setRotate(newAngle);
-            
-            // Update GameObject angle
-            simObj.setAngle(newAngle);
+            // Check for collision before allowing the rotation
+            if (!wouldCauseOverlap(pair, currentPosition.getX(), currentPosition.getY(), newAngle)) {
+                // Update visual rotation
+                pair.visual.setRotate(newAngle);
 
-            // Update physics body rotation
-            pair.body.setTransform(
-                pair.body.getPosition(), 
-                (float) Math.toRadians(newAngle)
-            );
-            
-            // Create move command for rotation
-            MoveObjectController.MoveObjectParams rotateParams = new MoveObjectController.MoveObjectParams.Builder()
-                .setGameObject(simObj)
-                .setPair(pair)
-                .setPositions(currentPosition, currentPosition)
-                .setAngles(startAngle, newAngle)
-                .build();
-            MoveObjectController rotateCommand = new MoveObjectController(rotateParams);
-            model.getUndoRedoManager().executeCommand(rotateCommand);
-            
+                // Update GameObject angle
+                simObj.setAngle(newAngle);
+
+                // Update physics body rotation
+                pair.body.setTransform(
+                    pair.body.getPosition(),
+                    (float) Math.toRadians(newAngle)
+                );
+
+                // Create move command for rotation
+                MoveObjectController.MoveObjectParams rotateParams = new MoveObjectController.MoveObjectParams.Builder()
+                    .setGameObject(simObj)
+                    .setPair(pair)
+                    .setPositions(currentPosition, currentPosition)
+                    .setAngles(startAngle, newAngle)
+                    .build();
+                MoveObjectController rotateCommand = new MoveObjectController(rotateParams);
+                model.getUndoRedoManager().executeCommand(rotateCommand);
+            }
+            // If collision would occur, do nothing (deny rotation)
+
             event.consume();
         });
     }
 
     /**
-     * Checks if moving an object to a new position would cause it to overlap with other objects.
+     * Checks if moving or rotating an object to a new position/angle would cause it to overlap with other objects.
      * Delegates to the model's collision detection service.
-     * 
+     *
      * @param movingPair The physics-visual pair being moved
      * @param newX The proposed new X position
      * @param newY The proposed new Y position
-     * @return true if the new position would cause an overlap, false otherwise
+     * @param newAngle The proposed new angle (in degrees)
+     * @return true if the new transform would cause an overlap, false otherwise
      */
-    private boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY) {
-        return model.wouldCauseOverlap(movingPair, newX, newY);
+    private boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY, float newAngle) {
+        return model.wouldCauseOverlap(movingPair, newX, newY, newAngle);
     }
 }
