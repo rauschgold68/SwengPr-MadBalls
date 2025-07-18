@@ -122,23 +122,7 @@ public class SimulationController {
      * Updates all inventory object sprite paths to use the selected skin folder.
      */
     private void updateInventorySpritesForSkin() {
-        String skinFolder = "/objectSkins/" + selectedSkin + "/";
-
-        for (InventoryObject obj : model.getInventoryObjects()) {
-            String originalSprite = obj.getSprite();
-
-            if (originalSprite != null && !originalSprite.trim().isEmpty()) {
-                String newSprite;
-                // If sprite already contains full path, replace the skin folder
-                if (originalSprite.contains("/objectSkins/")) {
-                    newSprite = originalSprite.replaceAll("/objectSkins/[^/]+/", skinFolder);
-                } else {
-                    // If sprite is just filename, prepend with skin folder
-                    newSprite = skinFolder + originalSprite;
-                }
-                obj.setSprite(newSprite);
-            }
-        }
+        SkinManager.getInstance().updateInventorySpritesForSkin(model.getInventoryObjects());
     }
 
     /**
