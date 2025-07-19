@@ -21,6 +21,10 @@ public class TestPhysics {
         Physics testPhysics = new Physics();
         assertNotNull(testPhysics);
         assertEquals(Physics.class, testPhysics.getClass());
+        float testFloat = 0.123f;
+        String testString = "test";
+        testPhysics = new Physics(testFloat, testFloat, testFloat, testString);
+        testAssertions(testPhysics, testFloat, testFloat, testFloat, testString);
     }
 
     /**
@@ -38,9 +42,12 @@ public class TestPhysics {
         testPhysics.setFriction(testFriction);
         testPhysics.setRestitution(testRestitution);
         testPhysics.setShape(testShape);
-        assertEquals(testDensity, testPhysics.getDensity());
-        assertEquals(testFriction, testPhysics.getFriction());
-        assertEquals(testRestitution, testPhysics.getRestitution());
+        testAssertions(testPhysics, testDensity, testFriction, testRestitution, testShape);
+    }
+    private void testAssertions(Physics testPhysics, float testDensity, float testFriction, float testRestitution, String testShape) {
+        assertEquals(testDensity, testPhysics.getDensity(),0.00001);
+        assertEquals(testFriction, testPhysics.getFriction(),0.00001);
+        assertEquals(testRestitution, testPhysics.getRestitution(),0.00001);
         assertEquals(testShape, testPhysics.getShape());
     }
 }

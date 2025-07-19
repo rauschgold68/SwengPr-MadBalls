@@ -31,7 +31,7 @@ public class TestSize {
         float testFloat = 0.123f;
         Size testSize = new Size(testFloat, testFloat);
         assertNotNull(testSize);
-        assertEquals(Size.class, testSize);
+        assertEquals(Size.class, testSize.getClass());
         assertEquals(testFloat, testSize.getWidth(), 0.0001);
         assertEquals(testFloat, testSize.getHeight(), 0.0001);
     }

@@ -31,7 +31,27 @@ public class Physics {
     /** The restitution (bounciness) of the object (0 = no bounce, 1 = perfect bounce). */
     private float restitution;
     /** The shape/body type of the object (e.g., "DYNAMIC", "STATIC"). */
-    private String shape;
+    private String shape = "STATIC";
+
+    /**
+     * The basic Constructor for creating an empty physics object
+     */
+    public Physics() {}
+
+    /**
+     * The constructor for creating working physics object.
+     * 
+     * @param density
+     * @param friction
+     * @param restitution
+     * @param shape
+     */
+    public Physics(float density, float friction, float restitution, String shape) {
+        this.density = density;
+        this.friction = friction;
+        this.restitution = restitution;
+        this.shape = shape;
+    }
 
     /**
      * Gets the density of the object.

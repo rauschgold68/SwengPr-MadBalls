@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test-Klasse für die GameObject-Klasse.
- * Testet die grundlegende Funktionalität und Konstruktoren der GameObject-Klasse.
+ * Test-Class for GameObject class.
+ * Tests basic functionality of constructor and getter setter methods.
  */
 public class TestGameObject extends TestAbstractObject {
     
@@ -15,14 +15,14 @@ public class TestGameObject extends TestAbstractObject {
      * Tests the core functionality of the GameObject class.
      * 
      * This test method verifies multiple aspects of the GameObject class:
-     * <ul>
+     * <ol>
      *   <li><strong>Default Constructor:</strong> Ensures the default constructor creates
      *       a valid, non-null GameObject instance with proper class initialization</li>
      *   <li><strong>Position Management:</strong> Tests the position property setter and getter
      *       methods to ensure proper encapsulation and data integrity</li>
      *   <li><strong>Parameterized Constructor:</strong> Validates that the full constructor
      *       accepting name, description, position, and size parameters works correctly</li>
-     * </ul>
+     * </ol>
      * 
      * @throws AssertionError if any of the GameObject functionality tests fail
      * 
