@@ -9,6 +9,7 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
@@ -399,5 +400,36 @@ public class InventoryObjectController {
      */
     private static boolean isZoneObject(String name) {
         return name.equalsIgnoreCase("noPlaceZone") || name.equalsIgnoreCase("winZone");
+    }
+
+    /**
+     * Creates a preview visual representation for an InventoryObject, similar to
+     * the conversion process but without creating a physics body.
+     * <p>
+     * This method is used for displaying object previews in the inventory,
+     * supporting the same shape types (rectangle, circle, bucket) as the main
+     * conversion method.
+     * </p>
+     *
+     * @param obj The InventoryObject to create a preview visual for. Must not be
+     *            {@code null}.
+     * @return A JavaFX {@link Node} representing the visual preview of the object.
+     */
+    public static Node createPreviewVisual(InventoryObject obj) {
+        String type = obj.getType();
+        Shape visual;
+        
+        if ("rectangle".equalsIgnoreCase(type)) {
+            visual = createRectangleVisual(obj);
+        } else if ("circle".equalsIgnoreCase(type)) {
+            visual = createCircleVisual(obj); 
+        } else if ("bucket".equalsIgnoreCase(type)) {
+            visual = createBucketVisual(obj);
+        } else {
+            throw new IllegalArgumentException("Unsupported shape type: " + type);
+        }
+        
+        visual.setRotate(obj.getAngle());
+        return visual;
     }
 }

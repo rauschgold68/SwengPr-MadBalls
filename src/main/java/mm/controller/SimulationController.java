@@ -1,6 +1,7 @@
 package mm.controller;
 
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.ClipboardContent;
@@ -343,18 +344,16 @@ public class SimulationController {
      * @return a StackPane wrapper containing the visual representation
      */
     private StackPane createInventoryItemWrapper(InventoryObject obj) {
-        PhysicsVisualPair pair = mm.controller.InventoryObjectController.convert(obj, model.getWorld());
-        if (pair.visual == null) {
+        Node visual = InventoryObjectController.createPreviewVisual(obj);
+        if (visual == null) {
             return null;
         }
 
-        pair.visual.setRotate(obj.getAngle());
-
         // Dynamically adjust wrapper size based on rotated dimensions
-        double rotatedWidth = pair.visual.getBoundsInParent().getWidth();
-        double rotatedHeight = pair.visual.getBoundsInParent().getHeight();
+        double rotatedWidth = visual.getBoundsInParent().getWidth();
+        double rotatedHeight = visual.getBoundsInParent().getHeight();
 
-        StackPane wrapper = new StackPane(pair.visual);
+        StackPane wrapper = new StackPane(visual);
         wrapper.setPrefSize(rotatedWidth + 20, rotatedHeight + 20);
 
         Label countLabel = new Label(Integer.toString(obj.getCount()));
