@@ -124,14 +124,25 @@ public class PhysicsAnimationController extends AnimationTimer {
                 double scaledX = pos.x * SCALE;
                 double scaledY = pos.y * SCALE;
                 
-                // Update culling check to use actual bounds with some margin
-                double margin = 100.0; // Extra space before culling
-                if (scaledX < -margin || scaledX > simSpaceWidth + margin || 
-                    scaledY < -margin || scaledY > simSpaceHeight + margin) {
+                // Get object type
+                String objectName = (String) pair.body.getUserData();
+                
+                // Use smaller margin for balloons to cull them faster
+                double margin = objectName.equalsIgnoreCase("ballon") ? 50.0 : 100.0;
+                
+                // Add extra vertical check for balloons to catch them earlier when rising
+                boolean shouldCull = scaledX < -margin || scaledX > simSpaceWidth + margin || 
+                                   scaledY < -margin || scaledY > simSpaceHeight + margin;
+                                   
+                if (objectName.equalsIgnoreCase("ballon")) {
+                    // Additional early culling check for balloons going up
+                    shouldCull = shouldCull || scaledY < simSpaceHeight * 0.1; // Cull if in top 10% of screen
+                }
+
+                if (shouldCull) {
                     pairsToRemove.add(pair);
                     
                     // Store original position and object for restoration
-                    String objectName = (String) pair.body.getUserData();
                     for (mm.model.GameObject obj : model.getDroppedObjects()) {
                         if (obj.getName().equals(objectName)) {
                             objectsToRemove.add(obj);
