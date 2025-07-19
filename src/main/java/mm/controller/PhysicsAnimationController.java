@@ -136,7 +136,7 @@ public class PhysicsAnimationController extends AnimationTimer {
                                    
                 if (objectName.equalsIgnoreCase("ballon")) {
                     // Additional early culling check for balloons going up
-                    shouldCull = shouldCull || scaledY < simSpaceHeight * 0.01; // Cull if in top 1% of screen
+                    shouldCull = shouldCull || scaledY < simSpaceHeight * 0.1; // Cull if in top 1% of screen
                 }
 
                 if (shouldCull) {
