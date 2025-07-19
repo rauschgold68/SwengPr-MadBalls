@@ -92,7 +92,6 @@ public class TitleScreenController {
                     false, false);
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
-            primaryStage.sizeToScene();
         });
 
         // Show options overlay
@@ -111,21 +110,18 @@ public class TitleScreenController {
                     false);
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
-            primaryStage.sizeToScene();
         });
         view.levelCards.levelCard2.setOnMouseClicked(e -> {
             SimulationController simController = new SimulationController(primaryStage, "/level/level2.json", true,
                     false);
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
-            primaryStage.sizeToScene();
         });
         view.levelCards.levelCard3.setOnMouseClicked(e -> {
             SimulationController simController = new SimulationController(primaryStage, "/level/level3.json", true,
                     true);
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
-            primaryStage.sizeToScene();
         });
 
         // Keyboard shortcut: ESC closes overlays
