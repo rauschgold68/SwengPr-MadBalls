@@ -429,6 +429,8 @@ public class GameObjectController {
      * <p>
      * The U-shape is defined by vertices in clockwise order starting from the bottom-left
      * outer corner, creating a hollow container shape suitable for catching falling objects.
+     * The vertices are defined relative to the top-left corner for consistent positioning
+     * with other shape types.
      * </p>
      *
      * @param obj The GameObject containing bucket properties including width, height, position, and color
@@ -443,24 +445,24 @@ public class GameObjectController {
         
         Polygon bucket = new Polygon();
         
-        // Define U-shape vertices (relative to center, matching physics body)
+        // Define U-shape vertices (relative to top-left, matching other shapes)
         Double[] points = {
-            (double)(-width/2), (double)(height/2),                                    // Bottom-left outer
-            (double)(-width/2), (double)(-height/2),                                  // Top-left outer
-            (double)(-width/2 + wallThickness), (double)(-height/2),                  // Top-left inner
-            (double)(-width/2 + wallThickness), (double)(height/2 - wallThickness),   // Bottom-left inner
-            (double)(width/2 - wallThickness), (double)(height/2 - wallThickness),    // Bottom-right inner
-            (double)(width/2 - wallThickness), (double)(-height/2),                   // Top-right inner
-            (double)(width/2), (double)(-height/2),                                   // Top-right outer
-            (double)(width/2), (double)(height/2)                                     // Bottom-right outer
+            (double)(0), (double)(height),                                    // Bottom-left outer
+            (double)(0), (double)(0),                                         // Top-left outer
+            (double)(wallThickness), (double)(0),                            // Top-left inner
+            (double)(wallThickness), (double)(height - wallThickness),       // Bottom-left inner
+            (double)(width - wallThickness), (double)(height - wallThickness), // Bottom-right inner
+            (double)(width - wallThickness), (double)(0),                    // Top-right inner
+            (double)(width), (double)(0),                                     // Top-right outer
+            (double)(width), (double)(height)                                // Bottom-right outer
         };
         
         bucket.getPoints().addAll(points);
         bucket.setFill(Color.valueOf(obj.getColour()));
         
         // Position and rotate the bucket in the scene (same as other shapes)
-        bucket.setTranslateX(x + width / 2); // Center the visual
-        bucket.setTranslateY(y + height / 2);
+        bucket.setTranslateX(x);
+        bucket.setTranslateY(y);
         bucket.setRotate(obj.getAngle()); // Apply the rotation from the GameObject
         
         return bucket;

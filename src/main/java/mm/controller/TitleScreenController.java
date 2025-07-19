@@ -100,7 +100,6 @@ public class TitleScreenController {
             ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
-            primaryStage.sizeToScene();
         });
 
         // Show options overlay
@@ -121,7 +120,6 @@ public class TitleScreenController {
             ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
-            primaryStage.sizeToScene();
         });
         view.levelCards.levelCard2.setOnMouseClicked(e -> {
             String selectedSkin = SkinManager.getInstance().getSelectedSkin();
@@ -130,7 +128,6 @@ public class TitleScreenController {
             ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
-            primaryStage.sizeToScene();
         });
         view.levelCards.levelCard3.setOnMouseClicked(e -> {
             String selectedSkin = SkinManager.getInstance().getSelectedSkin();
@@ -139,7 +136,6 @@ public class TitleScreenController {
             ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
-            primaryStage.sizeToScene();
         });
 
         // Keyboard shortcut: ESC closes overlays

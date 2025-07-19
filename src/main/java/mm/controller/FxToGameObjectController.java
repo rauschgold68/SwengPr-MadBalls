@@ -55,18 +55,15 @@ public class FxToGameObjectController {
         String colour = (String.class != null) ? "BLACK" : extractColour(pair, shape);
         Position position = new Position(0, 0);
         Size size = new Size();
-        String type = extractShapeProperties(shape, position, size);
+        String type = extractShapeProperties(shape, position, size); // Will now also handle "Bucket"
         Physics physics = extractPhysics(pair.body);
 
-        // Create GameObject with basic constructor
         GameObject gameObject = new GameObject(name, type, position, size);
-        
-        // Set additional properties using setters
         gameObject.setPhysics(physics);
         gameObject.setAngle(angle);
         gameObject.setColour(colour);
         gameObject.setWinning(winning);
-        
+
         return gameObject;
     }
 
@@ -134,6 +131,8 @@ public class FxToGameObjectController {
             return handleRectangle((Rectangle) shape, position, size);
         } else if (shape instanceof Circle) {
             return handleCircle((Circle) shape, position, size);
+        } else if (shape instanceof Polygon) {
+            return handleBucket((Polygon) shape, position, size);
         } else {
             throw new IllegalArgumentException("Shape-Typ nicht unterstützt: " + shape.getClass());
         }
@@ -181,6 +180,40 @@ public class FxToGameObjectController {
         size.setWidth(0);
         size.setRadius((float) circle.getRadius());
         return "Circle";
+    }
+
+    /**
+     * Handles bucket (Polygon) shape properties extraction.
+     * <p>
+     * Extracts position and size properties specific to bucket shapes.
+     * Assumes the bucket is a U-shaped polygon as created by InventoryObjectController.
+     * </p>
+     * 
+     * @param polygon The Polygon shape to extract properties from
+     * @param position The Position object to populate with x,y coordinates
+     * @param size The Size object to populate with width and height
+     * @return The string "Bucket" indicating the shape type
+     */
+    private static String handleBucket(Polygon polygon, Position position, Size size) {
+        // The bucket polygon is positioned using translateX/Y, just like other shapes
+        position.setX((float) polygon.getTranslateX());
+        position.setY((float) polygon.getTranslateY());
+
+        // Extract width and height from the polygon's points
+        // The points are in the order: (0, height), (0, 0), (wallThickness, 0), ...
+        // So width = maxX, height = maxY
+        double maxX = 0, maxY = 0;
+        for (int i = 0; i < polygon.getPoints().size(); i += 2) {
+            double x = polygon.getPoints().get(i);
+            double y = polygon.getPoints().get(i + 1);
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+        }
+        size.setWidth((float) maxX);
+        size.setHeight((float) maxY);
+        size.setRadius(0); // Buckets have no radius
+
+        return "Bucket";
     }
 
     /**

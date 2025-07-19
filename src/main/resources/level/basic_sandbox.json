@@ -2,6 +2,26 @@
   "levelObjects": [],
   "inventoryObjects": [
     {
+      "name": "box1",
+      "type": "rectangle",
+      "size": {
+        "width": 100.0,
+        "height": 100.0,
+        "radius": 0.0
+      },
+      "angle": 90.0,
+      "sprite": null,
+      "colour": "BROWN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "DYNAMIC"
+      },
+      "winning": false,
+      "count": 15
+    },
+    {
       "name": "Domino",
       "type": "rectangle",
       "size": {
@@ -19,7 +39,7 @@
         "shape": "DYNAMIC"
       },
       "winning": false,
-      "count": 1
+      "count": 15
     },
     {
       "name": "winZone",
@@ -39,7 +59,7 @@
         "shape": "STATIC"
       },
       "winning": false,
-      "count": 1
+      "count": 15
     },
     {
       "name": "winPlat",
@@ -62,7 +82,7 @@
     {
       "name": "platform",
       "type": "rectangle",
-      "count": 1,
+      "count": 15,
       "angle": 0.0,
       "size": {
         "width": 300.0,
@@ -81,7 +101,7 @@
     {
       "name": "log",
       "type": "circle",
-      "count": 1,
+      "count": 15,
       "angle": 0.0,
       "size": {
         "width": 0.0,
@@ -100,7 +120,7 @@
     {
       "name": "tennisball",
       "type": "circle",
-      "count": 1,
+      "count": 15,
       "angle": 0.0,
       "size": {
         "width": 0.0,
@@ -119,7 +139,7 @@
     {
       "name": "bowlingball",
       "type": "circle",
-      "count": 1,
+      "count": 15,
       "angle": 0.0,
       "size": {
         "width": 0.0,
@@ -138,7 +158,7 @@
     {
       "name": "ball",
       "type": "circle",
-      "count": 1,
+      "count": 15,
       "angle": 0.0,
       "size": {
         "width": 0.0,
@@ -158,7 +178,7 @@
     {
       "name": "ballon",
       "type": "circle",
-      "count": 1,
+      "count": 15,
       "angle": 0.0,
       "size": {
         "width": 0.0,
@@ -192,7 +212,7 @@
         "shape": "STATIC"
       },
       "winning": false,
-      "count": 1
+      "count": 15
     },
     {
       "name": "box1",
@@ -232,7 +252,7 @@
         "shape": "STATIC"
       },
       "winning": false,
-      "count": 1
+      "count": 15
     }
   ]
 }

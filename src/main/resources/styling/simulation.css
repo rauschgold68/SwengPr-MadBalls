@@ -12,16 +12,17 @@
 
 /* Buttons inside simulation area */
 .sim-space-button {
+  color: #0e1722;
   -fx-text-fill: #0e1722;
   background-color: #d1d1d1;
   -fx-background-color: #d1d1d1;
-  -fx-border-color: #a0a0a0;
   border-color: #a0a0a0;
+  -fx-border-color: #a0a0a0;
   border-width: 1px;
   -fx-border-width: 1;
+  border-radius: 4px;
   -fx-background-radius: 4;
   -fx-border-radius: 4;
-  border-radius: 4px;
   font-size: 14px;
   -fx-font-size: 14px;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 2, 0, 0, 1);
@@ -48,29 +49,34 @@
 /* Inventory box, stretches above menu square */
 .inventory-box {
   background-color: #1b2736;
-  background-color: #1b2736;
   -fx-background-color: #1b2736;
   border-color: #0e1722;
   -fx-border-color: #0e1722;
   border-width: 2px;
   -fx-border-width: 2;
-  -fx-background-radius: 8;
   border-radius: 8px;
+  -fx-background-radius: 8;
   -fx-border-radius: 8;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
 }
 
 /* Container to center menu square */
 .square-container {
+  text-align: center;
   -fx-alignment: center;
+  padding: 10px 0 10px 0;
   -fx-padding: 10 0 10 0;
 }
 
 /* Menu square styling */
 .menu-square {
+  background-color: #1b2736;
   -fx-background-color: #1b2736;
+  border-color: #0e1722;
   -fx-border-color: #0e1722;
+  border-width: 2px;
   -fx-border-width: 2;
+  border-radius: 8px;
   -fx-background-radius: 8;
   -fx-border-radius: 8;
   -fx-pref-width: 120px;
@@ -80,6 +86,7 @@
 
 /* Grid layout inside menu square */
 .menu-grid {
+  gap: 10px;
   -fx-hgap: 10;
   -fx-vgap: 10;
   padding: 10px;
@@ -88,25 +95,34 @@
 
 /* Bottom bar styling */
 .bottom-bar {
+  background-color: #0e1722;
   -fx-background-color: #0e1722;
-  -fx-pref-height: 150px;
+  border-color: #1b2736;
   -fx-border-color: #1b2736;
+  border-width: 2px 0 0 0; /* top border only */
   -fx-border-width: 2 0 0 0; /* top border only */
+  -fx-pref-height: 150px;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, -2);
 }
 
 /* Buttons or elements inside bottom bar */
 .bottom-bar .button {
+  color: #ffffff;
   -fx-text-fill: #ffffff;
+  background-color: #1e2a3a;
   -fx-background-color: #1e2a3a;
+  border-color: #0e1722;
   -fx-border-color: #0e1722;
+  border-width: 1px;
   -fx-border-width: 1;
+  border-radius: 4px;
   -fx-background-radius: 4;
   -fx-border-radius: 4;
   -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 2, 0, 0, 1);
 }
 
 .bottom-bar .button:hover {
+  background-color: #2b3b4b;
   -fx-background-color: #2b3b4b;
 }
 
@@ -116,15 +132,23 @@
 }
 
 .menu-button {
+  padding: 8px;
   -fx-padding: 8;
+  background: linear-gradient(to bottom, #3a4b5c 0%, #22313f 100%);
+  background-color: #3a4b5c; /* fallback for standard CSS */
   -fx-background-color: linear-gradient(to bottom, #3a4b5c 0%, #22313f 100%);
+  border-radius: 12px;
   -fx-background-radius: 12;
+  border-color: #0e1722;
   -fx-border-color: #0e1722;
+  border-width: 1px;
   -fx-border-width: 1;
   -fx-border-radius: 12;
+  color: white;
   -fx-text-fill: white;
   -fx-pref-width: 40;
   -fx-pref-height: 40;
+  font-size: 14px;
   -fx-font-size: 14px;
   /* subtle drop shadow for lifted 3D look */
   -fx-effect: dropshadow(
@@ -138,11 +162,15 @@
 }
 
 .menu-button:hover {
+  background: linear-gradient(to bottom, #4a5b6c 0%, #334150 100%);
+  background-color: #4a5b6c; /* fallback for standard CSS */
   -fx-background-color: linear-gradient(to bottom, #4a5b6c 0%, #334150 100%);
 }
 
 .menu-button:pressed {
   -fx-translate-y: 1;
+  background: linear-gradient(to bottom, #1a2b3c 0%, #11202a 100%);
+  background-color: #1a2b3c; /* fallback for standard CSS */
   -fx-background-color: linear-gradient(to bottom, #1a2b3c 0%, #11202a 100%);
   /* inner shadow to simulate button being pushed in */
   -fx-effect: innershadow(
@@ -158,12 +186,15 @@
 /* Align items in inventory HBox*/
 .inventoryItemBox {
   -fx-spacing: 15;
+  text-align: center;
   -fx-alignment: center;
+  padding: 5px 10px 5px 10px;
   -fx-padding: 5 10 5 10;
 }
 
 /* Change visual of inventory items when simulation is running */
 .inventory-item-disabled {
+  opacity: 0.5;
   -fx-opacity: 0.5;
 }
 
@@ -172,20 +203,29 @@
 }
 
 .win-crown {
+  padding: 10px;
   -fx-padding: 10;
 }
 
 .win-title {
+  text-align: center;
   -fx-text-alignment: center;
 }
 
 .circle-button {
+  background-color: #4a90e2;
   -fx-background-color: #4a90e2;
+  border-radius: 50%;
   -fx-background-radius: 50%;
+  min-width: 50px;
   -fx-min-width: 50px;
+  min-height: 50px;
   -fx-min-height: 50px;
+  max-width: 50px;
   -fx-max-width: 50px;
+  max-height: 50px;
   -fx-max-height: 50px;
+  cursor: pointer;
   -fx-cursor: hand;
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 8, 0, 0, 2);
 }
@@ -196,41 +236,143 @@
 }
 
 .win-title-large {
+  color: white;
   -fx-text-fill: white;
+  font-size: 28px;
   -fx-font-size: 28px;
+  font-weight: bold;
   -fx-font-weight: bold;
 }
 
 .white-label {
+  color: white;
   -fx-text-fill: white;
+  font-size: 16px;
   -fx-font-size: 16px;
+  font-weight: bold;
   -fx-font-weight: bold;
 }
 
 .overlay-close-button {
+  background-color: transparent;
   -fx-background-color: transparent;
+  color: white;
   -fx-text-fill: white;
+  font-size: 14px;
   -fx-font-size: 14px;
 }
 
 .item-count-yes {
+  background-color: rgba(0, 255, 26, 0.8);
   -fx-background-color: rgba(0, 255, 26, 0.8);
+  border-radius: 10px;
   -fx-background-radius: 10;
+  color: black;
   -fx-text-fill: black;
+  padding: 2px 6px 2px 6px;
   -fx-padding: 2 6 2 6;
+  font-size: 12px;
   -fx-font-size: 12px;
+  font-weight: bold;
   -fx-font-weight: bold;
 }
 
 .item-count-no {
+  background-color: rgba(255, 0, 0, 0.8);
   -fx-background-color: rgba(255, 0, 0, 0.8);
+  border-radius: 10px;
   -fx-background-radius: 10;
+  color: black;
   -fx-text-fill: black;
+  padding: 2px 6px 2px 6px;
   -fx-padding: 2 6 2 6;
+  font-size: 12px;
   -fx-font-size: 12px;
+  font-weight: bold;
   -fx-font-weight: bold;
 }
 
 .item-count-no-wrapper {
+  opacity: 0.5;
   -fx-opacity: 0.5;
+}
+
+/* Inventory ScrollPane styling */
+.inventory-scroll-pane {
+  background-color: transparent;
+  -fx-background-color: transparent;
+  border-color: transparent;
+  -fx-border-color: transparent;
+  border-width: 0;
+  -fx-border-width: 0;
+  border-radius: 0;
+  -fx-background-radius: 0;
+  -fx-border-radius: 0;
+}
+
+.inventory-scroll-pane .viewport {
+  background-color: transparent;
+  -fx-background-color: transparent;
+}
+
+.inventory-scroll-pane .corner {
+  background-color: transparent;
+  -fx-background-color: transparent;
+}
+
+/* Customize scrollbar for inventory */
+.inventory-scroll-pane .scroll-bar:vertical {
+  background-color: rgba(14, 23, 34, 0.5);
+  -fx-background-color: rgba(14, 23, 34, 0.5);
+  border-radius: 0;
+  -fx-background-radius: 0;
+  border-color: transparent;
+  -fx-border-color: transparent;
+  border-width: 0;
+  -fx-border-width: 0;
+  -fx-pref-width: 8;
+}
+
+.inventory-scroll-pane .scroll-bar:vertical .track {
+  background-color: rgba(27, 39, 54, 0.3);
+  -fx-background-color: rgba(27, 39, 54, 0.3);
+  border-radius: 4px;
+  -fx-background-radius: 4;
+  border-color: transparent;
+  -fx-border-color: transparent;
+  border-width: 0;
+  -fx-border-width: 0;
+}
+
+.inventory-scroll-pane .scroll-bar:vertical .thumb {
+  background-color: rgba(58, 75, 92, 0.8);
+  -fx-background-color: rgba(58, 75, 92, 0.8);
+  border-radius: 4px;
+  -fx-background-radius: 4;
+  border-color: transparent;
+  -fx-border-color: transparent;
+  border-width: 0;
+  -fx-border-width: 0;
+}
+
+.inventory-scroll-pane .scroll-bar:vertical .thumb:hover {
+  background-color: rgba(78, 95, 112, 0.9);
+  -fx-background-color: rgba(78, 95, 112, 0.9);
+}
+
+.inventory-scroll-pane .scroll-bar:vertical .thumb:pressed {
+  background-color: rgba(98, 115, 132, 1);
+  -fx-background-color: rgba(98, 115, 132, 1);
+}
+
+/* Hide horizontal scrollbar completely */
+.inventory-scroll-pane .scroll-bar:horizontal {
+  background-color: transparent;
+  -fx-background-color: transparent;
+  height: 0;
+  -fx-pref-height: 0;
+  max-height: 0;
+  -fx-max-height: 0;
+  min-height: 0;
+  -fx-min-height: 0;
 }
