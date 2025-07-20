@@ -172,7 +172,8 @@ public class SimulationController {
         Pane simSpace = view.getSimSpace();
         simSpace.getChildren().clear();
 
-        model.setupSimulation(simSpace);
+        model.setupSimulation();
+        model.connectToView(simSpace);
         // Clear the mapping and rebuild it during setup
         gameObjectToPairMap.clear();
 

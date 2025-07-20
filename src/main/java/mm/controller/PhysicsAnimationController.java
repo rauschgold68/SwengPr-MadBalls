@@ -82,6 +82,40 @@ public class PhysicsAnimationController extends AnimationTimer {
     }
 
     /**
+     * Constructs a PhysicsAnimationController without simSpace (to be set later).
+     *
+     * @param world the Box2D world to step
+     * @param pairs the list of {@link PhysicsVisualPair} objects to update
+     * @param model the SimulationModel to update when objects are culled
+     */
+    public PhysicsAnimationController(World world, List<PhysicsVisualPair> pairs, SimulationModel model) {
+        this.world = world;
+        this.pairs = pairs;
+        this.model = model;
+        
+        // Default dimensions - will be updated when simSpace is set
+        this.simSpaceWidth = 800.0;
+        this.simSpaceHeight = 600.0;
+    }
+
+    /**
+     * Sets the simulation space pane and initializes bounds tracking.
+     * 
+     * @param simSpace the JavaFX Pane representing the simulation space
+     */
+    public void setSimSpace(Pane simSpace) {
+        // Get actual simulation space bounds
+        this.simSpaceWidth = simSpace.getWidth();
+        this.simSpaceHeight = simSpace.getHeight();
+        
+        // Listen for size changes
+        simSpace.widthProperty().addListener((obs, old, newVal) -> 
+            this.simSpaceWidth = newVal.doubleValue());
+        simSpace.heightProperty().addListener((obs, old, newVal) -> 
+            this.simSpaceHeight = newVal.doubleValue());
+    }
+
+    /**
      * Starts the animation timer and marks it as running.
      */
     @Override

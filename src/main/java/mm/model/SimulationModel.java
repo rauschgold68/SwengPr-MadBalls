@@ -282,17 +282,15 @@ public class SimulationModel {
      * Loads the level and initializes the physics world and objects.
      * <p>
      * This method creates a new physics world, loads game objects from the level
-     * file,
-     * converts them to physics-visual pairs, and sets up no-place zones and the
-     * animation timer.
+     * file, converts them to physics-visual pairs, and sets up no-place zones.
      * It also adds any previously dropped objects and sets up the contact listener
      * for win conditions.
      * </p>
-     * @param simSpace the Pane representing the simulation space in the view
      */
-    public void setupSimulation(Pane simSpace) {
+    public void setupSimulation() {
         physics.world = new World(new Vec2(0.0f, 9.8f));
         physics.pairs = new ArrayList<>();
+        physics.geometryPairs = new ArrayList<>();
         gameObjects.noPlaceZones = new ArrayList<>();
 
         LevelImportController importer = new LevelImportController(state.levelPath);
@@ -316,10 +314,22 @@ public class SimulationModel {
             }
         }
 
-        // Use simSpace passed as parameter
-        physics.timer = new PhysicsAnimationController(physics.world, physics.pairs, this, simSpace);
+        // Initialize timer without simSpace - will be connected by controller
+        physics.timer = new PhysicsAnimationController(physics.world, physics.pairs, this);
 
         listenContact();
+    }
+
+    /**
+     * Connects the simulation to a JavaFX pane for visualization.
+     * This method should be called by the controller after setupSimulation().
+     * 
+     * @param simSpace the Pane representing the simulation space in the view
+     */
+    public void connectToView(Pane simSpace) {
+        if (physics.timer != null) {
+            physics.timer.setSimSpace(simSpace);
+        }
     }
 
     /**
