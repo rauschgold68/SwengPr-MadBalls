@@ -48,7 +48,13 @@ public class LevelExportController {
             GameObject obj = FxToGameObjectController.convertBack(pair);
             gameObjects.add(obj);
         }
-        
+        for (InventoryObject obj : inventoryObjects) {
+            String sprite = obj.getSprite();
+            if (sprite != null && !sprite.isEmpty()) {
+                sprite = sprite.substring(sprite.lastIndexOf('/')+1, sprite.length());
+            }
+            obj.setSprite(sprite);
+        }
         levelOut.setLevelObjects(gameObjects);
         levelOut.setInventoryObjects(inventoryObjects);
 

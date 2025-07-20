@@ -52,7 +52,7 @@ public class FxToGameObjectController {
         Shape shape = pair.visual;
 
         String sprite = extractSprite(pair, shape);
-        String colour = (String.class != null) ? "BLACK" : extractColour(pair, shape);
+        String colour = (sprite == null) ? "BLACK" : extractColour(pair, shape);
         Position position = new Position(0, 0);
         Size size = new Size();
         String type = extractShapeProperties(shape, position, size);
@@ -60,7 +60,7 @@ public class FxToGameObjectController {
 
         // Create GameObject with basic constructor
         GameObject gameObject = new GameObject(name, type, position, size);
-        
+        gameObject.setSprite(sprite);
         // Set additional properties using setters
         gameObject.setPhysics(physics);
         gameObject.setAngle(angle);
