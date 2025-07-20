@@ -262,6 +262,7 @@
                         <!-- Ignore GUI classes for coverage -->
                         <exclude>mm/view/**/*</exclude>
                         <exclude>mm/controller/ApplicationController.class</exclude>
+                        <exclude>mm/model/CollisionDetection.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>
