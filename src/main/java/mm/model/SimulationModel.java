@@ -48,6 +48,7 @@ public class SimulationModel {
     private final UndoRedoController undoRedoController = new UndoRedoController();
 
     private final CollisionDetection collisionService;
+    private final GeometricCollisionDetection geometricCollisionService;
 
     /**
      * Container for physics-related simulation components.
@@ -57,6 +58,8 @@ public class SimulationModel {
         public World world;
         /** List of pairs of physics objects and their visual representations. */
         public List<PhysicsVisualPair> pairs = new ArrayList<>();
+        /** List of geometry pairs (view-agnostic). */
+        public List<PhysicsGeometryPair> geometryPairs = new ArrayList<>();
         /** The animation timer controlling the simulation loop. */
         public PhysicsAnimationController timer;
     }
@@ -98,6 +101,7 @@ public class SimulationModel {
     public SimulationModel(String levelPath) {
         this.state.levelPath = levelPath;
         this.collisionService = new CollisionDetection(this);
+        this.geometricCollisionService = new GeometricCollisionDetection(this);
     }
 
     /**
@@ -116,6 +120,15 @@ public class SimulationModel {
      */
     public List<PhysicsVisualPair> getPairs() {
         return physics.pairs;
+    }
+
+    /**
+     * Returns the list of physics-geometry pairs in the simulation.
+     * 
+     * @return the list of PhysicsGeometryPair objects
+     */
+    public List<PhysicsGeometryPair> getGeometryPairs() {
+        return physics.geometryPairs;
     }
 
     /**
@@ -163,6 +176,15 @@ public class SimulationModel {
      */
     public PhysicsAnimationController getTimer() {
         return physics.timer;
+    }
+
+    /**
+     * Returns the geometric collision detection service.
+     * 
+     * @return the collision detection service using view-agnostic geometry
+     */
+    public GeometricCollisionDetection getGeometricCollisionService() {
+        return geometricCollisionService;
     }
 
     /**
@@ -279,7 +301,7 @@ public class SimulationModel {
         // Add level objects
         for (GameObject obj : levelGameObjects) {
             PhysicsVisualPair pair = GameObjectController.convert(obj, physics.world);
-            physics.pairs.add(pair);
+            addPhysicsVisualPair(pair);
             if (obj.getName().equals("noPlaceZone")) {
                 gameObjects.noPlaceZones.add(pair);
             }
@@ -288,7 +310,7 @@ public class SimulationModel {
         // Add dropped objects
         for (GameObject obj : gameObjects.droppedObjects) {
             PhysicsVisualPair pair = GameObjectController.convert(obj, physics.world);
-            physics.pairs.add(pair);
+            addPhysicsVisualPair(pair);
             if (obj.getName().equals("noPlaceZone")) {
                 gameObjects.noPlaceZones.add(pair);
             }
@@ -544,6 +566,7 @@ public class SimulationModel {
 
     /**
      * Checks if a given position is inside any no-place zone.
+     * Now uses geometry-based collision detection.
      *
      * @param x the x-coordinate to check
      * @param y the y-coordinate to check
@@ -551,13 +574,11 @@ public class SimulationModel {
      */
     public boolean isInNoPlaceZone(double x, double y) {
         for (PhysicsVisualPair zone : gameObjects.noPlaceZones) {
-            if (zone.visual instanceof javafx.scene.shape.Rectangle) {
-                javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) zone.visual;
-                double zoneX = rect.getTranslateX();
-                double zoneY = rect.getTranslateY();
-                double zoneW = rect.getWidth();
-                double zoneH = rect.getHeight();
-                if (x >= zoneX && x <= zoneX + zoneW && y >= zoneY && y <= zoneY + zoneH) {
+            // Find corresponding geometry pair
+            int index = physics.pairs.indexOf(zone);
+            if (index >= 0 && index < physics.geometryPairs.size()) {
+                PhysicsGeometryPair geometryPair = physics.geometryPairs.get(index);
+                if (geometryPair.getGeometry() != null && geometryPair.getGeometry().containsPoint(x, y)) {
                     return true;
                 }
             }
@@ -567,15 +588,22 @@ public class SimulationModel {
 
     /**
      * Checks if a given position is inside any win zone.
+     * Now uses geometry-based collision detection.
      *
      * @param x the x-coordinate to check
      * @param y the y-coordinate to check
      * @return true if the position is inside a win zone, false otherwise
      */
     public boolean isInWinZone(double x, double y) {
-        for (PhysicsVisualPair pair : physics.pairs) {
-            if (isWinZonePair(pair) && isPositionInPair(pair, x, y)) {
-                return true;
+        for (int i = 0; i < physics.pairs.size(); i++) {
+            PhysicsVisualPair pair = physics.pairs.get(i);
+            if (isWinZonePair(pair)) {
+                if (i < physics.geometryPairs.size()) {
+                    PhysicsGeometryPair geometryPair = physics.geometryPairs.get(i);
+                    if (geometryPair.getGeometry() != null && geometryPair.getGeometry().containsPoint(x, y)) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -590,55 +618,6 @@ public class SimulationModel {
     private boolean isWinZonePair(PhysicsVisualPair pair) {
         Object userData = pair.body.getUserData();
         return "winZone".equals(userData) || "winPlat".equals(userData);
-    }
-
-    /**
-     * Checks if a position is inside the visual bounds of a physics-visual pair.
-     * 
-     * @param pair The pair to check against
-     * @param x The x-coordinate
-     * @param y The y-coordinate
-     * @return true if the position is inside the pair's visual bounds
-     */
-    private boolean isPositionInPair(PhysicsVisualPair pair, double x, double y) {
-        if (pair.visual instanceof javafx.scene.shape.Rectangle) {
-            return isPositionInRectangle((javafx.scene.shape.Rectangle) pair.visual, x, y);
-        } else if (pair.visual instanceof javafx.scene.shape.Circle) {
-            return isPositionInCircle((javafx.scene.shape.Circle) pair.visual, x, y);
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a position is inside a rectangle.
-     * 
-     * @param rect The rectangle to check
-     * @param x The x-coordinate
-     * @param y The y-coordinate
-     * @return true if the position is inside the rectangle
-     */
-    private boolean isPositionInRectangle(javafx.scene.shape.Rectangle rect, double x, double y) {
-        double zoneX = rect.getTranslateX();
-        double zoneY = rect.getTranslateY();
-        double zoneW = rect.getWidth();
-        double zoneH = rect.getHeight();
-        return x >= zoneX && x <= zoneX + zoneW && y >= zoneY && y <= zoneY + zoneH;
-    }
-
-    /**
-     * Checks if a position is inside a circle.
-     * 
-     * @param circle The circle to check
-     * @param x The x-coordinate
-     * @param y The y-coordinate
-     * @return true if the position is inside the circle
-     */
-    private boolean isPositionInCircle(javafx.scene.shape.Circle circle, double x, double y) {
-        double centerX = circle.getTranslateX();
-        double centerY = circle.getTranslateY();
-        double radius = circle.getRadius();
-        double distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-        return distance <= radius;
     }
 
     /**
@@ -718,5 +697,16 @@ public class SimulationModel {
      */
     public boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY, float newAngle) {
         return collisionService.wouldCauseOverlap(movingPair, newX, newY, newAngle);
+    }
+
+    /**
+     * Adds a physics-visual pair and creates the corresponding geometry pair.
+     * This method maintains synchronization between the old and new systems.
+     */
+    public void addPhysicsVisualPair(PhysicsVisualPair visualPair) {
+        physics.pairs.add(visualPair);
+        // Create corresponding geometry pair
+        PhysicsGeometryPair geometryPair = mm.controller.GeometryConverter.fromVisualPair(visualPair);
+        physics.geometryPairs.add(geometryPair);
     }
 }
