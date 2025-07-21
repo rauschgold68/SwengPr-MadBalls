@@ -297,6 +297,17 @@ public class SimulationView {
     }
 }
 
+    private void createJsonViewer() {
+    layout.jsonViewer = new TextArea();
+    layout.jsonViewer.setEditable(true);
+    layout.jsonViewer.getStyleClass().add("json-viewer");
+    layout.jsonViewer.setWrapText(false);
+    // Remove fixed height constraints - let it fill the bottom bar completely
+    layout.jsonViewer.setPrefHeight(Region.USE_COMPUTED_SIZE);
+    layout.jsonViewer.setMinHeight(Region.USE_PREF_SIZE);
+    layout.jsonViewer.setMaxHeight(Region.USE_COMPUTED_SIZE);
+}
+
     /**
      * Creates the sidebar with inventory and control buttons.
      * 
