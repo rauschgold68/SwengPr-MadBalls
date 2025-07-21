@@ -10,8 +10,8 @@
   -fx-background-color: white;
 
   /* Background image */
-  background-image: url("/pictures/levelSelect.png");
-  -fx-background-image: url("/pictures/levelSelect.png");
+  background-image: url("/pictures/simSpaceBg.png");
+  -fx-background-image: url("/pictures/simSpaceBg.png");
 
   /* Background positioning and sizing */
   background-size: cover;
@@ -109,6 +109,14 @@
 .bottom-bar {
   background-color: #0e1722;
   -fx-background-color: #0e1722;
+  background-image: url("/pictures/bottombar2.png");
+  -fx-background-image: url("/pictures/bottombar2.png");
+  background-repeat: no-repeat;
+  -fx-background-repeat: no-repeat;
+  background-position: center;
+  -fx-background-position: center;
+  background-size: cover;
+  -fx-background-size: cover;
   border-color: #1b2736;
   -fx-border-color: #1b2736;
   border-width: 2px 0 0 0; /* top border only */
