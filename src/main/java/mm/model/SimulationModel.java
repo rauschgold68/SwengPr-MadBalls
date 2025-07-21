@@ -926,90 +926,27 @@ public class SimulationModel {
     }
 
     /**
-     * Parses a single GameObject from JSON string.
-     */
-    private GameObject parseGameObject(String objStr) {
-        try {
-            String name = extractJsonValue(objStr, "name");
-            String type = extractJsonValue(objStr, "type");
-            
-            float x = Float.parseFloat(extractJsonValue(objStr, "x"));
-            float y = Float.parseFloat(extractJsonValue(objStr, "y"));
-            float angle = Float.parseFloat(extractJsonValue(objStr, "angle"));
-            
-            float width = Float.parseFloat(extractJsonValue(objStr, "width"));
-            float height = Float.parseFloat(extractJsonValue(objStr, "height"));
-            float radius = Float.parseFloat(extractJsonValue(objStr, "radius"));
-            
-            String colour = extractJsonValue(objStr, "colour");
-            String sprite = extractJsonValue(objStr, "sprite");
-            boolean winning = Boolean.parseBoolean(extractJsonValue(objStr, "winning"));
-            
-            // Physics properties
-            float density = Float.parseFloat(extractJsonValue(objStr, "density"));
-            float friction = Float.parseFloat(extractJsonValue(objStr, "friction"));
-            float restitution = Float.parseFloat(extractJsonValue(objStr, "restitution"));
-            String shape = extractJsonValue(objStr, "shape");
-            
-            // Create GameObject
-            GameObject obj = new GameObject(name, type, new Position(x, y), new Size(width, height));
-            obj.getSize().setRadius(radius);
-            obj.setAngle(angle);
-            obj.setColour(colour);
-            obj.setSprite("null".equals(sprite) ? null : sprite);
-            obj.setWinning(winning);
-            
-            // Set physics
-            Physics physics = new Physics(density, friction, restitution, shape);
-            obj.setPhysics(physics);
-            
-            return obj;
-        } catch (Exception e) {
-            System.err.println("Error parsing GameObject: " + e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Updates inventory object count from JSON.
-     */
-    private void updateInventoryObjectCount(String objStr) {
-        try {
-            String name = extractJsonValue(objStr, "name");
-            int count = Integer.parseInt(extractJsonValue(objStr, "count"));
-            
-            for (InventoryObject invObj : gameObjects.inventoryObjects) {
-                if (invObj.getName().equals(name)) {
-                    invObj.setCount(count);
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error updating inventory count: " + e.getMessage());
-        }
-    }
-
-    /**
      * Extracts a value from JSON string (simplified parser).
      */
     private String extractJsonValue(String jsonStr, String key) {
         String pattern = "\"" + key + "\":";
         int startIndex = jsonStr.indexOf(pattern);
-        if (startIndex == -1) return "";
+        if (startIndex == -1) return "0"; // Return default value instead of empty string
         
         startIndex += pattern.length();
         while (startIndex < jsonStr.length() && Character.isWhitespace(jsonStr.charAt(startIndex))) {
             startIndex++;
         }
         
-        if (startIndex >= jsonStr.length()) return "";
+        if (startIndex >= jsonStr.length()) return "0";
         
         char firstChar = jsonStr.charAt(startIndex);
         if (firstChar == '"') {
             // String value
             startIndex++;
             int endIndex = jsonStr.indexOf('"', startIndex);
-            return endIndex != -1 ? jsonStr.substring(startIndex, endIndex) : "";
+            String result = endIndex != -1 ? jsonStr.substring(startIndex, endIndex) : "";
+            return result.isEmpty() ? "0" : result; // Return "0" for empty strings when expecting numbers
         } else {
             // Number or boolean value
             int endIndex = startIndex;
@@ -1020,7 +957,160 @@ public class SimulationModel {
                 }
                 endIndex++;
             }
-            return jsonStr.substring(startIndex, endIndex).trim();
+            String result = jsonStr.substring(startIndex, endIndex).trim();
+            return result.isEmpty() ? "0" : result; // Return "0" for empty values
+        }
+    }
+
+    /**
+     * Safely parses a float value with default fallback.
+     */
+    private float safeParseFloat(String value, float defaultValue) {
+        try {
+            if (value == null || value.trim().isEmpty() || "null".equals(value)) {
+                return defaultValue;
+            }
+            return Float.parseFloat(value.trim());
+        } catch (NumberFormatException e) {
+            System.err.println("Warning: Could not parse float value '" + value + "', using default: " + defaultValue);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Safely parses an integer value with default fallback.
+     */
+    private int safeParseInt(String value, int defaultValue) {
+        try {
+            if (value == null || value.trim().isEmpty() || "null".equals(value)) {
+                return defaultValue;
+            }
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            System.err.println("Warning: Could not parse int value '" + value + "', using default: " + defaultValue);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Safely parses a boolean value with default fallback.
+     */
+    private boolean safeParseBoolean(String value, boolean defaultValue) {
+        try {
+            if (value == null || value.trim().isEmpty() || "null".equals(value)) {
+                return defaultValue;
+            }
+            return Boolean.parseBoolean(value.trim());
+        } catch (Exception e) {
+            System.err.println("Warning: Could not parse boolean value '" + value + "', using default: " + defaultValue);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Parses a single GameObject from JSON string.
+     */
+    private GameObject parseGameObject(String objStr) {
+        try {
+            String name = extractJsonValue(objStr, "name");
+            String type = extractJsonValue(objStr, "type");
+            
+            // Use safe parsing with defaults
+            float x = safeParseFloat(extractJsonValue(objStr, "x"), 0.0f);
+            float y = safeParseFloat(extractJsonValue(objStr, "y"), 0.0f);
+            float angle = safeParseFloat(extractJsonValue(objStr, "angle"), 0.0f);
+            
+            float width = safeParseFloat(extractJsonValue(objStr, "width"), 50.0f);
+            float height = safeParseFloat(extractJsonValue(objStr, "height"), 50.0f);
+            float radius = safeParseFloat(extractJsonValue(objStr, "radius"), 0.0f);
+            
+            String colour = extractJsonValue(objStr, "colour");
+            String sprite = extractJsonValue(objStr, "sprite");
+            boolean winning = safeParseBoolean(extractJsonValue(objStr, "winning"), false);
+            
+            // Physics properties with safe defaults
+            float density = safeParseFloat(extractJsonValue(objStr, "density"), 1.0f);
+            float friction = safeParseFloat(extractJsonValue(objStr, "friction"), 0.4f);
+            float restitution = safeParseFloat(extractJsonValue(objStr, "restitution"), 0.1f);
+            String shape = extractJsonValue(objStr, "shape");
+            if (shape.isEmpty() || "null".equals(shape)) {
+                shape = "DYNAMIC";
+            }
+            
+            // Create GameObject
+            GameObject obj = new GameObject(name, type, new Position(x, y), new Size(width, height));
+            obj.getSize().setRadius(radius);
+            obj.setAngle(angle);
+            obj.setColour(colour.isEmpty() ? "BLACK" : colour);
+            obj.setSprite("null".equals(sprite) || sprite.isEmpty() ? null : sprite);
+            obj.setWinning(winning);
+            
+            // Set physics
+            Physics physics = new Physics(density, friction, restitution, shape);
+            obj.setPhysics(physics);
+            
+            return obj;
+        } catch (Exception e) {
+            System.err.println("Error parsing GameObject: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Updates inventory object count from JSON.
+     */
+    private void updateInventoryObjectCount(String objStr) {
+        try {
+            String name = extractJsonValue(objStr, "name");
+            int count = safeParseInt(extractJsonValue(objStr, "count"), 0);
+            
+            // Also parse other properties that might have changed with safe defaults
+            float angle = safeParseFloat(extractJsonValue(objStr, "angle"), 0.0f);
+            String colour = extractJsonValue(objStr, "colour");
+            String sprite = extractJsonValue(objStr, "sprite");
+            boolean winning = safeParseBoolean(extractJsonValue(objStr, "winning"), false);
+            
+            // Physics properties with safe defaults
+            float density = safeParseFloat(extractJsonValue(objStr, "density"), 1.0f);
+            float friction = safeParseFloat(extractJsonValue(objStr, "friction"), 0.4f);
+            float restitution = safeParseFloat(extractJsonValue(objStr, "restitution"), 0.1f);
+            String shape = extractJsonValue(objStr, "shape");
+            if (shape.isEmpty() || "null".equals(shape)) {
+                shape = "DYNAMIC";
+            }
+            
+            // Size properties with safe defaults
+            float width = safeParseFloat(extractJsonValue(objStr, "width"), 50.0f);
+            float height = safeParseFloat(extractJsonValue(objStr, "height"), 50.0f);
+            float radius = safeParseFloat(extractJsonValue(objStr, "radius"), 0.0f);
+            
+            for (InventoryObject invObj : gameObjects.inventoryObjects) {
+                if (invObj.getName().equals(name)) {
+                    // Update count
+                    invObj.setCount(count);
+                    
+                    // Update other properties
+                    invObj.setAngle(angle);
+                    invObj.setColour(colour.isEmpty() ? invObj.getColour() : colour); // Keep existing if empty
+                    invObj.setSprite("null".equals(sprite) || sprite.isEmpty() ? null : sprite);
+                    invObj.setWinning(winning);
+                    
+                    // Update physics
+                    Physics physics = new Physics(density, friction, restitution, shape);
+                    invObj.setPhysics(physics);
+                    
+                    // Update size
+                    Size newSize = new Size(width, height);
+                    newSize.setRadius(radius);
+                    invObj.setSize(newSize);
+                    
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error updating inventory object: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

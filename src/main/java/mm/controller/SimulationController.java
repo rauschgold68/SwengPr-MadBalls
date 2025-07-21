@@ -99,14 +99,6 @@ public class SimulationController {
      *
      * @param primaryStage the primary stage of the application
      * @param levelPath    the resource path to the level JSON file
-     */
-
-    /**
-     * Constructs the SimulationController, sets up the model and view, and wires up
-     * event handlers. Accepts a skin selection for inventory sprites.
-     *
-     * @param primaryStage the primary stage of the application
-     * @param levelPath    the resource path to the level JSON file
      * @param isPuzzleMode whether puzzle mode is enabled
      * @param atPuzzlesEnd whether at the end of puzzles
      * @param selectedSkin the selected skin ("Default" or "Legacy")
@@ -467,9 +459,24 @@ public class SimulationController {
         // Add text change listener for real-time updates
         jsonViewer.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!isUpdatingFromJson && !newValue.equals(lastJsonContent)) {
+                // Visual feedback for editing
+                jsonViewer.setStyle("-fx-border-color: orange; -fx-border-width: 2px;");
+                
                 // Debounce rapid changes
                 Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
-                    updateSimulationFromJson(newValue);
+                    boolean success = updateSimulationFromJson(newValue);
+                    // Visual feedback for update result
+                    if (success) {
+                        jsonViewer.setStyle("-fx-border-color: green; -fx-border-width: 2px;");
+                    } else {
+                        jsonViewer.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+                    }
+                    
+                    // Reset border after 1 second
+                    Timeline resetTimeline = new Timeline(new KeyFrame(Duration.millis(1000), reset -> {
+                        jsonViewer.setStyle("");
+                    }));
+                    resetTimeline.play();
                 }));
                 timeline.play();
             }
@@ -478,7 +485,13 @@ public class SimulationController {
         // Add key shortcuts for manual updates
         jsonViewer.setOnKeyPressed(event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.ENTER) {
-                updateSimulationFromJson(jsonViewer.getText());
+                boolean success = updateSimulationFromJson(jsonViewer.getText());
+                // Immediate visual feedback for manual update
+                if (success) {
+                    jsonViewer.setStyle("-fx-border-color: green; -fx-border-width: 2px;");
+                } else {
+                    jsonViewer.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+                }
                 event.consume();
             }
         });
@@ -487,7 +500,7 @@ public class SimulationController {
     /**
      * Updates the simulation from the JSON viewer content.
      */
-    private void updateSimulationFromJson(String jsonContent) {
+    private boolean updateSimulationFromJson(String jsonContent) {
         if (isInteractionAllowed() && model.updateFromJson(jsonContent)) {
             // Refresh the entire simulation
             Platform.runLater(() -> {
@@ -497,7 +510,9 @@ public class SimulationController {
                 lastJsonContent = jsonContent;
                 isUpdatingFromJson = false;
             });
+            return true;
         }
+        return false;
     }
 
     /**
