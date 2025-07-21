@@ -275,9 +275,9 @@ public class SimulationView {
             }
         }
 
-        layout.bottomBar.setPrefHeight(150);
-        layout.bottomBar.setMaxHeight(150);
-        layout.bottomBar.setMinHeight(150);
+        layout.bottomBar.setPrefHeight(200);
+        layout.bottomBar.setMaxHeight(200);
+        layout.bottomBar.setMinHeight(200);
     }
 
     /**
