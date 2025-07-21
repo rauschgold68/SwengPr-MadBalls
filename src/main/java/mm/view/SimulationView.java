@@ -258,21 +258,6 @@ public class SimulationView {
             System.out.println("Bottom bar background image loaded successfully: " + bottomBarImagePath);
         } catch (Exception e) {
             System.err.println("Warning: Could not load bottom bar background image: " + e.getMessage());
-            // Try alternative image
-            try {
-                String altBottomBarImagePath = getClass().getResource("/pictures/bottombar0.png").toExternalForm();
-                layout.bottomBar.setStyle("-fx-background-color: transparent; " +
-                        "-fx-background-image: url('" + altBottomBarImagePath + "'); " +
-                        "-fx-background-repeat: no-repeat; " +
-                        "-fx-background-position: center; " +
-                        "-fx-background-size: cover;");
-                System.out.println("Alternative bottom bar background image loaded: " + altBottomBarImagePath);
-            } catch (Exception e2) {
-                System.err
-                        .println("Warning: Could not load alternative bottom bar background image: " + e2.getMessage());
-                // Final fallback styling
-                layout.bottomBar.setStyle("-fx-background-color: #0e1722;");
-            }
         }
 
         layout.bottomBar.setPrefHeight(200);
