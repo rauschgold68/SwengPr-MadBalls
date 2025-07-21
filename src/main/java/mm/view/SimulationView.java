@@ -5,6 +5,7 @@ import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -93,6 +94,12 @@ public class SimulationView {
 
         /** Root stack pane that layers the main content and overlays */
         public StackPane rootStack;
+        
+        /** JSON viewer area showing real-time simulation state */
+        public TextArea jsonViewer;
+        
+        /** ScrollPane containing the JSON viewer */
+        public ScrollPane jsonScrollPane;
     }
 
     /**
@@ -234,6 +241,26 @@ public class SimulationView {
         layout.bottomBar.setPrefHeight(150);
         layout.bottomBar.setMaxHeight(150);
         layout.bottomBar.setMinHeight(150);
+        
+        createJsonViewer();
+    }
+
+    /**
+     * Creates the JSON viewer component for real-time simulation state display.
+     */
+    private void createJsonViewer() {
+        layout.jsonViewer = new TextArea();
+        layout.jsonViewer.setEditable(false);
+        layout.jsonViewer.getStyleClass().add("json-viewer");
+        layout.jsonViewer.setWrapText(false);
+        layout.jsonViewer.setPrefWidth(300);
+        layout.jsonViewer.setMinWidth(300);
+        layout.jsonViewer.setMaxWidth(300);
+        
+        layout.jsonScrollPane = new ScrollPane(layout.jsonViewer);
+        layout.jsonScrollPane.setFitToWidth(false);
+        layout.jsonScrollPane.setFitToHeight(true);
+        layout.jsonScrollPane.getStyleClass().add("json-scroll-pane");
     }
 
     /**
@@ -293,6 +320,7 @@ public class SimulationView {
         layout.mainPane.setCenter(layout.simSpace);
         layout.mainPane.setRight(layout.sideBar);
         layout.mainPane.setBottom(layout.bottomBar);
+        layout.mainPane.setLeft(layout.jsonScrollPane);
     }
 
     /**
@@ -387,7 +415,7 @@ public class SimulationView {
     public VBox getSideBar() {
         return layout.sideBar;
     }
-
+    
     /** @return the bottom bar (reserved for future features) */
     public HBox getBottomBar() {
         return layout.bottomBar;
@@ -406,6 +434,16 @@ public class SimulationView {
     /** @return the root container that layers all components */
     public StackPane getRootStack() {
         return layout.rootStack;
+    }
+
+    /** @return the JSON viewer text area */
+    public TextArea getJsonViewer() {
+        return layout.jsonViewer;
+    }
+
+    /** @return the JSON viewer scroll pane */
+    public ScrollPane getJsonScrollPane() {
+        return layout.jsonScrollPane;
     }
 
     // ==================================================================================

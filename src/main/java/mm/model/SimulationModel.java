@@ -709,4 +709,59 @@ public class SimulationModel {
         PhysicsGeometryPair geometryPair = mm.controller.GeometryConverter.fromVisualPair(visualPair);
         physics.geometryPairs.add(geometryPair);
     }
+
+    /**
+     * Generates a JSON representation of the current simulation state.
+     * This includes all dropped objects and their current positions/rotations.
+     * 
+     * @return JSON string representing the current simulation state
+     */
+    public String generateCurrentStateJson() {
+        StringBuilder json = new StringBuilder();
+        json.append("{\n");
+        json.append("  \"droppedObjects\": [\n");
+        
+        for (int i = 0; i < gameObjects.droppedObjects.size(); i++) {
+            GameObject obj = gameObjects.droppedObjects.get(i);
+            json.append("    {\n");
+            json.append("      \"name\": \"").append(obj.getName()).append("\",\n");
+            json.append("      \"type\": \"").append(obj.getType()).append("\",\n");
+            json.append("      \"position\": {\n");
+            json.append("        \"x\": ").append(String.format("%.2f", obj.getPosition().getX())).append(",\n");
+            json.append("        \"y\": ").append(String.format("%.2f", obj.getPosition().getY())).append("\n");
+            json.append("      },\n");
+            json.append("      \"size\": {\n");
+            json.append("        \"width\": ").append(String.format("%.2f", obj.getSize().getWidth())).append(",\n");
+            json.append("        \"height\": ").append(String.format("%.2f", obj.getSize().getHeight())).append("\n");
+            json.append("      },\n");
+            json.append("      \"angle\": ").append(String.format("%.2f", obj.getAngle())).append(",\n");
+            json.append("      \"colour\": \"").append(obj.getColour()).append("\",\n");
+            json.append("      \"isWinning\": ").append(obj.isWinning()).append("\n");
+            json.append("    }");
+            if (i < gameObjects.droppedObjects.size() - 1) {
+                json.append(",");
+            }
+            json.append("\n");
+        }
+        
+        json.append("  ],\n");
+        json.append("  \"inventoryObjects\": [\n");
+        
+        for (int i = 0; i < gameObjects.inventoryObjects.size(); i++) {
+            InventoryObject obj = gameObjects.inventoryObjects.get(i);
+            json.append("    {\n");
+            json.append("      \"name\": \"").append(obj.getName()).append("\",\n");
+            json.append("      \"count\": ").append(obj.getCount()).append("\n");
+            json.append("    }");
+            if (i < gameObjects.inventoryObjects.size() - 1) {
+                json.append(",");
+            }
+            json.append("\n");
+        }
+        
+        json.append("  ]\n");
+        json.append("}");
+        
+        return json.toString();
+    }
 }

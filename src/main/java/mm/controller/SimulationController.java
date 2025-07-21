@@ -128,6 +128,7 @@ public class SimulationController {
         setupMenuButtons();
         setupOverlayToggle();
         setupWinNextLevel();
+        updateJsonViewer(); // Initialize JSON viewer
     }
 
     /**
@@ -185,6 +186,8 @@ public class SimulationController {
                 processPhysicsVisualPair(pair, dropped, simSpace);
             }
         }
+        
+        updateJsonViewer(); // Update JSON viewer after simulation setup
     }
 
     /**
@@ -446,6 +449,17 @@ public class SimulationController {
     }
 
     /**
+     * Updates the JSON viewer with the current simulation state.
+     * This method is called whenever the simulation state changes.
+     */
+    private void updateJsonViewer() {
+        Platform.runLater(() -> {
+            String jsonContent = model.generateCurrentStateJson();
+            view.getJsonViewer().setText(jsonContent);
+        });
+    }
+
+    /**
      * Refreshes the inventory display without reloading data from file.
      * <p>
      * This method updates the visual representation of inventory items
@@ -454,6 +468,7 @@ public class SimulationController {
      */
     private void refreshInventoryDisplay() {
         setupInventory(false);
+        updateJsonViewer(); // Update JSON viewer when inventory changes
     }
 
     /**
@@ -651,6 +666,7 @@ public class SimulationController {
             simButtons.undoButton.setOnAction(e -> {
                 if (isInteractionAllowed()) {
                     model.getUndoRedoManager().undo();
+                    updateJsonViewer(); // Update JSON viewer after undo
                 }
             });
         }
@@ -659,6 +675,7 @@ public class SimulationController {
             simButtons.redoButton.setOnAction(e -> {
                 if (isInteractionAllowed()) {
                     model.getUndoRedoManager().redo();
+                    updateJsonViewer(); // Update JSON viewer after redo
                 }
             });
         }
@@ -682,6 +699,7 @@ public class SimulationController {
                 setInventoryItemsDisabled(false);
                 setupSimulation();
                 refreshInventoryDisplay();
+                updateJsonViewer(); // Update JSON viewer after deleting all
             });
         }
     }
@@ -901,6 +919,8 @@ public class SimulationController {
                             new org.jbox2d.common.Vec2(centerX / 50.0f, centerY / 50.0f),
                             pair.body.getAngle());
                 }
+                
+                updateJsonViewer(); // Update JSON viewer during drag
             }
             // If collision would occur, simply don't update the position - object stays in
             // place
@@ -933,6 +953,7 @@ public class SimulationController {
                 model.getUndoRedoManager().executeCommand(moveCommand);
             }
 
+            updateJsonViewer(); // Update JSON viewer after drag ends
             event.consume();
         });
 
@@ -968,6 +989,8 @@ public class SimulationController {
                         .build();
                 MoveObjectController rotateCommand = new MoveObjectController(rotateParams);
                 model.getUndoRedoManager().executeCommand(rotateCommand);
+                
+                updateJsonViewer(); // Update JSON viewer after rotation
             }
             // If collision would occur, do nothing (deny rotation)
 
