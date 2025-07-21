@@ -253,9 +253,9 @@ public class SimulationView {
     private void createBottomBar(boolean isPuzzleMode) {
         layout.bottomBar = new HBox();
         layout.bottomBar.getStyleClass().add("bottom-bar");
-        layout.bottomBar.setPrefHeight(150);
-        layout.bottomBar.setMaxHeight(150);
-        layout.bottomBar.setMinHeight(150);
+        layout.bottomBar.setPrefHeight(200);
+        layout.bottomBar.setMaxHeight(200);
+        layout.bottomBar.setMinHeight(200);
         
         if (!isPuzzleMode) {
             // Sandbox mode: add JSON viewer
@@ -280,16 +280,16 @@ public class SimulationView {
         layout.jsonViewer.setEditable(true);
         layout.jsonViewer.getStyleClass().add("json-viewer");
         layout.jsonViewer.setWrapText(false);
-        layout.jsonViewer.setPrefHeight(120); // Adjust height to fit in bottom bar
-        layout.jsonViewer.setMinHeight(120);
-        layout.jsonViewer.setMaxHeight(120);
+        layout.jsonViewer.setPrefHeight(170); // Adjusted for taller bottom bar
+        layout.jsonViewer.setMinHeight(170);
+        layout.jsonViewer.setMaxHeight(170);
         
         layout.jsonScrollPane = new ScrollPane(layout.jsonViewer);
         layout.jsonScrollPane.setFitToWidth(true);
         layout.jsonScrollPane.setFitToHeight(true);
         layout.jsonScrollPane.getStyleClass().add("json-scroll-pane");
-        layout.jsonScrollPane.setPrefHeight(130);
-        layout.jsonScrollPane.setMaxHeight(130);
+        layout.jsonScrollPane.setPrefHeight(180); // Adjusted for taller bottom bar
+        layout.jsonScrollPane.setMaxHeight(180);
     }
 
     /**
