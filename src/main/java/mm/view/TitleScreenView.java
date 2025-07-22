@@ -413,12 +413,12 @@ public class TitleScreenView {
         puzzleTitle.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
         puzzleTitle.setPadding(new Insets(30, 0, 0, 0));
 
-        levelCards.levelCard1 = createLevelCard("Level 1", "Leichtes Einsteigerlevel",
-                "/pictures/levelSelectBoard.jpeg");
-        levelCards.levelCard2 = createLevelCard("Level 2", "Knifflige Mechanik",
-                "/pictures/levelSelectBoard.jpeg");
-        levelCards.levelCard3 = createLevelCard("Level 3", "Nur für Profis",
-                "/pictures/levelSelectBoard.jpeg");
+        levelCards.levelCard1 = createLevelCard("Level 1 - LoopHole", "Difficulty: Easy",
+                "/pictures/level1Preview.png");
+        levelCards.levelCard2 = createLevelCard("Level 2 - ", "Difficulty: Medium",
+                "/pictures/level1Preview.png");
+        levelCards.levelCard3 = createLevelCard("Level 3 - Precise Interplay", "Difficulty: Hard",
+                "/pictures/level3Preview.png");
 
         HBox cardRow = new HBox(40, levelCards.levelCard1, levelCards.levelCard2, levelCards.levelCard3);
         cardRow.setAlignment(Pos.CENTER);

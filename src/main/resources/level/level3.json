@@ -4,16 +4,16 @@
       "name": "platform",
       "type": "rectangle",
       "position": {
-        "x": 500.0,
-        "y": 800.0
+        "x": -232.0,
+        "y": 281.0
       },
-      "angle": 0.0,
+      "angle": 450.0,
       "size": {
-        "width": 900.0,
+        "width": 660.0,
         "height": 20.0,
         "radius": 0.0
       },
-      "sprite": "madPlatform.png",
+      "sprite": "/objectSkins/Default/madPlatform.png",
       "colour": "BLACK",
       "physics": {
         "density": 1.0,
@@ -27,16 +27,16 @@
       "name": "platform",
       "type": "rectangle",
       "position": {
-        "x": 200.0,
-        "y": 650.0
+        "x": 88.0,
+        "y": 460.0
       },
-      "angle": 0.0,
+      "angle": 90.0,
       "size": {
-        "width": 150.0,
+        "width": 300.0,
         "height": 20.0,
         "radius": 0.0
       },
-      "sprite": "madPlatform.png",
+      "sprite": "/objectSkins/Default/madPlatform.png",
       "colour": "BLACK",
       "physics": {
         "density": 1.0,
@@ -50,16 +50,16 @@
       "name": "platform",
       "type": "rectangle",
       "position": {
-        "x": 500.0,
-        "y": 500.0
+        "x": 246.0,
+        "y": 359.0
       },
-      "angle": 0.0,
+      "angle": 15.0,
       "size": {
-        "width": 200.0,
+        "width": 300.0,
         "height": 20.0,
         "radius": 0.0
       },
-      "sprite": "madPlatform.png",
+      "sprite": "/objectSkins/Default/madPlatform.png",
       "colour": "BLACK",
       "physics": {
         "density": 1.0,
@@ -73,16 +73,16 @@
       "name": "platform",
       "type": "rectangle",
       "position": {
-        "x": 800.0,
-        "y": 650.0
+        "x": 561.0,
+        "y": 418.0
       },
       "angle": 0.0,
       "size": {
-        "width": 150.0,
+        "width": 100.0,
         "height": 20.0,
         "radius": 0.0
       },
-      "sprite": "madPlatform.png",
+      "sprite": "/objectSkins/Default/madPlatform.png",
       "colour": "BLACK",
       "physics": {
         "density": 1.0,
@@ -91,17 +91,155 @@
         "shape": "STATIC"
       },
       "winning": false
+    },
+    {
+      "name": "platform",
+      "type": "rectangle",
+      "position": {
+        "x": 1104.0,
+        "y": 603.0
+      },
+      "angle": 0.0,
+      "size": {
+        "width": 232.0,
+        "height": 20.0,
+        "radius": 0.0
+      },
+      "sprite": "/objectSkins/Default/madPlatform.png",
+      "colour": "BLACK",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "platform",
+      "type": "rectangle",
+      "position": {
+        "x": 666.0,
+        "y": 621.0
+      },
+      "angle": 90.0,
+      "size": {
+        "width": 270.0,
+        "height": 20.0,
+        "radius": 0.0
+      },
+      "sprite": "/objectSkins/Default/madPlatform.png",
+      "colour": "BLACK",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "platform",
+      "type": "rectangle",
+      "position": {
+        "x": 809.0,
+        "y": 564.0
+      },
+      "angle": 15.0,
+      "size": {
+        "width": 297.0,
+        "height": 20.0,
+        "radius": 0.0
+      },
+      "sprite": "/objectSkins/Default/madPlatform.png",
+      "colour": "BLACK",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "platform",
+      "type": "rectangle",
+      "position": {
+        "x": 1047.0,
+        "y": 339.0
+      },
+      "angle": 270.0,
+      "size": {
+        "width": 300.0,
+        "height": 20.0,
+        "radius": 0.0
+      },
+      "sprite": "/objectSkins/Default/madPlatform.png",
+      "colour": "BLACK",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "platform",
+      "type": "rectangle",
+      "position": {
+        "x": 1176.0,
+        "y": 442.0
+      },
+      "angle": 90.0,
+      "size": {
+        "width": 300.0,
+        "height": 20.0,
+        "radius": 0.0
+      },
+      "sprite": "/objectSkins/Default/madPlatform.png",
+      "colour": "BLACK",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "ball",
+      "type": "circle",
+      "position": {
+        "x": 1326.0,
+        "y": 276.0
+      },
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 25.0
+      },
+      "sprite": "/objectSkins/Default/madBall.png",
+      "colour": "BLACK",
+      "physics": {
+        "density": 0.5,
+        "friction": 0.75,
+        "restitution": 0.5,
+        "shape": "DYNAMIC"
+      },
+      "winning": true
     },
     {
       "name": "winZone",
       "type": "rectangle",
       "position": {
-        "x": 800.0,
-        "y": 600.0
+        "x": 1341.0,
+        "y": 563.0
       },
       "angle": 0.0,
       "size": {
-        "width": 100.0,
+        "width": 200.0,
         "height": 40.0,
         "radius": 0.0
       },
@@ -116,43 +254,20 @@
       "winning": false
     },
     {
-      "name": "log",
-      "type": "circle",
+      "name": "platform",
+      "type": "rectangle",
       "position": {
-        "x": 350.0,
-        "y": 400.0
+        "x": 626.0,
+        "y": 229.0
       },
-      "angle": 0.0,
+      "angle": 95.0,
       "size": {
-        "width": 0.0,
-        "height": 0.0,
-        "radius": 50.0
+        "width": 300.0,
+        "height": 20.0,
+        "radius": 0.0
       },
-      "sprite": "madLog.png",
-      "colour": "GREEN",
-      "physics": {
-        "density": 1.0,
-        "friction": 0.4,
-        "restitution": 0.1,
-        "shape": "STATIC"
-      },
-      "winning": false
-    },
-    {
-      "name": "log",
-      "type": "circle",
-      "position": {
-        "x": 650.0,
-        "y": 400.0
-      },
-      "angle": 0.0,
-      "size": {
-        "width": 0.0,
-        "height": 0.0,
-        "radius": 50.0
-      },
-      "sprite": "madLog.png",
-      "colour": "GREEN",
+      "sprite": "/objectSkins/Default/madPlatform.png",
+      "colour": "BLACK",
       "physics": {
         "density": 1.0,
         "friction": 0.4,
@@ -165,13 +280,13 @@
       "name": "noPlaceZone",
       "type": "rectangle",
       "position": {
-        "x": 500.0,
-        "y": 350.0
+        "x": 1127.0,
+        "y": 308.0
       },
-      "angle": 0.0,
+      "angle": 90.0,
       "size": {
-        "width": 200.0,
-        "height": 100.0,
+        "width": 270.0,
+        "height": 110.0,
         "radius": 0.0
       },
       "sprite": null,
@@ -183,60 +298,251 @@
         "shape": "STATIC"
       },
       "winning": false
-    }
-  ],
-  "inventoryObjects": [
-    {
-      "name": "ball",
-      "type": "circle",
-      "count": 1,
-      "angle": 0.0,
-      "size": {
-        "width": 0.0,
-        "height": 0.0,
-        "radius": 25.0
-      },
-      "sprite": "madBall.png",
-      "colour": "BLACK",
-      "physics": {
-        "density": 0.5,
-        "friction": 0.75,
-        "restitution": 0.5,
-        "shape": "DYNAMIC"
-      },
-      "winning": true
     },
     {
-      "name": "tennisball",
+      "name": "noPlaceZone",
+      "type": "rectangle",
+      "position": {
+        "x": 981.8,
+        "y": 264.0
+      },
+      "angle": 90.0,
+      "size": {
+        "width": 270.0,
+        "height": 140.0,
+        "radius": 0.0
+      },
+      "sprite": null,
+      "colour": "noplaceZone",
+      "physics": {
+        "density": 1.0,
+        "friction": 1.0,
+        "restitution": 0.0,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "log",
       "type": "circle",
-      "count": 1,
+      "position": {
+        "x": 1246.0,
+        "y": 134.0
+      },
       "angle": 0.0,
       "size": {
         "width": 0.0,
         "height": 0.0,
-        "radius": 10.0
+        "radius": 50.0
       },
-      "sprite": "madTennis.png",
-      "colour": "YELLOW",
+      "sprite": "/objectSkins/Default/madLog.png",
+      "colour": "GREEN",
       "physics": {
-        "density": 0.1,
-        "friction": 0.9,
-        "restitution": 0.75,
-        "shape": "DYNAMIC"
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "log",
+      "type": "circle",
+      "position": {
+        "x": 1345.0,
+        "y": 152.0
+      },
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": "/objectSkins/Default/madLog.png",
+      "colour": "GREEN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "log",
+      "type": "circle",
+      "position": {
+        "x": 1438.0,
+        "y": 189.0
+      },
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": "/objectSkins/Default/madLog.png",
+      "colour": "GREEN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "log",
+      "type": "circle",
+      "position": {
+        "x": 1521.0,
+        "y": 246.0
+      },
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": "/objectSkins/Default/madLog.png",
+      "colour": "GREEN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "log",
+      "type": "circle",
+      "position": {
+        "x": 1147.0,
+        "y": 149.0
+      },
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": "/objectSkins/Default/madLog.png",
+      "colour": "GREEN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "log",
+      "type": "circle",
+      "position": {
+        "x": 826.0,
+        "y": 357.0
+      },
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": "/objectSkins/Default/madLog.png",
+      "colour": "GREEN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "log",
+      "type": "circle",
+      "position": {
+        "x": 926.0,
+        "y": 347.0
+      },
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": "/objectSkins/Default/madLog.png",
+      "colour": "GREEN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "log",
+      "type": "circle",
+      "position": {
+        "x": 995.0,
+        "y": 274.0
+      },
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": "/objectSkins/Default/madLog.png",
+      "colour": "GREEN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "log",
+      "type": "circle",
+      "position": {
+        "x": 1059.0,
+        "y": 197.0
+      },
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": "/objectSkins/Default/madLog.png",
+      "colour": "GREEN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
       },
       "winning": false
     },
     {
       "name": "bowlingball",
       "type": "circle",
-      "count": 1,
+      "position": {
+        "x": 239.0,
+        "y": 284.0
+      },
       "angle": 0.0,
       "size": {
         "width": 0.0,
         "height": 0.0,
         "radius": 35.0
       },
-      "sprite": "madBowling.png",
+      "sprite": "/objectSkins/Default/madBowling.png",
       "colour": "GREY",
       "physics": {
         "density": 0.9,
@@ -247,64 +553,135 @@
       "winning": false
     },
     {
-      "name": "box1",
-      "type": "rectangle",
-      "size": {
-        "width": 70.0,
-        "height": 70.0,
-        "radius": 0.0
+      "name": "ballon",
+      "type": "circle",
+      "position": {
+        "x": 1180.0,
+        "y": 552.0
       },
       "angle": 0.0,
-      "sprite": "madBox.png",
-      "colour": "BROWN",
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": "/objectSkins/Default/madBalloon.png",
+      "colour": "#800080",
       "physics": {
-        "density": 1.0,
-        "friction": 0.4,
-        "restitution": 0.1,
+        "density": 0.15,
+        "friction": 0.9,
+        "restitution": 0.2,
         "shape": "DYNAMIC"
       },
-      "winning": false,
-      "count": 1
+      "winning": false
     },
     {
-      "name": "Domino",
-      "type": "rectangle",
-      "size": {
-        "width": 25.0,
-        "height": 100.0,
-        "radius": 0.0
+      "name": "bowlingball",
+      "type": "circle",
+      "position": {
+        "x": 801.0,
+        "y": 460.0
       },
       "angle": 0.0,
-      "sprite": "madDomino.png",
-      "colour": "BROWN",
-      "physics": {
-        "density": 1.0,
-        "friction": 0.4,
-        "restitution": 0.1,
-        "shape": "DYNAMIC"
-      },
-      "winning": false,
-      "count": 5
-    },
-    {
-      "name": "bucket",
-      "type": "bucket",
       "size": {
-        "width": 100.0,
-        "height": 80.0,
-        "radius": 0.0
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 35.0
       },
-      "angle": 0.0,
-      "sprite": null,
+      "sprite": "/objectSkins/Default/madBowling.png",
       "colour": "GREY",
+      "physics": {
+        "density": 0.9,
+        "friction": 0.5,
+        "restitution": 0.3,
+        "shape": "DYNAMIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "platform",
+      "type": "rectangle",
+      "position": {
+        "x": 245.0,
+        "y": 672.0
+      },
+      "angle": 15.0,
+      "size": {
+        "width": 550.0,
+        "height": 20.0,
+        "radius": 0.0
+      },
+      "sprite": "/objectSkins/Default/madPlatform.png",
+      "colour": "BLACK",
       "physics": {
         "density": 1.0,
         "friction": 0.4,
         "restitution": 0.1,
         "shape": "STATIC"
       },
-      "winning": false,
-      "count": 1
+      "winning": false
+    }
+  ],
+  "inventoryObjects": [
+    {
+      "name": "Domino",
+      "type": "rectangle",
+      "count": 1,
+      "angle": 0.0,
+      "size": {
+        "width": 25.0,
+        "height": 100.0,
+        "radius": 0.0
+      },
+      "sprite": "/objectSkins/Default/madDomino.png",
+      "colour": "BROWN",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "DYNAMIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "platform",
+      "type": "rectangle",
+      "count": 1,
+      "angle": 0.0,
+      "size": {
+        "width": 50.0,
+        "height": 20.0,
+        "radius": 0.0
+      },
+      "sprite": "/objectSkins/Default/madPlatform.png",
+      "colour": "BLACK",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "ballon",
+      "type": "circle",
+      "count": 1,
+      "angle": 0.0,
+      "size": {
+        "width": 0.0,
+        "height": 0.0,
+        "radius": 50.0
+      },
+      "sprite": "/objectSkins/Default/madBalloon.png",
+      "colour": "#800080",
+      "physics": {
+        "density": 0.15,
+        "friction": 0.9,
+        "restitution": 0.2,
+        "shape": "DYNAMIC"
+      },
+      "winning": false
     }
   ]
 }

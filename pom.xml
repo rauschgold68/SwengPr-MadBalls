@@ -162,13 +162,6 @@
                     <mainClass>mm.controller.ApplicationController</mainClass>
                     <!-- Make command line arguments setable with -Dargs="" -->
                     <commandlineArgs>${args}</commandlineArgs>
-                    <!-- JVM arguments to fix cross-platform OpenGL/Framebuffer issues -->
-                    <additionalArgs>
-                        <additionalArg>-Dprism.order=sw</additionalArg>
-                        <additionalArg>-Dprism.verbose=false</additionalArg>
-                        <additionalArg>-Djava.awt.headless=false</additionalArg>
-                        <additionalArg>-Dprism.forceGPU=false</additionalArg>
-                    </additionalArgs>
                 </configuration>
             </plugin>
             <plugin>
