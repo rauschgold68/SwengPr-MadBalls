@@ -354,6 +354,10 @@ public class SimulationModel {
      */
     public void addDroppedObject(GameObject obj) {
         gameObjects.droppedObjects.add(obj);
+        // Update the animation timer cache if it exists
+        if (physics.timer != null) {
+            physics.timer.updateObjectCache();
+        }
     }
 
     /**

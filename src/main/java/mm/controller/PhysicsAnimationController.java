@@ -56,6 +56,24 @@ public class PhysicsAnimationController extends AnimationTimer {
     // Add new field to store culled objects
     private final List<mm.model.GameObject> culledObjects = new ArrayList<>();
     private final List<Vec2> originalPositions = new ArrayList<>();
+    
+    // Physics timing accumulator for fixed time step
+    private float accumulator = 0.0f;
+    
+    // Cache for object-to-pair mapping to avoid linear searches
+    private final java.util.Map<String, mm.model.GameObject> objectNameMap = new java.util.HashMap<>();
+    
+    // Pre-allocated lists for removal to avoid creating new objects each frame
+    private final List<PhysicsVisualPair> pairsToRemove = new ArrayList<>();
+    private final List<mm.model.GameObject> objectsToRemove = new ArrayList<>();
+    private final List<javafx.scene.Node> visualsToRemove = new ArrayList<>();
+    
+    // Adaptive performance settings
+    private int velocityIterations = 6;
+    private int positionIterations = 2;
+    private long frameTimeHistory = 0;
+    private int frameCount = 0;
+    private static final long TARGET_FRAME_TIME_NS = 16_666_666L; // ~60 FPS in nanoseconds
 
     /**
      * Constructs a PhysicsAnimationController for the given physics world and visual pairs.
@@ -140,13 +158,33 @@ public class PhysicsAnimationController extends AnimationTimer {
             return;
         }
 
-        float timeStep = (now - lastTime) / 1_000_000_000.0f;
-        world.step(timeStep, 8, 3);
+        // Use fixed time step with accumulation for deterministic physics
+        float frameTime = (now - lastTime) / 1_000_000_000.0f;
+        long actualFrameTimeNs = now - lastTime;
         lastTime = now;
+        
+        // Adaptive quality adjustment based on performance
+        updateAdaptiveQuality(actualFrameTimeNs);
+        
+        // Cap maximum frame time to prevent physics instability
+        frameTime = Math.min(frameTime, 0.05f); // Max 50ms frame time
+        
+        // Fixed time step for deterministic physics (60 FPS)
+        final float fixedTimeStep = 1.0f / 60.0f;
+        
+        // Accumulate time and step physics in fixed intervals
+        accumulator += frameTime;
+        
+        // Reduced iteration counts for better performance on older hardware
+        while (accumulator >= fixedTimeStep) {
+            world.step(fixedTimeStep, velocityIterations, positionIterations);
+            accumulator -= fixedTimeStep;
+        }
 
-        // Create lists to track objects to remove
-        List<PhysicsVisualPair> pairsToRemove = new ArrayList<>();
-        List<mm.model.GameObject> objectsToRemove = new ArrayList<>();
+        // Clear pre-allocated removal lists for reuse
+        pairsToRemove.clear();
+        objectsToRemove.clear();
+        visualsToRemove.clear();
 
         for (PhysicsVisualPair pair : pairs) {
             if (pair.visual != null && pair.body != null) {
@@ -158,17 +196,18 @@ public class PhysicsAnimationController extends AnimationTimer {
                 double scaledX = pos.x * SCALE;
                 double scaledY = pos.y * SCALE;
                 
-                // Get object type
+                // Get object type - cache the string to avoid repeated getUserData() calls
                 String objectName = (String) pair.body.getUserData();
+                boolean isBalloon = "ballon".equalsIgnoreCase(objectName);
                 
                 // Use smaller margin for balloons to cull them faster
-                double margin = objectName.equalsIgnoreCase("ballon") ? 50.0 : 100.0;
+                double margin = isBalloon ? 50.0 : 100.0;
                 
                 // Add extra vertical check for balloons to catch them earlier when rising
                 boolean shouldCull = scaledX < -margin || scaledX > simSpaceWidth + margin || 
                                    scaledY < -margin || scaledY > simSpaceHeight + margin;
                                    
-                if (objectName.equalsIgnoreCase("ballon")) {
+                if (isBalloon) {
                     // Additional early culling check for balloons going up
                     shouldCull = shouldCull || scaledY < simSpaceHeight * 0.1; // Cull if in top 1% of screen
                 }
@@ -176,21 +215,34 @@ public class PhysicsAnimationController extends AnimationTimer {
                 if (shouldCull) {
                     pairsToRemove.add(pair);
                     
-                    // Store original position and object for restoration
-                    for (mm.model.GameObject obj : model.getDroppedObjects()) {
-                        if (obj.getName().equals(objectName)) {
-                            objectsToRemove.add(obj);
-                            culledObjects.add(obj);
-                            originalPositions.add(new Vec2(obj.getPosition().getX(), obj.getPosition().getY()));
-                            break;
+                    // Use cached mapping if available, otherwise fall back to linear search
+                    mm.model.GameObject matchedObj = objectNameMap.get(objectName);
+                    if (matchedObj == null) {
+                        // Fall back to linear search and cache the result
+                        for (mm.model.GameObject obj : model.getDroppedObjects()) {
+                            if (obj.getName().equals(objectName)) {
+                                matchedObj = obj;
+                                objectNameMap.put(objectName, obj);
+                                break;
+                            }
                         }
+                    }
+                    
+                    if (matchedObj != null) {
+                        objectsToRemove.add(matchedObj);
+                        culledObjects.add(matchedObj);
+                        originalPositions.add(new Vec2(matchedObj.getPosition().getX(), matchedObj.getPosition().getY()));
+                    }
+                    
+                    // Queue visual for removal
+                    if (pair.visual.getParent() != null) {
+                        visualsToRemove.add(pair.visual);
                     }
                     continue;
                 }
 
-                // Apply balloon physics if applicable
-                String tmp_name = (String) pair.body.getUserData();
-                if (tmp_name.equalsIgnoreCase("ballon")) {
+                // Apply balloon physics if applicable - reuse the boolean check
+                if (isBalloon) {
                     float up = -1 / pair.body.getFixtureList().getDensity();
                     Vec2 boyancy = new Vec2(0f, up);
                     pair.body.applyForceToCenter(boyancy);
@@ -217,17 +269,20 @@ public class PhysicsAnimationController extends AnimationTimer {
             for (PhysicsVisualPair pair : pairsToRemove) {
                 world.destroyBody(pair.body);
                 System.out.println(pair.getBody().getUserData());
-                if (pair.visual != null && pair.visual.getParent() != null) {
-                    // Remove visual from UI on JavaFX thread
-                    Platform.runLater(() -> {
-                        Parent parent = pair.visual.getParent();
+            }
+            
+            // Batch visual removal in a single Platform.runLater call for better performance
+            if (!visualsToRemove.isEmpty()) {
+                Platform.runLater(() -> {
+                    for (javafx.scene.Node visual : visualsToRemove) {
+                        Parent parent = visual.getParent();
                         if (parent instanceof Group) {
-                            ((Group) parent).getChildren().remove(pair.visual);
+                            ((Group) parent).getChildren().remove(visual);
                         } else if (parent instanceof Pane) {
-                            ((Pane) parent).getChildren().remove(pair.visual);
+                            ((Pane) parent).getChildren().remove(visual);
                         }
-                    });
-                }
+                    }
+                });
             }
 
             // Update model collections
@@ -238,6 +293,8 @@ public class PhysicsAnimationController extends AnimationTimer {
             // Restore inventory counts for removed objects
             for (mm.model.GameObject obj : objectsToRemove) {
                 model.incrementInventoryCount(obj.getName());
+                // Remove from cache since object is being removed
+                objectNameMap.remove(obj.getName());
             }
         }
     }
@@ -247,6 +304,10 @@ public class PhysicsAnimationController extends AnimationTimer {
      */
     public void reset() {
         lastTime = 0;
+        accumulator = 0.0f; // Reset physics accumulator
+        
+        // Clear object cache since we're resetting
+        objectNameMap.clear();
         
         // Restore all culled objects to their original positions
         for (int i = 0; i < culledObjects.size(); i++) {
@@ -260,6 +321,9 @@ public class PhysicsAnimationController extends AnimationTimer {
             // Add back to model
             model.addDroppedObject(obj);
             
+            // Update cache
+            objectNameMap.put(obj.getName(), obj);
+            
             // Decrement inventory count since object is being restored
             model.decrementInventoryCount(obj.getName());
         }
@@ -267,6 +331,45 @@ public class PhysicsAnimationController extends AnimationTimer {
         // Clear the culled objects lists
         culledObjects.clear();
         originalPositions.clear();
+    }
+    
+    /**
+     * Updates the object name mapping cache when new objects are added.
+     * This should be called when objects are added to the simulation.
+     */
+    public void updateObjectCache() {
+        objectNameMap.clear();
+        for (mm.model.GameObject obj : model.getDroppedObjects()) {
+            objectNameMap.put(obj.getName(), obj);
+        }
+    }
+    
+    /**
+     * Adaptively adjusts physics quality based on frame performance.
+     * Reduces iteration counts when performance is poor to maintain smooth simulation.
+     */
+    private void updateAdaptiveQuality(long frameTimeNs) {
+        frameCount++;
+        frameTimeHistory += frameTimeNs;
+        
+        // Adjust quality every 60 frames (about once per second at 60 FPS)
+        if (frameCount >= 60) {
+            long avgFrameTime = frameTimeHistory / frameCount;
+            
+            if (avgFrameTime > TARGET_FRAME_TIME_NS * 1.5) {
+                // Performance is poor, reduce quality
+                if (velocityIterations > 3) velocityIterations--;
+                if (positionIterations > 1) positionIterations--;
+            } else if (avgFrameTime < TARGET_FRAME_TIME_NS * 0.8) {
+                // Performance is good, can increase quality
+                if (velocityIterations < 8) velocityIterations++;
+                if (positionIterations < 3) positionIterations++;
+            }
+            
+            // Reset counters
+            frameCount = 0;
+            frameTimeHistory = 0;
+        }
     }
 
     /**
