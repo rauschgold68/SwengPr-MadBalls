@@ -95,10 +95,10 @@ public class SimulationView {
 
         /** Root stack pane that layers the main content and overlays */
         public StackPane rootStack;
-        
+
         /** JSON viewer area showing real-time simulation state */
         public TextArea jsonViewer;
-        
+
         /** ScrollPane containing the JSON viewer */
         public ScrollPane jsonScrollPane;
     }
@@ -227,7 +227,8 @@ public class SimulationView {
      * Creates the main pane, simulation space, and bottom bar with proper styling
      * and size constraints.
      * 
-     * @param isPuzzleMode true if in puzzle mode (no JSON viewer), false for sandbox mode
+     * @param isPuzzleMode true if in puzzle mode (no JSON viewer), false for
+     *                     sandbox mode
      */
     private void initializeMainComponents(boolean isPuzzleMode) {
         layout.mainPane = new BorderPane();
@@ -266,47 +267,47 @@ public class SimulationView {
      * @param isPuzzleMode true if in puzzle mode, false for sandbox mode
      */
     private void createBottomBar(boolean isPuzzleMode) {
-    layout.bottomBar = new HBox();
-    layout.bottomBar.getStyleClass().add("bottom-bar");
-    
-    layout.bottomBar.setPrefHeight(200);
-    layout.bottomBar.setMaxHeight(200);
-    layout.bottomBar.setMinHeight(200);
-    // Add padding inside the bottom bar
-    layout.bottomBar.setSpacing(10);
-    layout.bottomBar.setStyle("-fx-padding: 10;");
-    
-    if (!isPuzzleMode) {
-        // Sandbox mode: add JSON viewer directly (no ScrollPane wrapper)
-        createJsonViewer();
-        layout.bottomBar.getChildren().add(layout.jsonViewer);
-        HBox.setHgrow(layout.jsonViewer, Priority.ALWAYS);
-    } else {
-        // Puzzle mode: set background image for bottom bar
-        try {
-            String bottomBarImagePath = getClass().getResource("/pictures/bottombar2.png").toExternalForm();
-            layout.bottomBar.setStyle("-fx-background-color: transparent; " +
-                    "-fx-background-image: url('" + bottomBarImagePath + "'); " +
-                    "-fx-background-repeat: no-repeat; " +
-                    "-fx-background-position: center; " +
-                    "-fx-background-size: cover;");
-            System.out.println("Bottom bar background image loaded successfully: " + bottomBarImagePath);
-        } catch (Exception e) {
-            System.err.println("Warning: Could not load bottom bar background image: " + e.getMessage());
+        layout.bottomBar = new HBox();
+        layout.bottomBar.getStyleClass().add("bottom-bar");
+
+        layout.bottomBar.setPrefHeight(200);
+        layout.bottomBar.setMaxHeight(200);
+        layout.bottomBar.setMinHeight(200);
+        // Add padding inside the bottom bar
+        layout.bottomBar.setSpacing(10);
+        layout.bottomBar.setStyle("-fx-padding: 10;");
+
+        if (!isPuzzleMode) {
+            // Sandbox mode: add JSON viewer directly (no ScrollPane wrapper)
+            createJsonViewer();
+            layout.bottomBar.getChildren().add(layout.jsonViewer);
+            HBox.setHgrow(layout.jsonViewer, Priority.ALWAYS);
+        } else {
+            // Puzzle mode: set background image for bottom bar
+            try {
+                String bottomBarImagePath = getClass().getResource("/pictures/bottombar.png").toExternalForm();
+                layout.bottomBar.setStyle("-fx-background-color: transparent; " +
+                        "-fx-background-image: url('" + bottomBarImagePath + "'); " +
+                        "-fx-background-repeat: no-repeat; " +
+                        "-fx-background-position: center; " +
+                        "-fx-background-size: cover;");
+                System.out.println("Bottom bar background image loaded successfully: " + bottomBarImagePath);
+            } catch (Exception e) {
+                System.err.println("Warning: Could not load bottom bar background image: " + e.getMessage());
+            }
         }
     }
-}
 
     private void createJsonViewer() {
-    layout.jsonViewer = new TextArea();
-    layout.jsonViewer.setEditable(true);
-    layout.jsonViewer.getStyleClass().add("json-viewer");
-    layout.jsonViewer.setWrapText(false);
-    // Remove fixed height constraints - let it fill the bottom bar completely
-    layout.jsonViewer.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    layout.jsonViewer.setMinHeight(Region.USE_PREF_SIZE);
-    layout.jsonViewer.setMaxHeight(Region.USE_COMPUTED_SIZE);
-}
+        layout.jsonViewer = new TextArea();
+        layout.jsonViewer.setEditable(true);
+        layout.jsonViewer.getStyleClass().add("json-viewer");
+        layout.jsonViewer.setWrapText(false);
+        // Remove fixed height constraints - let it fill the bottom bar completely
+        layout.jsonViewer.setPrefHeight(Region.USE_COMPUTED_SIZE);
+        layout.jsonViewer.setMinHeight(Region.USE_PREF_SIZE);
+        layout.jsonViewer.setMaxHeight(Region.USE_COMPUTED_SIZE);
+    }
 
     /**
      * Creates the sidebar with inventory and control buttons.
@@ -375,7 +376,7 @@ public class SimulationView {
     private void setupMainLayout(boolean isPuzzleMode) {
         layout.mainPane.setCenter(layout.simSpace);
         layout.mainPane.setRight(layout.sideBar);
-        
+
         // Always add bottom bar (content varies by mode)
         layout.mainPane.setBottom(layout.bottomBar);
     }
@@ -472,7 +473,7 @@ public class SimulationView {
     public VBox getSideBar() {
         return layout.sideBar;
     }
-    
+
     /** @return the bottom bar (only available in sandbox mode) */
     public HBox getBottomBar() {
         return layout.bottomBar;

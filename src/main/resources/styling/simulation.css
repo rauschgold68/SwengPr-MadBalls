@@ -109,8 +109,8 @@
 .bottom-bar {
   background-color: #0e1722;
   -fx-background-color: #0e1722;
-  background-image: url("/pictures/bottombar2.png");
-  -fx-background-image: url("/pictures/bottombar2.png");
+  background-image: url("/pictures/bottombar.png");
+  -fx-background-image: url("/pictures/bottombar.png");
   background-repeat: no-repeat;
   -fx-background-repeat: no-repeat;
   background-position: center;

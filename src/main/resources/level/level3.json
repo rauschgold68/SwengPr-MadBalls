@@ -303,8 +303,31 @@
       "name": "noPlaceZone",
       "type": "rectangle",
       "position": {
-        "x": 981.8,
-        "y": 264.0
+        "x": 930.9,
+        "y": 396.9
+      },
+      "angle": 90.0,
+      "size": {
+        "width": 250.0,
+        "height": 140.0,
+        "radius": 0.0
+      },
+      "sprite": null,
+      "colour": "noplaceZone",
+      "physics": {
+        "density": 1.0,
+        "friction": 1.0,
+        "restitution": 0.0,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
+      "name": "noPlaceZone",
+      "type": "rectangle",
+      "position": {
+        "x": 981.9,
+        "y": 264.9
       },
       "angle": 90.0,
       "size": {
