@@ -233,61 +233,16 @@ public class PhysicsAnimationController extends AnimationTimer {
                 }
 
                 if (shouldCull) {
-                    pairsToRemove.add(pair);
-                    
-                    // Use cached mapping if available, otherwise fall back to linear search
-                    mm.model.GameObject matchedObj = objectNameMap.get(objectName);
-                    if (matchedObj == null) {
-                        // Fall back to linear search and cache the result
-                        for (mm.model.GameObject obj : model.getDroppedObjects()) {
-                            if (obj.getName().equals(objectName)) {
-                                matchedObj = obj;
-                                objectNameMap.put(objectName, obj);
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (matchedObj != null) {
-                        objectsToRemove.add(matchedObj);
-                        culledObjects.add(matchedObj);
-                        originalPositions.add(new Vec2(matchedObj.getPosition().getX(), matchedObj.getPosition().getY()));
-                    }
-                    
-                    // Queue visual for removal
-                    if (pair.visual.getParent() != null) {
-                        visualsToRemove.add(pair.visual);
-                    }
+                    handleObjectCulling(pair, objectName);
                     continue;
                 }
 
                 if (isBalloon) {
-    
                     Vec2 buoyancy = new Vec2(0f, -3.8f);
                     pair.body.applyForceToCenter(buoyancy);
                 }
 
-                if (pair.visual != null) {
-                    // Update visual positions as before
-                    if (pair.visual instanceof javafx.scene.shape.Rectangle) {
-                        javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
-                        rect.setTranslateX(pos.x * SCALE - rect.getWidth() / 2);
-                        rect.setTranslateY(pos.y * SCALE - rect.getHeight() / 2);
-                        rect.setRotate(angle);
-                    } else if (pair.visual instanceof javafx.scene.shape.Circle) {
-                        javafx.scene.shape.Circle circ = (javafx.scene.shape.Circle) pair.visual;
-                        circ.setTranslateX(pos.x * SCALE);
-                        circ.setTranslateY(pos.y * SCALE);
-                        circ.setRotate(angle);
-                    } else if (pair.visual instanceof javafx.scene.shape.Polygon) {
-                    // Handle bucket (polygon) positioning - center like rectangles
-                    javafx.scene.shape.Polygon polygon = (javafx.scene.shape.Polygon) pair.visual;
-                    javafx.geometry.Bounds bounds = polygon.getBoundsInLocal();
-                    polygon.setTranslateX(pos.x * SCALE - bounds.getWidth() / 2);
-                    polygon.setTranslateY(pos.y * SCALE - bounds.getHeight() / 2);
-                    polygon.setRotate(angle);
-                    }
-                }
+                updateVisualPosition(pair, pos, angle, SCALE);
             }
         }
 
@@ -303,12 +258,7 @@ public class PhysicsAnimationController extends AnimationTimer {
             if (!visualsToRemove.isEmpty()) {
                 Platform.runLater(() -> {
                     for (javafx.scene.Node visual : visualsToRemove) {
-                        Parent parent = visual.getParent();
-                        if (parent instanceof Group) {
-                            ((Group) parent).getChildren().remove(visual);
-                        } else if (parent instanceof Pane) {
-                            ((Pane) parent).getChildren().remove(visual);
-                        }
+                        removeVisualFromParent(visual);
                     }
                 });
             }
@@ -384,21 +334,56 @@ public class PhysicsAnimationController extends AnimationTimer {
         // Adjust quality every 60 frames (about once per second at 60 FPS)
         if (frameCount >= 60) {
             long avgFrameTime = frameTimeHistory / frameCount;
-            
-            if (avgFrameTime > TARGET_FRAME_TIME_NS * 1.5) {
-                // Performance is poor, reduce quality
-                if (velocityIterations > 3) velocityIterations--;
-                if (positionIterations > 1) positionIterations--;
-            } else if (avgFrameTime < TARGET_FRAME_TIME_NS * 0.8) {
-                // Performance is good, can increase quality
-                if (velocityIterations < 8) velocityIterations++;
-                if (positionIterations < 3) positionIterations++;
-            }
-            
-            // Reset counters
-            frameCount = 0;
-            frameTimeHistory = 0;
+            adjustQualityBasedOnPerformance(avgFrameTime);
+            resetPerformanceCounters();
         }
+    }
+    
+    /**
+     * Adjusts physics quality based on average frame time performance.
+     * 
+     * @param avgFrameTime the average frame time in nanoseconds
+     */
+    private void adjustQualityBasedOnPerformance(long avgFrameTime) {
+        if (avgFrameTime > TARGET_FRAME_TIME_NS * 1.5) {
+            // Performance is poor, reduce quality
+            reducePhysicsQuality();
+        } else if (avgFrameTime < TARGET_FRAME_TIME_NS * 0.8) {
+            // Performance is good, can increase quality
+            increasePhysicsQuality();
+        }
+    }
+    
+    /**
+     * Reduces physics iteration counts to improve performance.
+     */
+    private void reducePhysicsQuality() {
+        if (velocityIterations > 3) {
+            velocityIterations--;
+        }
+        if (positionIterations > 1) {
+            positionIterations--;
+        }
+    }
+    
+    /**
+     * Increases physics iteration counts for better quality.
+     */
+    private void increasePhysicsQuality() {
+        if (velocityIterations < 8) {
+            velocityIterations++;
+        }
+        if (positionIterations < 3) {
+            positionIterations++;
+        }
+    }
+    
+    /**
+     * Resets the performance monitoring counters.
+     */
+    private void resetPerformanceCounters() {
+        frameCount = 0;
+        frameTimeHistory = 0;
     }
 
     /**
@@ -415,5 +400,116 @@ public class PhysicsAnimationController extends AnimationTimer {
     public void stop() {
         running = false;
         super.stop();
+    }
+    
+    /**
+     * Handles culling logic for objects that are out of bounds.
+     * 
+     * @param pair the physics-visual pair to process
+     * @param objectName the name of the object
+     */
+    private void handleObjectCulling(PhysicsVisualPair pair, String objectName) {
+        pairsToRemove.add(pair);
+        
+        mm.model.GameObject matchedObj = findMatchedObject(objectName);
+        
+        if (matchedObj != null) {
+            objectsToRemove.add(matchedObj);
+            culledObjects.add(matchedObj);
+            originalPositions.add(new Vec2(matchedObj.getPosition().getX(), matchedObj.getPosition().getY()));
+        }
+        
+        // Queue visual for removal
+        if (pair.visual.getParent() != null) {
+            visualsToRemove.add(pair.visual);
+        }
+    }
+    
+    /**
+     * Finds a matching GameObject for the given object name using cache first, then search.
+     * 
+     * @param objectName the name of the object to find
+     * @return the matching GameObject or null if not found
+     */
+    private mm.model.GameObject findMatchedObject(String objectName) {
+        // Use cached mapping if available
+        mm.model.GameObject matchedObj = objectNameMap.get(objectName);
+        if (matchedObj != null) {
+            return matchedObj;
+        }
+        
+        // Fall back to linear search and cache the result
+        for (mm.model.GameObject obj : model.getDroppedObjects()) {
+            if (obj.getName().equals(objectName)) {
+                objectNameMap.put(objectName, obj);
+                return obj;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Updates the visual position and rotation for different shape types.
+     * 
+     * @param pair the physics-visual pair to update
+     * @param pos the position from physics simulation
+     * @param angle the angle from physics simulation
+     * @param SCALE the scale factor for converting physics to visual coordinates
+     */
+    private void updateVisualPosition(PhysicsVisualPair pair, Vec2 pos, double angle, float SCALE) {
+        if (pair.visual == null) {
+            return;
+        }
+        
+        if (pair.visual instanceof javafx.scene.shape.Rectangle) {
+            updateRectanglePosition((javafx.scene.shape.Rectangle) pair.visual, pos, angle, SCALE);
+        } else if (pair.visual instanceof javafx.scene.shape.Circle) {
+            updateCirclePosition((javafx.scene.shape.Circle) pair.visual, pos, angle, SCALE);
+        } else if (pair.visual instanceof javafx.scene.shape.Polygon) {
+            updatePolygonPosition((javafx.scene.shape.Polygon) pair.visual, pos, angle, SCALE);
+        }
+    }
+    
+    /**
+     * Updates rectangle position and rotation.
+     */
+    private void updateRectanglePosition(javafx.scene.shape.Rectangle rect, Vec2 pos, double angle, float SCALE) {
+        rect.setTranslateX(pos.x * SCALE - rect.getWidth() / 2);
+        rect.setTranslateY(pos.y * SCALE - rect.getHeight() / 2);
+        rect.setRotate(angle);
+    }
+    
+    /**
+     * Updates circle position and rotation.
+     */
+    private void updateCirclePosition(javafx.scene.shape.Circle circ, Vec2 pos, double angle, float SCALE) {
+        circ.setTranslateX(pos.x * SCALE);
+        circ.setTranslateY(pos.y * SCALE);
+        circ.setRotate(angle);
+    }
+    
+    /**
+     * Updates polygon position and rotation.
+     */
+    private void updatePolygonPosition(javafx.scene.shape.Polygon polygon, Vec2 pos, double angle, float SCALE) {
+        javafx.geometry.Bounds bounds = polygon.getBoundsInLocal();
+        polygon.setTranslateX(pos.x * SCALE - bounds.getWidth() / 2);
+        polygon.setTranslateY(pos.y * SCALE - bounds.getHeight() / 2);
+        polygon.setRotate(angle);
+    }
+    
+    /**
+     * Removes a visual node from its parent container.
+     * 
+     * @param visual the visual node to remove
+     */
+    private void removeVisualFromParent(javafx.scene.Node visual) {
+        Parent parent = visual.getParent();
+        if (parent instanceof Group) {
+            ((Group) parent).getChildren().remove(visual);
+        } else if (parent instanceof Pane) {
+            ((Pane) parent).getChildren().remove(visual);
+        }
     }
 }
