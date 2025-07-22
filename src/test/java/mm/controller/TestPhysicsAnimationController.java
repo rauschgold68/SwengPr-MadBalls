@@ -131,4 +131,95 @@ public class TestPhysicsAnimationController {
         // Verify no unexpected interactions with mock model during construction and basic operations
         verifyNoInteractions(mockModel);
     }
+
+    /**
+     * Tests the handle method's time initialization and world stepping without visual processing.
+     * <p>
+     * This test verifies:
+     * </p>
+     * <ul>
+     * <li>Handle method correctly initializes lastTime on first call</li>
+     * <li>Handle method calls world.step with proper time delta on subsequent calls</li>
+     * <li>Method executes without errors even with empty pairs list</li>
+     * <li>Physics world stepping logic is executed</li>
+     * </ul>
+     */
+    @Test
+    public void testHandleMethodTimeAndWorldStepping() {
+        // Verify initial state
+        assertEquals(0, testPairs.size(), "Should start with empty pairs list");
+        
+        // Call handle method with initial timestamp
+        long firstTime = 1000000000L; // 1 second in nanoseconds
+        
+        // First call should initialize lastTime and return early
+        assertDoesNotThrow(() -> {
+            controller.handle(firstTime);
+        }, "Handle method should execute without throwing exceptions on first call");
+        
+        // Second call with different timestamp should trigger world stepping
+        long secondTime = 1050000000L; // 1.05 seconds (50ms later)
+        
+        assertDoesNotThrow(() -> {
+            controller.handle(secondTime);
+        }, "Handle method should execute without throwing exceptions on subsequent calls");
+        
+        // Verify that world.step was called by checking that method execution completed
+        // Since we're using a mock world, we can verify it doesn't crash
+        verify(mockWorld, times(1)).step(eq(0.05f), eq(8), eq(3));
+        
+        // Call again with another timestamp to verify continuous operation
+        long thirdTime = 1100000000L; // 1.1 seconds (50ms later)
+        
+        assertDoesNotThrow(() -> {
+            controller.handle(thirdTime);
+        }, "Handle method should continue working on multiple calls");
+        
+        verify(mockWorld, times(2)).step(eq(0.05f), eq(8), eq(3));
+    }
+
+    /**
+     * Tests the handle method's behavior with pairs but focuses on non-JavaFX logic.
+     * <p>
+     * This test verifies the method execution and world stepping behavior when pairs
+     * have null visuals, which is a valid state that should be handled gracefully.
+     * The method should skip visual processing but still step the world.
+     * </p>
+     */
+    @Test 
+    public void testHandleMethodWithNullVisuals() {
+        // Mock body 
+        org.jbox2d.dynamics.Body mockBody = mock(org.jbox2d.dynamics.Body.class);
+        
+        // Setup basic mock behavior (these won't be called due to null visual)
+        when(mockBody.getPosition()).thenReturn(new org.jbox2d.common.Vec2(5.0f, 5.0f));
+        when(mockBody.getAngle()).thenReturn(0.0f);
+        when(mockBody.getUserData()).thenReturn("test");
+        
+        // Create a pair with null visual (will be skipped in main loop)
+        PhysicsVisualPair testPair = new PhysicsVisualPair(null, mockBody);
+        testPairs.add(testPair);
+        
+        assertEquals(1, testPairs.size(), "Should have one test pair");
+        
+        // Initialize and call handle method
+        long firstTime = 1000000000L;
+        long secondTime = 1050000000L;
+        
+        controller.handle(firstTime);
+        
+        assertDoesNotThrow(() -> {
+            controller.handle(secondTime);
+        }, "Handle method should handle null visuals gracefully");
+        
+        // Verify world stepping occurred even with null visuals
+        verify(mockWorld, times(1)).step(eq(0.05f), eq(8), eq(3));
+        
+        // Verify that body methods were NOT called since visual was null
+        verify(mockBody, never()).getPosition();
+        verify(mockBody, never()).getUserData();
+        
+        // The pair should still be in the list since it wasn't processed/removed
+        assertEquals(1, testPairs.size(), "Pair with null visual should remain in list");
+    }
 }

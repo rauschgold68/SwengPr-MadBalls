@@ -153,7 +153,7 @@ public class PhysicsAnimationController extends AnimationTimer {
         List<mm.model.GameObject> objectsToRemove = new ArrayList<>();
 
         for (PhysicsVisualPair pair : pairs) {
-            if (pair.visual != null && pair.body != null) {
+            if (pair.body != null) {
                 float SCALE = 50.0f;
                 Vec2 pos = pair.body.getPosition();
                 double angle = Math.toDegrees(pair.body.getAngle());
@@ -200,17 +200,19 @@ public class PhysicsAnimationController extends AnimationTimer {
                     pair.body.applyForceToCenter(boyancy);
                 }
 
-                // Update visual positions as before
-                if (pair.visual instanceof javafx.scene.shape.Rectangle) {
-                    javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
-                    rect.setTranslateX(pos.x * SCALE - rect.getWidth() / 2);
-                    rect.setTranslateY(pos.y * SCALE - rect.getHeight() / 2);
-                    rect.setRotate(angle);
-                } else if (pair.visual instanceof javafx.scene.shape.Circle) {
-                    javafx.scene.shape.Circle circ = (javafx.scene.shape.Circle) pair.visual;
-                    circ.setTranslateX(pos.x * SCALE);
-                    circ.setTranslateY(pos.y * SCALE);
-                    circ.setRotate(angle);
+                if (pair.visual != null) {
+                    // Update visual positions as before
+                    if (pair.visual instanceof javafx.scene.shape.Rectangle) {
+                        javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
+                        rect.setTranslateX(pos.x * SCALE - rect.getWidth() / 2);
+                        rect.setTranslateY(pos.y * SCALE - rect.getHeight() / 2);
+                        rect.setRotate(angle);
+                    } else if (pair.visual instanceof javafx.scene.shape.Circle) {
+                        javafx.scene.shape.Circle circ = (javafx.scene.shape.Circle) pair.visual;
+                        circ.setTranslateX(pos.x * SCALE);
+                        circ.setTranslateY(pos.y * SCALE);
+                        circ.setRotate(angle);
+                    }
                 }
             }
         }
