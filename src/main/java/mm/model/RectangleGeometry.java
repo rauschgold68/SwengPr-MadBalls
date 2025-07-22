@@ -84,12 +84,12 @@ public class RectangleGeometry extends GeometryData {
      * boundary checks. For rotated rectangles, it transforms the test point to
      * the rectangle's local coordinate system and then performs the containment test.</p>
      * 
-     * <p>The algorithm works by:
+     * The algorithm works by:
      * <ol>
      * <li>If no rotation: simple axis-aligned bounding box test</li>
      * <li>If rotated: transform point to local coordinates by inverse rotation,
      *     then test against unrotated rectangle bounds</li>
-     * </ol></p>
+     * </ol>
      * 
      * @param x the x coordinate of the point to test
      * @param y the y coordinate of the point to test
@@ -133,12 +133,12 @@ public class RectangleGeometry extends GeometryData {
      * positions of all four corners after rotation and finds the minimum and
      * maximum x and y coordinates.</p>
      * 
-     * <p>The algorithm works by:
+     * The algorithm works by:
      * <ol>
      * <li>If no rotation: return the rectangle's position and dimensions directly</li>
      * <li>If rotated: calculate all four corner positions after rotation,
      *     then find the min/max bounds that contain all corners</li>
-     * </ol></p>
+     * </ol>
      * 
      * @return an array of four doubles [minX, minY, maxX, maxY] representing
      *         the smallest axis-aligned rectangle that contains this geometry

@@ -102,7 +102,6 @@ public class CircleGeometry extends GeometryData {
      * with sides parallel to the coordinate axes. This is useful for broad-phase
      * collision detection and spatial partitioning algorithms.
      * </p>
-     * <p>
      * The returned array contains four values representing the bounding rectangle:
      * <ul>
      *   <li>bounds[0] = minimum x-coordinate (left edge)</li>
@@ -110,7 +109,6 @@ public class CircleGeometry extends GeometryData {
      *   <li>bounds[2] = maximum x-coordinate (right edge)</li>
      *   <li>bounds[3] = maximum y-coordinate (bottom edge)</li>
      * </ul>
-     * </p>
      *
      * @return a four-element double array containing [minX, minY, maxX, maxY] of the
      *         bounding rectangle that encloses this circle
