@@ -240,6 +240,12 @@ public class PhysicsAnimationController extends AnimationTimer {
                     }
                     continue;
                 }
+
+                if (isBalloon) {
+    
+                    Vec2 buoyancy = new Vec2(0f, -3.8f);
+                    pair.body.applyForceToCenter(buoyancy);
+                }
                 
                 // Update visual positions as before
                 if (pair.visual instanceof javafx.scene.shape.Rectangle) {
