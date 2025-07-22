@@ -4,6 +4,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
@@ -100,6 +101,9 @@ public class SimulationView {
         
         /** ScrollPane containing the JSON viewer */
         public ScrollPane jsonScrollPane;
+        
+        /** Status label for JSON validation feedback */
+        public Label jsonStatusLabel;
     }
 
     /**
@@ -276,10 +280,16 @@ public class SimulationView {
     layout.bottomBar.setStyle("-fx-padding: 10;");
     
     if (!isPuzzleMode) {
-        // Sandbox mode: add JSON viewer directly (no ScrollPane wrapper)
+        // Sandbox mode: add JSON viewer with status label
         createJsonViewer();
-        layout.bottomBar.getChildren().add(layout.jsonViewer);
-        HBox.setHgrow(layout.jsonViewer, Priority.ALWAYS);
+        
+        // Create container for JSON viewer and status label
+        VBox jsonContainer = new VBox(5); // 5px spacing
+        jsonContainer.getChildren().addAll(layout.jsonViewer, layout.jsonStatusLabel);
+        VBox.setVgrow(layout.jsonViewer, Priority.ALWAYS); // JSON viewer takes most space
+        
+        layout.bottomBar.getChildren().add(jsonContainer);
+        HBox.setHgrow(jsonContainer, Priority.ALWAYS);
     } else {
         // Puzzle mode: set background image for bottom bar
         try {
@@ -305,6 +315,12 @@ public class SimulationView {
     layout.jsonViewer.setPrefHeight(Region.USE_COMPUTED_SIZE);
     layout.jsonViewer.setMinHeight(Region.USE_PREF_SIZE);
     layout.jsonViewer.setMaxHeight(Region.USE_COMPUTED_SIZE);
+    
+    // Create status label for JSON validation feedback
+    layout.jsonStatusLabel = new Label("");
+    layout.jsonStatusLabel.getStyleClass().add("json-status-label");
+    layout.jsonStatusLabel.setWrapText(true);
+    layout.jsonStatusLabel.setVisible(false); // Initially hidden
 }
 
     /**
@@ -480,6 +496,11 @@ public class SimulationView {
     /** @return the JSON viewer text area (only available in sandbox mode) */
     public TextArea getJsonViewer() {
         return layout.jsonViewer;
+    }
+    
+    /** @return the JSON status label (only available in sandbox mode) */
+    public Label getJsonStatusLabel() {
+        return layout.jsonStatusLabel;
     }
 
     /** @return the JSON viewer scroll pane (only available in sandbox mode) */

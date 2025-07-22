@@ -135,14 +135,15 @@ public class SimulationController {
      */
     private void setupJsonController() {
         TextArea jsonViewer = view.getJsonViewer();
-        if (jsonViewer != null) {
+        Label statusLabel = view.getJsonStatusLabel();
+        if (jsonViewer != null && statusLabel != null) {
             // Create callback for when simulation needs to be refreshed
             Runnable onSimulationUpdate = () -> {
                 setupSimulation();
                 refreshInventoryDisplay();
             };
 
-            jsonViewController = new JsonViewController(model, jsonViewer, onSimulationUpdate);
+            jsonViewController = new JsonViewController(model, jsonViewer, statusLabel, onSimulationUpdate);
         }
     }
 

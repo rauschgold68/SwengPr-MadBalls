@@ -764,6 +764,39 @@ public class SimulationModel {
         return jsonService.isValidJson(jsonString);
     }
     
+    /**
+     * Validates JSON format and provides detailed error information.
+     */
+    public JsonStateService.ValidationResult validateSimulationJson(String jsonString) {
+        // Get simulation space bounds for validation
+        double simSpaceWidth = getSimulationSpaceWidth();
+        double simSpaceHeight = getSimulationSpaceHeight();
+        
+        return jsonService.validateJson(jsonString, simSpaceWidth, simSpaceHeight);
+    }
+    
+    /**
+     * Gets the current simulation space width.
+     * @return the width of the simulation space, or 0 if not available
+     */
+    private double getSimulationSpaceWidth() {
+        if (physics.timer != null) {
+            return ((PhysicsAnimationController) physics.timer).getSimSpaceWidth();
+        }
+        return 0;
+    }
+    
+    /**
+     * Gets the current simulation space height.
+     * @return the height of the simulation space, or 0 if not available
+     */
+    private double getSimulationSpaceHeight() {
+        if (physics.timer != null) {
+            return ((PhysicsAnimationController) physics.timer).getSimSpaceHeight();
+        }
+        return 0;
+    }
+    
     private void updateInventoryFromState(List<InventoryObject> newInventoryObjects) {
         // Create a set of names from new inventory for quick lookup
         java.util.Set<String> newInventoryNames = newInventoryObjects.stream()

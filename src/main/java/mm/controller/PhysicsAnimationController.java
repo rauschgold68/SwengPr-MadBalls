@@ -141,6 +141,22 @@ public class PhysicsAnimationController extends AnimationTimer {
         running = true;
         super.start();
     }
+    
+    /**
+     * Gets the current simulation space width.
+     * @return the width of the simulation space
+     */
+    public double getSimSpaceWidth() {
+        return simSpaceWidth;
+    }
+    
+    /**
+     * Gets the current simulation space height.
+     * @return the height of the simulation space
+     */
+    public double getSimSpaceHeight() {
+        return simSpaceHeight;
+    }
 
     /**
      * Advances the physics simulation and updates the JavaFX visuals.

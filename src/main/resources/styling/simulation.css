@@ -600,3 +600,44 @@
   -fx-padding: 10;
   -fx-alignment: center;
 }
+
+/* JSON status label styling */
+.json-status-label {
+  -fx-font-family: "System";
+  -fx-font-size: 12px;
+  -fx-font-weight: normal;
+  -fx-wrap-text: true;
+  -fx-padding: 5px 8px;
+  -fx-background-radius: 4px;
+  -fx-border-radius: 4px;
+  -fx-border-width: 1px;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+}
+
+/* Success status */
+.json-status-label.success {
+  -fx-text-fill: #2d5016;
+  -fx-background-color: #d4edda;
+  -fx-border-color: #c3e6cb;
+}
+
+/* Error status */
+.json-status-label.error {
+  -fx-text-fill: #721c24;
+  -fx-background-color: #f8d7da;
+  -fx-border-color: #f5c6cb;
+}
+
+/* Warning status */
+.json-status-label.warning {
+  -fx-text-fill: #856404;
+  -fx-background-color: #fff3cd;
+  -fx-border-color: #ffeaa7;
+}
+
+/* Info status */
+.json-status-label.info {
+  -fx-text-fill: #0c5460;
+  -fx-background-color: #d1ecf1;
+  -fx-border-color: #bee5eb;
+}

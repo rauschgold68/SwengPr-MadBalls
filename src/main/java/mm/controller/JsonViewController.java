@@ -3,9 +3,11 @@ package mm.controller;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.util.Duration;
+import mm.model.JsonStateService;
 import mm.model.SimulationModel;
 
 /**
@@ -15,15 +17,17 @@ import mm.model.SimulationModel;
 public class JsonViewController {
     private final SimulationModel model;
     private final TextArea jsonViewer;
+    private final Label statusLabel;
     private final Runnable onSimulationUpdate;
     
     private boolean isUpdatingFromJson = false;
     private String lastJsonContent = "";
     private Timeline debounceTimeline;
     
-    public JsonViewController(SimulationModel model, TextArea jsonViewer, Runnable onSimulationUpdate) {
+    public JsonViewController(SimulationModel model, TextArea jsonViewer, Label statusLabel, Runnable onSimulationUpdate) {
         this.model = model;
         this.jsonViewer = jsonViewer;
+        this.statusLabel = statusLabel;
         this.onSimulationUpdate = onSimulationUpdate;
         
         setupJsonListener();
@@ -51,16 +55,51 @@ public class JsonViewController {
     private void setupJsonListener() {
         // Text change listener for real-time validation and updates
         jsonViewer.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!isUpdatingFromJson && !newValue.equals(lastJsonContent)) {
-                handleJsonTextChange(newValue);
+            if (!isUpdatingFromJson) {
+                // Always clear persistent error messages when user types anything
+                if (!newValue.equals(lastJsonContent)) {
+                    clearPersistentMessages();
+                    handleJsonTextChange(newValue);
+                }
             }
         });
         
-        // Keyboard shortcuts
+        // Also listen for key presses to immediately clear errors on any keystroke
         jsonViewer.setOnKeyPressed(event -> {
+            if (!isUpdatingFromJson && !event.isControlDown()) {
+                // Clear errors immediately on any non-control key press
+                clearPersistentMessages();
+            }
+            
             if (event.isControlDown() && event.getCode() == KeyCode.ENTER) {
                 forceUpdateFromJson();
                 event.consume();
+            }
+        });
+    }
+    
+    /**
+     * Clears persistent error/warning messages when user starts editing.
+     */
+    private void clearPersistentMessages() {
+        // Always clear both visual border and status message when user starts typing
+        // This ensures immediate feedback when user begins editing
+        Platform.runLater(() -> {
+            // Clear the JSON viewer border styling
+            if (jsonViewer.getStyle().contains("border-color")) {
+                setJsonViewerStyle("");
+            }
+            
+            // Clear status message if it's visible and appears to be an error/warning
+            if (statusLabel != null && statusLabel.isVisible()) {
+                String currentStyle = statusLabel.getStyle();
+                boolean isPersistentMessage = currentStyle.contains("darkred") || // error
+                                            currentStyle.contains("#b8860b") ||   // warning
+                                            currentStyle.contains("red");         // any red styling
+                
+                if (isPersistentMessage) {
+                    hideStatusMessage();
+                }
             }
         });
     }
@@ -71,6 +110,7 @@ public class JsonViewController {
     private void handleJsonTextChange(String newValue) {
         // Visual feedback for editing
         setJsonViewerStyle("-fx-border-color: orange; -fx-border-width: 2px;");
+        showStatusMessage("Validating JSON...", "info");
         
         // Cancel previous debounce timer
         if (debounceTimeline != null) {
@@ -79,22 +119,33 @@ public class JsonViewController {
         
         // Create new debounce timer
         debounceTimeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
-            boolean isValid = model.isValidSimulationJson(newValue);
+            JsonStateService.ValidationResult validation = model.validateSimulationJson(newValue);
             
-            if (isValid && isUpdateAllowed()) {
+            if (validation.isValid() && isUpdateAllowed()) {
                 boolean success = updateSimulationFromJson(newValue);
-                setJsonViewerStyle(success ? 
-                    "-fx-border-color: green; -fx-border-width: 2px;" : 
-                    "-fx-border-color: red; -fx-border-width: 2px;");
-            } else {
+                if (success) {
+                    setJsonViewerStyle("-fx-border-color: green; -fx-border-width: 2px;");
+                    showStatusMessage("JSON applied successfully!", "success");
+                    // Auto-hide success messages after 2 seconds
+                    Timeline successTimeline = new Timeline(new KeyFrame(Duration.millis(2000), reset -> {
+                        setJsonViewerStyle("");
+                        hideStatusMessage();
+                    }));
+                    successTimeline.play();
+                } else {
+                    setJsonViewerStyle("-fx-border-color: red; -fx-border-width: 2px;");
+                    showStatusMessage("Failed to apply JSON to simulation", "error");
+                    // Keep error messages persistent - no auto-hide
+                }
+            } else if (!validation.isValid()) {
                 setJsonViewerStyle("-fx-border-color: red; -fx-border-width: 2px;");
+                showStatusMessage(validation.getMessage(), "error");
+                // Keep error messages persistent - no auto-hide
+            } else if (validation.isValid() && !isUpdateAllowed()) {
+                setJsonViewerStyle("-fx-border-color: yellow; -fx-border-width: 2px;");
+                showStatusMessage("Valid JSON - Stop simulation to apply changes", "warning");
+                // Keep warning messages persistent - no auto-hide
             }
-            
-            // Reset border after delay
-            Timeline resetTimeline = new Timeline(new KeyFrame(Duration.millis(1000), reset -> {
-                setJsonViewerStyle("");
-            }));
-            resetTimeline.play();
         }));
         
         debounceTimeline.play();
@@ -105,17 +156,29 @@ public class JsonViewController {
      */
     private void forceUpdateFromJson() {
         String jsonContent = jsonViewer.getText();
-        boolean success = updateSimulationFromJson(jsonContent);
+        JsonStateService.ValidationResult validation = model.validateSimulationJson(jsonContent);
         
-        setJsonViewerStyle(success ? 
-            "-fx-border-color: green; -fx-border-width: 2px;" : 
-            "-fx-border-color: red; -fx-border-width: 2px;");
-        
-        // Reset after short delay
-        Timeline resetTimeline = new Timeline(new KeyFrame(Duration.millis(1000), e -> {
-            setJsonViewerStyle("");
-        }));
-        resetTimeline.play();
+        if (validation.isValid()) {
+            boolean success = updateSimulationFromJson(jsonContent);
+            if (success) {
+                setJsonViewerStyle("-fx-border-color: green; -fx-border-width: 2px;");
+                showStatusMessage("JSON applied successfully!", "success");
+                // Auto-hide success messages after 2 seconds
+                Timeline successTimeline = new Timeline(new KeyFrame(Duration.millis(2000), e -> {
+                    setJsonViewerStyle("");
+                    hideStatusMessage();
+                }));
+                successTimeline.play();
+            } else {
+                setJsonViewerStyle("-fx-border-color: red; -fx-border-width: 2px;");
+                showStatusMessage("Failed to apply JSON to simulation", "error");
+                // Keep error messages persistent - no auto-hide
+            }
+        } else {
+            setJsonViewerStyle("-fx-border-color: red; -fx-border-width: 2px;");
+            showStatusMessage(validation.getMessage(), "error");
+            // Keep error messages persistent - no auto-hide
+        }
     }
     
     /**
@@ -153,6 +216,45 @@ public class JsonViewController {
      */
     private void setJsonViewerStyle(String style) {
         Platform.runLater(() -> jsonViewer.setStyle(style));
+    }
+    
+    /**
+     * Shows status message with appropriate styling.
+     */
+    private void showStatusMessage(String message, String type) {
+        if (statusLabel != null) {
+            Platform.runLater(() -> {
+                statusLabel.setText(message);
+                statusLabel.setVisible(true);
+                
+                // Set appropriate style based on message type
+                String baseStyle = "-fx-padding: 5px; -fx-font-size: 12px; ";
+                switch (type) {
+                    case "success":
+                        statusLabel.setStyle(baseStyle + "-fx-text-fill: green; -fx-background-color: #e8f5e8; -fx-border-color: green; -fx-border-radius: 3px; -fx-background-radius: 3px;");
+                        break;
+                    case "error":
+                        statusLabel.setStyle(baseStyle + "-fx-text-fill: darkred; -fx-background-color: #ffeaea; -fx-border-color: darkred; -fx-border-radius: 3px; -fx-background-radius: 3px;");
+                        break;
+                    case "warning":
+                        statusLabel.setStyle(baseStyle + "-fx-text-fill: #b8860b; -fx-background-color: #fffacd; -fx-border-color: #b8860b; -fx-border-radius: 3px; -fx-background-radius: 3px;");
+                        break;
+                    case "info":
+                    default:
+                        statusLabel.setStyle(baseStyle + "-fx-text-fill: #0066cc; -fx-background-color: #e6f3ff; -fx-border-color: #0066cc; -fx-border-radius: 3px; -fx-background-radius: 3px;");
+                        break;
+                }
+            });
+        }
+    }
+    
+    /**
+     * Hides the status message.
+     */
+    private void hideStatusMessage() {
+        if (statusLabel != null) {
+            Platform.runLater(() -> statusLabel.setVisible(false));
+        }
     }
     
     /**
