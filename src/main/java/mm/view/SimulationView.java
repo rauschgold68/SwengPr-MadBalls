@@ -306,6 +306,8 @@ public class SimulationView {
             System.err.println("Warning: Could not load bottom bar background image: " + e.getMessage());
         }
     }
+    
+    }
 
     private void createJsonViewer() {
       
