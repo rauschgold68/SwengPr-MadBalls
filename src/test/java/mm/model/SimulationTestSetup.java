@@ -2,6 +2,37 @@ package mm.model;
 
 import org.junit.jupiter.api.BeforeEach;
 
+/**
+ * Base test setup class providing common functionality for simulation model testing.
+ * <p>
+ * This abstract test setup class serves as a foundation for all simulation model test classes,
+ * providing standardized test initialization, helper methods for creating test objects, and
+ * ensuring consistent test environment setup across the test suite.
+ * </p>
+ * 
+ * <h2>Key Features:</h2>
+ * <ul>
+ * <li><b>Automatic Setup:</b> Initializes a fresh SimulationModel before each test</li>
+ * <li><b>Test Object Creation:</b> Provides helper methods for creating realistic test objects</li>
+ * <li><b>Consistent Configuration:</b> Ensures all test objects have proper physics and visual properties</li>
+ * <li><b>Inheritance-Based:</b> Allows test classes to focus on testing logic rather than setup</li>
+ * </ul>
+ * 
+ * <h2>Usage Pattern:</h2>
+ * <p>
+ * Test classes should extend this class to automatically inherit:
+ * </p>
+ * <ul>
+ * <li>Pre-initialized {@code simulationModel} instance</li>
+ * <li>Helper methods for creating {@link InventoryObject} and {@link GameObject} instances</li>
+ * <li>Consistent test environment reset before each test method</li>
+ * </ul>
+ * 
+ * @see SimulationModel
+ * @see TestSimulationModelBasics
+ * @see InventoryObject
+ * @see GameObject
+ */
 public class SimulationTestSetup {
     /** The SimulationModel instance under test. */
     protected SimulationModel simulationModel;

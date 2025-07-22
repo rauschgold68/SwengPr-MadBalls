@@ -6,15 +6,44 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 
 /**
- * Test-Klasse für die Physics-Klasse.
- * Testet die Funktionalität der Physics-Klasse inklusive aller Setter/Getter-Methoden
- * für physikalische Eigenschaften.
+ * Unit tests for the {@link Physics} class.
+ * <p>
+ * This test class verifies the functionality of the Physics class including all
+ * setter and getter methods for physical properties such as density, friction,
+ * restitution, and shape configuration.
+ * </p>
+ * 
+ * <h2>Test Coverage Areas:</h2>
+ * <ul>
+ * <li><b>Constructor Testing:</b> Tests both default and parameterized constructors</li>
+ * <li><b>Property Management:</b> Tests all setter/getter methods for physical properties</li>
+ * <li><b>Object Integrity:</b> Ensures proper object creation and type consistency</li>
+ * </ul>
+ * 
+ * @author MadBalls Team
+ * @version 1.0
+ * @since 1.0
+ * 
+ * @see Physics
+ * @see org.junit.jupiter.api.Test
  */
 public class TestPhysics {
     
     /**
-     * Testet die grundlegende Funktionalität der Physics-Klasse.
-     * Überprüft die Objekterstellung und stellt sicher, dass das Objekt nicht null ist.
+     * Tests the basic functionality of the Physics class.
+     * <p>
+     * This test method verifies:
+     * </p>
+     * <ul>
+     * <li>Object creation using default constructor</li>
+     * <li>Object is not null after creation</li>
+     * <li>Correct class type assignment</li>
+     * <li>Parameterized constructor with all physics properties</li>
+     * <li>Proper assignment of constructor parameters</li>
+     * </ul>
+     * 
+     * @see Physics#Physics()
+     * @see Physics#Physics(float, float, float, String)
      */
     @Test
     public void testPhysics() {
@@ -28,8 +57,26 @@ public class TestPhysics {
     }
 
     /**
-     * Testet alle Setter- und Getter-Methoden der Physics-Klasse.
-     * Überprüft Density, Friction, Restitution und Shape-Eigenschaften.
+     * Tests all setter and getter methods of the Physics class.
+     * <p>
+     * This test method validates:
+     * </p>
+     * <ul>
+     * <li>Density property setter and getter functionality</li>
+     * <li>Friction property setter and getter functionality</li>
+     * <li>Restitution property setter and getter functionality</li>
+     * <li>Shape property setter and getter functionality</li>
+     * <li>Proper value retention after setting properties</li>
+     * </ul>
+     * 
+     * @see Physics#setDensity(float)
+     * @see Physics#getDensity()
+     * @see Physics#setFriction(float)
+     * @see Physics#getFriction()
+     * @see Physics#setRestitution(float)
+     * @see Physics#getRestitution()
+     * @see Physics#setShape(String)
+     * @see Physics#getShape()
      */
     @Test
     public void testSetterGetter() {

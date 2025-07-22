@@ -38,6 +38,27 @@ import mm.controller.PhysicsAnimationController;
  * <li><b>Mock Usage:</b> Uses Mockito for testing complex dependencies without full system setup</li>
  * <li><b>Realistic Data:</b> Uses helper methods to create realistic test objects with proper configurations</li>
  * </ul>
+ * 
+ * <h2>Testing Strategy:</h2>
+ * <ul>
+ * <li><b>Unit Testing Focus:</b> Tests individual methods and their interactions in isolation</li>
+ * <li><b>Edge Case Coverage:</b> Includes tests for extreme values, null inputs, and boundary conditions</li>
+ * <li><b>Consistency Verification:</b> Ensures repeated calls yield consistent results</li>
+ * <li><b>Exception Safety:</b> Verifies methods handle unexpected inputs gracefully</li>
+ * </ul>
+ * 
+ * <h2>Test Environment:</h2>
+ * <ul>
+ * <li><b>JUnit 5:</b> Uses modern JUnit annotations and assertion methods</li>
+ * <li><b>Mockito:</b> Leverages mocking for complex dependencies</li>
+ * <li><b>JavaFX-Free:</b> Runs without JavaFX runtime for CI/CD pipeline compatibility</li>
+ * <li><b>Inheritance:</b> Extends {@link SimulationTestSetup} for common setup functionality</li>
+ * </ul>
+ * 
+ * @see SimulationModel
+ * @see SimulationTestSetup
+ * @see org.junit.jupiter.api.Test
+ * @see org.mockito.Mockito
  */
 public class TestSimulationModelBasics extends SimulationTestSetup {
     /**
