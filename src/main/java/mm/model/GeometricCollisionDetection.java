@@ -12,6 +12,21 @@ import java.util.List;
  */
 public class GeometricCollisionDetection {
     
+    /**
+     * Data class to hold transformation parameters for collision detection.
+     */
+    private static class TransformData {
+        final double x;
+        final double y;
+        final double angle;
+        
+        TransformData(double x, double y, double angle) {
+            this.x = x;
+            this.y = y;
+            this.angle = angle;
+        }
+    }
+    
     private final SimulationModel model;
     
     /**
@@ -57,7 +72,8 @@ public class GeometricCollisionDetection {
                 continue;
             }
             
-            if (hasCollisionWithRotation(movingPair, otherPair, newX, newY, newAngle)) {
+            TransformData transform = new TransformData(newX, newY, newAngle);
+            if (hasCollisionWithRotation(movingPair, otherPair, transform)) {
                 return true;
             }
         }
@@ -76,11 +92,7 @@ public class GeometricCollisionDetection {
         
         // Skip if other object is in win zone or no-place zone
         Object userData = otherPair.body.getUserData();
-        if ("winZone".equals(userData) || "winPlat".equals(userData) || "noPlace".equals(userData)) {
-            return true;
-        }
-        
-        return false;
+        return "winZone".equals(userData) || "winPlat".equals(userData) || "noPlace".equals(userData);
     }
     
     /**
@@ -104,7 +116,7 @@ public class GeometricCollisionDetection {
      * Checks collision with rotation.
      */
     private boolean hasCollisionWithRotation(PhysicsGeometryPair movingPair, PhysicsGeometryPair otherPair, 
-                                           double newX, double newY, double newAngle) {
+                                           TransformData transform) {
         GeometryData movingGeom = movingPair.getGeometry();
         GeometryData otherGeom = otherPair.getGeometry();
         
@@ -113,7 +125,7 @@ public class GeometricCollisionDetection {
         }
         
         // Create temporary geometry at new position and angle
-        GeometryData tempMovingGeom = createGeometryAtPosition(movingGeom, newX, newY, newAngle);
+        GeometryData tempMovingGeom = createGeometryAtPosition(movingGeom, transform.x, transform.y, transform.angle);
         
         return geometriesIntersect(tempMovingGeom, otherGeom);
     }
