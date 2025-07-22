@@ -1,7 +1,5 @@
 package mm.controller;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -28,7 +26,6 @@ import mm.view.SimulationView;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
-import javafx.util.Duration;
 
 /**
  * The {@code SimulationController} class coordinates the interaction between
@@ -89,9 +86,7 @@ public class SimulationController {
     private Position dragStartPosition;
     private float dragStartAngle;
 
-    // Add these fields to the controller
-    private boolean isUpdatingFromJson = false;
-    private String lastJsonContent = "";
+    private JsonViewController jsonViewController;
 
     /**
      * Constructs the SimulationController, sets up the model and view, and wires up
@@ -130,7 +125,33 @@ public class SimulationController {
         setupWinNextLevel();
         updateJsonViewer(); // Initialize JSON viewer
 
-        setupJsonListener(); // Add this line
+        // Initialize JSON controller if in sandbox mode
+        setupJsonController();
+    }
+
+    /**
+     * Sets up JSON controller for sandbox mode.
+     */
+    private void setupJsonController() {
+        TextArea jsonViewer = view.getJsonViewer();
+        if (jsonViewer != null) {
+            // Create callback for when simulation needs to be refreshed
+            Runnable onSimulationUpdate = () -> {
+                setupSimulation();
+                refreshInventoryDisplay();
+            };
+
+            jsonViewController = new JsonViewController(model, jsonViewer, onSimulationUpdate);
+        }
+    }
+
+    /**
+     * Updates JSON viewer when simulation state changes.
+     */
+    private void updateJsonViewer() {
+        if (jsonViewController != null) {
+            jsonViewController.updateJsonViewer();
+        }
     }
 
     /**
@@ -449,95 +470,6 @@ public class SimulationController {
 
         db.setDragView(snapshot, snapshot.getWidth() / 2, snapshot.getHeight() / 2);
         event.consume();
-    }
-
-    /**
-     * Sets up real-time JSON monitoring for bidirectional updates.
-     * Only works in sandbox mode where JSON viewer is available.
-     */
-    private void setupJsonListener() {
-        TextArea jsonViewer = view.getJsonViewer();
-        
-        // Only set up JSON listener if JSON viewer exists (sandbox mode only)
-        if (jsonViewer == null) {
-            return;
-        }
-        
-        // Add text change listener for real-time updates
-        jsonViewer.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!isUpdatingFromJson && !newValue.equals(lastJsonContent)) {
-                // Visual feedback for editing
-                jsonViewer.setStyle("-fx-border-color: orange; -fx-border-width: 2px;");
-                
-                // Debounce rapid changes
-                Timeline timeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
-                    boolean success = updateSimulationFromJson(newValue);
-                    // Visual feedback for update result
-                    if (success) {
-                        jsonViewer.setStyle("-fx-border-color: green; -fx-border-width: 2px;");
-                    } else {
-                        jsonViewer.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
-                    }
-                    
-                    // Reset border after 1 second
-                    Timeline resetTimeline = new Timeline(new KeyFrame(Duration.millis(1000), reset -> {
-                        jsonViewer.setStyle("");
-                    }));
-                    resetTimeline.play();
-                }));
-                timeline.play();
-            }
-        });
-        
-        // Add key shortcuts for manual updates
-        jsonViewer.setOnKeyPressed(event -> {
-            if (event.isControlDown() && event.getCode() == KeyCode.ENTER) {
-                boolean success = updateSimulationFromJson(jsonViewer.getText());
-                // Immediate visual feedback for manual update
-                if (success) {
-                    jsonViewer.setStyle("-fx-border-color: green; -fx-border-width: 2px;");
-                } else {
-                    jsonViewer.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
-                }
-                event.consume();
-            }
-        });
-    }
-
-    /**
-     * Updates the simulation from the JSON viewer content.
-     */
-    private boolean updateSimulationFromJson(String jsonContent) {
-        if (isInteractionAllowed() && model.updateFromJson(jsonContent)) {
-            // Refresh the entire simulation
-            Platform.runLater(() -> {
-                isUpdatingFromJson = true;
-                setupSimulation();
-                refreshInventoryDisplay();
-                lastJsonContent = jsonContent;
-                isUpdatingFromJson = false;
-            });
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Updates the JSON viewer with the current simulation state.
-     * This method is called whenever the simulation state changes.
-     * Only works in sandbox mode where JSON viewer is available.
-     */
-    private void updateJsonViewer() {
-        // Only update if JSON viewer exists (sandbox mode only) and not currently updating
-        if (!isUpdatingFromJson && view.getJsonViewer() != null) {
-            Platform.runLater(() -> {
-                isUpdatingFromJson = true;
-                String jsonContent = model.generateCurrentStateJson();
-                view.getJsonViewer().setText(jsonContent);
-                lastJsonContent = jsonContent;
-                isUpdatingFromJson = false;
-            });
-        }
     }
 
     /**

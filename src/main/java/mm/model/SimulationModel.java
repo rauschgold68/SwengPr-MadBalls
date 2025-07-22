@@ -49,6 +49,7 @@ public class SimulationModel {
 
     private final CollisionDetection collisionService;
     private final GeometricCollisionDetection geometricCollisionService;
+    private final JsonStateService jsonService;
 
     /**
      * Container for physics-related simulation components.
@@ -102,6 +103,7 @@ public class SimulationModel {
         this.state.levelPath = levelPath;
         this.collisionService = new CollisionDetection(this);
         this.geometricCollisionService = new GeometricCollisionDetection(this);
+        this.jsonService = new JsonStateService();
     }
 
     /**
@@ -725,414 +727,49 @@ public class SimulationModel {
     }
 
     /**
-     * Generates a JSON representation of the current simulation state.
-     * This includes all dropped objects and their current positions/rotations with full details.
-     * 
-     * @return JSON string representing the current simulation state
+     * Generates JSON representation of current simulation state using Jackson.
      */
     public String generateCurrentStateJson() {
-        StringBuilder json = new StringBuilder();
-        json.append("{\n");
-        json.append("  \"droppedObjects\": [\n");
-        
-        for (int i = 0; i < gameObjects.droppedObjects.size(); i++) {
-            GameObject obj = gameObjects.droppedObjects.get(i);
-            json.append("    {\n");
-            json.append("      \"name\": \"").append(obj.getName()).append("\",\n");
-            json.append("      \"type\": \"").append(obj.getType()).append("\",\n");
-            json.append("      \"position\": {\n");
-            json.append("        \"x\": ").append(String.format("%.2f", obj.getPosition().getX())).append(",\n");
-            json.append("        \"y\": ").append(String.format("%.2f", obj.getPosition().getY())).append("\n");
-            json.append("      },\n");
-            json.append("      \"angle\": ").append(String.format("%.2f", obj.getAngle())).append(",\n");
-            json.append("      \"size\": {\n");
-            json.append("        \"width\": ").append(String.format("%.2f", obj.getSize().getWidth())).append(",\n");
-            json.append("        \"height\": ").append(String.format("%.2f", obj.getSize().getHeight())).append(",\n");
-            json.append("        \"radius\": ").append(String.format("%.2f", obj.getSize().getRadius())).append("\n");
-            json.append("      },\n");
-            
-            // Add sprite information
-            String sprite = obj.getSprite();
-            if (sprite != null) {
-                json.append("      \"sprite\": \"").append(sprite).append("\",\n");
-            } else {
-                json.append("      \"sprite\": null,\n");
-            }
-            
-            json.append("      \"colour\": \"").append(obj.getColour()).append("\",\n");
-            
-            // Add physics properties
-            json.append("      \"physics\": {\n");
-            json.append("        \"density\": ").append(String.format("%.2f", obj.getPhysics().getDensity())).append(",\n");
-            json.append("        \"friction\": ").append(String.format("%.2f", obj.getPhysics().getFriction())).append(",\n");
-            json.append("        \"restitution\": ").append(String.format("%.2f", obj.getPhysics().getRestitution())).append(",\n");
-            json.append("        \"shape\": \"").append(obj.getPhysics().getShape()).append("\"\n");
-            json.append("      },\n");
-            
-            json.append("      \"winning\": ").append(obj.isWinning()).append("\n");
-            json.append("    }");
-            if (i < gameObjects.droppedObjects.size() - 1) {
-                json.append(",");
-            }
-            json.append("\n");
-        }
-        
-        json.append("  ],\n");
-        json.append("  \"inventoryObjects\": [\n");
-        
-        for (int i = 0; i < gameObjects.inventoryObjects.size(); i++) {
-            InventoryObject obj = gameObjects.inventoryObjects.get(i);
-            json.append("    {\n");
-            json.append("      \"name\": \"").append(obj.getName()).append("\",\n");
-            json.append("      \"type\": \"").append(obj.getType()).append("\",\n");
-            json.append("      \"count\": ").append(obj.getCount()).append(",\n");
-            json.append("      \"angle\": ").append(String.format("%.2f", obj.getAngle())).append(",\n");
-            json.append("      \"size\": {\n");
-            json.append("        \"width\": ").append(String.format("%.2f", obj.getSize().getWidth())).append(",\n");
-            json.append("        \"height\": ").append(String.format("%.2f", obj.getSize().getHeight())).append(",\n");
-            json.append("        \"radius\": ").append(String.format("%.2f", obj.getSize().getRadius())).append("\n");
-            json.append("      },\n");
-            
-            // Add sprite information
-            String sprite = obj.getSprite();
-            if (sprite != null) {
-                json.append("      \"sprite\": \"").append(sprite).append("\",\n");
-            } else {
-                json.append("      \"sprite\": null,\n");
-            }
-            
-            json.append("      \"colour\": \"").append(obj.getColour()).append("\",\n");
-            
-            // Add physics properties
-            json.append("      \"physics\": {\n");
-            json.append("        \"density\": ").append(String.format("%.2f", obj.getPhysics().getDensity())).append(",\n");
-            json.append("        \"friction\": ").append(String.format("%.2f", obj.getPhysics().getFriction())).append(",\n");
-            json.append("        \"restitution\": ").append(String.format("%.2f", obj.getPhysics().getRestitution())).append(",\n");
-            json.append("        \"shape\": \"").append(obj.getPhysics().getShape()).append("\"\n");
-            json.append("      },\n");
-            
-            json.append("      \"winning\": ").append(obj.isWinning()).append("\n");
-            json.append("    }");
-            if (i < gameObjects.inventoryObjects.size() - 1) {
-                json.append(",");
-            }
-            json.append("\n");
-        }
-        
-        json.append("  ]\n");
-        json.append("}");
-        
-        return json.toString();
+        return jsonService.generateStateJson(gameObjects.droppedObjects, gameObjects.inventoryObjects);
     }
 
     /**
-     * Updates the simulation state from a JSON string.
-     * Parses the JSON and updates both dropped objects and inventory counts.
-     * 
-     * @param jsonString the JSON representation of the simulation state
-     * @return true if update was successful, false if JSON was invalid
+     * Updates simulation state from JSON string using Jackson.
      */
     public boolean updateFromJson(String jsonString) {
         try {
-            // Simple JSON parsing - you could use a proper JSON library here
-            return parseAndUpdateSimulation(jsonString);
-        } catch (Exception e) {
-            System.err.println("Failed to parse JSON: " + e.getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Parses JSON string and updates simulation state.
-     * This is a simplified parser - in production you'd use Jackson or Gson.
-     */
-    private boolean parseAndUpdateSimulation(String jsonString) {
-        try {
-            // Clear current dropped objects
+            JsonStateService.SimulationState state = jsonService.parseStateJson(jsonString);
+            
+            // Clear current state
             gameObjects.droppedObjects.clear();
             gameObjects.droppedVisualPairs.clear();
             
-            // Parse dropped objects
-            parseDroppedObjects(jsonString);
+            // Update dropped objects
+            gameObjects.droppedObjects.addAll(state.getDroppedObjects());
             
-            // Parse inventory objects and update counts
-            parseInventoryObjects(jsonString);
+            // Update inventory counts
+            updateInventoryFromState(state.getInventoryObjects());
             
             return true;
         } catch (Exception e) {
-            System.err.println("Error parsing JSON: " + e.getMessage());
+            System.err.println("Failed to update from JSON: " + e.getMessage());
             return false;
         }
     }
-
+    
     /**
-     * Parses dropped objects from JSON and adds them to the simulation.
+     * Validates JSON format without applying changes.
      */
-    private void parseDroppedObjects(String jsonString) {
-        String droppedSection = extractJsonSection(jsonString, "droppedObjects");
-        if (droppedSection == null) return;
-        
-        String[] objects = splitJsonArray(droppedSection);
-        for (String objStr : objects) {
-            GameObject obj = parseGameObject(objStr);
-            if (obj != null) {
-                gameObjects.droppedObjects.add(obj);
+    public boolean isValidSimulationJson(String jsonString) {
+        return jsonService.isValidJson(jsonString);
+    }
+    
+    private void updateInventoryFromState(List<InventoryObject> newInventoryObjects) {
+        for (InventoryObject newObj : newInventoryObjects) {
+            InventoryObject existing = findInventoryObjectByName(newObj.getName());
+            if (existing != null) {
+                existing.setCount(newObj.getCount());
             }
         }
-    }
-
-    /**
-     * Parses inventory objects from JSON and updates their counts.
-     */
-    private void parseInventoryObjects(String jsonString) {
-        String inventorySection = extractJsonSection(jsonString, "inventoryObjects");
-        if (inventorySection == null) return;
-        
-        String[] objects = splitJsonArray(inventorySection);
-        for (String objStr : objects) {
-            updateInventoryObjectCount(objStr);
-        }
-    }
-
-    /**
-     * Extracts a section from JSON string (simplified parser).
-     */
-    private String extractJsonSection(String jsonString, String sectionName) {
-        String startPattern = "\"" + sectionName + "\": [";
-        int startIndex = jsonString.indexOf(startPattern);
-        if (startIndex == -1) return null;
-        
-        startIndex += startPattern.length();
-        int bracketCount = 1;
-        int endIndex = startIndex;
-        
-        while (endIndex < jsonString.length() && bracketCount > 0) {
-            char c = jsonString.charAt(endIndex);
-            if (c == '[') bracketCount++;
-            else if (c == ']') bracketCount--;
-            endIndex++;
-        }
-        
-        return jsonString.substring(startIndex, endIndex - 1);
-    }
-
-    /**
-     * Splits JSON array into individual object strings.
-     */
-    private String[] splitJsonArray(String arrayStr) {
-        List<String> objects = new ArrayList<>();
-        int braceCount = 0;
-        int start = 0;
-        
-        for (int i = 0; i < arrayStr.length(); i++) {
-            char c = arrayStr.charAt(i);
-            if (c == '{') braceCount++;
-            else if (c == '}') {
-                braceCount--;
-                if (braceCount == 0) {
-                    objects.add(arrayStr.substring(start, i + 1).trim());
-                    start = i + 2; // Skip comma and whitespace
-                }
-            }
-        }
-        
-        return objects.toArray(new String[0]);
-    }
-
-    /**
-     * Extracts a value from JSON string (simplified parser).
-     */
-    private String extractJsonValue(String jsonStr, String key) {
-        String pattern = "\"" + key + "\":";
-        int startIndex = jsonStr.indexOf(pattern);
-        if (startIndex == -1) return "0"; // Return default value instead of empty string
-        
-        startIndex += pattern.length();
-        while (startIndex < jsonStr.length() && Character.isWhitespace(jsonStr.charAt(startIndex))) {
-            startIndex++;
-        }
-        
-        if (startIndex >= jsonStr.length()) return "0";
-        
-        char firstChar = jsonStr.charAt(startIndex);
-        if (firstChar == '"') {
-            // String value
-            startIndex++;
-            int endIndex = jsonStr.indexOf('"', startIndex);
-            String result = endIndex != -1 ? jsonStr.substring(startIndex, endIndex) : "";
-            return result.isEmpty() ? "0" : result; // Return "0" for empty strings when expecting numbers
-        } else {
-            // Number or boolean value
-            int endIndex = startIndex;
-            while (endIndex < jsonStr.length()) {
-                char c = jsonStr.charAt(endIndex);
-                if (c == ',' || c == '}' || c == '\n' || Character.isWhitespace(c)) {
-                    break;
-                }
-                endIndex++;
-            }
-            String result = jsonStr.substring(startIndex, endIndex).trim();
-            return result.isEmpty() ? "0" : result; // Return "0" for empty values
-        }
-    }
-
-    /**
-     * Safely parses a float value with default fallback.
-     */
-    private float safeParseFloat(String value, float defaultValue) {
-        try {
-            if (value == null || value.trim().isEmpty() || "null".equals(value)) {
-                return defaultValue;
-            }
-            return Float.parseFloat(value.trim());
-        } catch (NumberFormatException e) {
-            System.err.println("Warning: Could not parse float value '" + value + "', using default: " + defaultValue);
-            return defaultValue;
-        }
-    }
-
-    /**
-     * Safely parses an integer value with default fallback.
-     */
-    private int safeParseInt(String value, int defaultValue) {
-        try {
-            if (value == null || value.trim().isEmpty() || "null".equals(value)) {
-                return defaultValue;
-            }
-            return Integer.parseInt(value.trim());
-        } catch (NumberFormatException e) {
-            System.err.println("Warning: Could not parse int value '" + value + "', using default: " + defaultValue);
-            return defaultValue;
-        }
-    }
-
-    /**
-     * Safely parses a boolean value with default fallback.
-     */
-    private boolean safeParseBoolean(String value, boolean defaultValue) {
-        try {
-            if (value == null || value.trim().isEmpty() || "null".equals(value)) {
-                return defaultValue;
-            }
-            return Boolean.parseBoolean(value.trim());
-        } catch (Exception e) {
-            System.err.println("Warning: Could not parse boolean value '" + value + "', using default: " + defaultValue);
-            return defaultValue;
-        }
-    }
-
-    /**
-     * Parses a single GameObject from JSON string.
-     */
-    private GameObject parseGameObject(String objStr) {
-        try {
-            String name = extractJsonValue(objStr, "name");
-            String type = extractJsonValue(objStr, "type");
-            
-            // Use safe parsing with defaults
-            float x = safeParseFloat(extractJsonValue(objStr, "x"), 0.0f);
-            float y = safeParseFloat(extractJsonValue(objStr, "y"), 0.0f);
-            float angle = safeParseFloat(extractJsonValue(objStr, "angle"), 0.0f);
-            
-            float width = safeParseFloat(extractJsonValue(objStr, "width"), 50.0f);
-            float height = safeParseFloat(extractJsonValue(objStr, "height"), 50.0f);
-            float radius = safeParseFloat(extractJsonValue(objStr, "radius"), 0.0f);
-            
-            String colour = extractJsonValue(objStr, "colour");
-            String sprite = extractJsonValue(objStr, "sprite");
-            boolean winning = safeParseBoolean(extractJsonValue(objStr, "winning"), false);
-            
-            // Physics properties with safe defaults
-            float density = safeParseFloat(extractJsonValue(objStr, "density"), 1.0f);
-            float friction = safeParseFloat(extractJsonValue(objStr, "friction"), 0.4f);
-            float restitution = safeParseFloat(extractJsonValue(objStr, "restitution"), 0.1f);
-            String shape = extractJsonValue(objStr, "shape");
-            if (shape.isEmpty() || "null".equals(shape)) {
-                shape = "DYNAMIC";
-            }
-            
-            // Create GameObject
-            GameObject obj = new GameObject(name, type, new Position(x, y), new Size(width, height));
-            obj.getSize().setRadius(radius);
-            obj.setAngle(angle);
-            obj.setColour(colour.isEmpty() ? "BLACK" : colour);
-            obj.setSprite("null".equals(sprite) || sprite.isEmpty() ? null : sprite);
-            obj.setWinning(winning);
-            
-            // Set physics
-            Physics physics = new Physics(density, friction, restitution, shape);
-            obj.setPhysics(physics);
-            
-            return obj;
-        } catch (Exception e) {
-            System.err.println("Error parsing GameObject: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * Updates inventory object count from JSON.
-     */
-    private void updateInventoryObjectCount(String objStr) {
-        try {
-            String name = extractJsonValue(objStr, "name");
-            int count = safeParseInt(extractJsonValue(objStr, "count"), 0);
-            
-            // Also parse other properties that might have changed with safe defaults
-            float angle = safeParseFloat(extractJsonValue(objStr, "angle"), 0.0f);
-            String colour = extractJsonValue(objStr, "colour");
-            String sprite = extractJsonValue(objStr, "sprite");
-            boolean winning = safeParseBoolean(extractJsonValue(objStr, "winning"), false);
-            
-            // Physics properties with safe defaults
-            float density = safeParseFloat(extractJsonValue(objStr, "density"), 1.0f);
-            float friction = safeParseFloat(extractJsonValue(objStr, "friction"), 0.4f);
-            float restitution = safeParseFloat(extractJsonValue(objStr, "restitution"), 0.1f);
-            String shape = extractJsonValue(objStr, "shape");
-            if (shape.isEmpty() || "null".equals(shape)) {
-                shape = "DYNAMIC";
-            }
-            
-            // Size properties with safe defaults
-            float width = safeParseFloat(extractJsonValue(objStr, "width"), 50.0f);
-            float height = safeParseFloat(extractJsonValue(objStr, "height"), 50.0f);
-            float radius = safeParseFloat(extractJsonValue(objStr, "radius"), 0.0f);
-            
-            for (InventoryObject invObj : gameObjects.inventoryObjects) {
-                if (invObj.getName().equals(name)) {
-                    // Update count
-                    invObj.setCount(count);
-                    
-                    // Update other properties
-                    invObj.setAngle(angle);
-                    invObj.setColour(colour.isEmpty() ? invObj.getColour() : colour); // Keep existing if empty
-                    invObj.setSprite("null".equals(sprite) || sprite.isEmpty() ? null : sprite);
-                    invObj.setWinning(winning);
-                    
-                    // Update physics
-                    Physics physics = new Physics(density, friction, restitution, shape);
-                    invObj.setPhysics(physics);
-                    
-                    // Update size
-                    Size newSize = new Size(width, height);
-                    newSize.setRadius(radius);
-                    invObj.setSize(newSize);
-                    
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error updating inventory object: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Triggers a complete simulation refresh from the current model state.
-     */
-    public void refreshSimulationFromModel() {
-        // This will be called by the controller to refresh the visual simulation
-        // after JSON updates
     }
 }
