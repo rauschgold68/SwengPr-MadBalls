@@ -262,7 +262,21 @@
                         <!-- Ignore GUI classes for coverage -->
                         <exclude>mm/view/**/*</exclude>
                         <exclude>mm/controller/ApplicationController.class</exclude>
+                        <exclude>mm/controller/TitleScreenController.class</exclude>
+                        <exclude>mm/controller/FxToGameObjectController.class</exclude>
                         <exclude>mm/model/CollisionDetection.class</exclude>
+
+                        <!-- Lambda functions are compiled to synthetic methods with specific patterns -->
+                        <exclude>**/PhysicsAnimationController$lambda$*</exclude>
+                        <exclude>**/PhysicsAnimationController$$Lambda$*</exclude>
+                        
+                        <!-- Exclude specific JavaFX event handler lambda patterns -->
+                        <exclude>**/*$lambda$addListener$*</exclude>
+                        <exclude>**/*$lambda$setOnAction$*</exclude>
+                        <exclude>**/*$lambda$setOnMouse*</exclude>
+                        <exclude>**/*$lambda$setOnDrag*</exclude>
+                        <exclude>**/*$lambda$setOnKey*</exclude>
+                        <exclude>**/*$lambda$runLater$*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

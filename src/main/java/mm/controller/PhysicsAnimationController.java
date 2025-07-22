@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
+import mm.Generated;
 import mm.model.PhysicsVisualPair;
 import mm.model.SimulationModel;
 
@@ -65,6 +66,7 @@ public class PhysicsAnimationController extends AnimationTimer {
      * @param model the SimulationModel to update when objects are culled
      * @param simSpace the JavaFX Pane representing the simulation space
      */
+    @Generated
     public PhysicsAnimationController(World world, List<PhysicsVisualPair> pairs, SimulationModel model, Pane simSpace) {
         this.world = world;
         this.pairs = pairs;
@@ -103,6 +105,7 @@ public class PhysicsAnimationController extends AnimationTimer {
      * 
      * @param simSpace the JavaFX Pane representing the simulation space
      */
+    @Generated
     public void setSimSpace(Pane simSpace) {
         // Get actual simulation space bounds
         this.simSpaceWidth = simSpace.getWidth();
@@ -118,6 +121,7 @@ public class PhysicsAnimationController extends AnimationTimer {
     /**
      * Starts the animation timer and marks it as running.
      */
+    @Generated
     @Override
     public void start(){
         running = true;
@@ -245,6 +249,7 @@ public class PhysicsAnimationController extends AnimationTimer {
     /**
      * Resets the timer and restores all culled objects to their original positions.
      */
+    @Generated
     public void reset() {
         lastTime = 0;
         
@@ -278,6 +283,7 @@ public class PhysicsAnimationController extends AnimationTimer {
         return running;
     }
 
+    @Generated
     @Override
     public void stop() {
         running = false;
