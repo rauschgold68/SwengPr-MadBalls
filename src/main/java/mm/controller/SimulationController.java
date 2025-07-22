@@ -67,6 +67,7 @@ import java.io.File;
  * @author MadBalls
  */
 public class SimulationController {
+
     private String selectedSkin = "Default";
 
     public final SimulationModel model;

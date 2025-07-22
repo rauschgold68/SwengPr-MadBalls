@@ -769,6 +769,12 @@ public class SimulationModel {
             InventoryObject existing = findInventoryObjectByName(newObj.getName());
             if (existing != null) {
                 existing.setCount(newObj.getCount());
+                existing.setAngle(newObj.getAngle());
+                existing.setPhysics(newObj.getPhysics());
+                existing.setSize(newObj.getSize());
+                existing.setSprite(newObj.getSprite());
+                existing.setWinning(newObj.isWinning());
+                existing.setColour(newObj.getColour());
             }
         }
     }
