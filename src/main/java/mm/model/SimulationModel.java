@@ -112,10 +112,10 @@ public class SimulationModel {
     }
 
     // Grouped component containers
-    
 
     /**
      * Constructs a SimulationModel for a specific level.
+     * 
      * @param levelPath the resource path to the level JSON file (e.g.,
      *                  "/level/level1.json")
      */
@@ -139,8 +139,9 @@ public class SimulationModel {
     }
 
     /**
-     * Sets wether the simulation is running in puzzle mode. 
+     * Sets wether the simulation is running in puzzle mode.
      * In puzzle mode, level objects cannot be manipulated.
+     * 
      * @param puzzleMode
      */
     public void setPuzzleMode(boolean puzzleMode) {
@@ -154,7 +155,7 @@ public class SimulationModel {
      */
     public boolean isPuzzleMode() {
         return state.isPuzzleMode();
-    }   
+    }
 
     /**
      * Returns the list of physics-visual pairs in the simulation.
@@ -339,33 +340,21 @@ public class SimulationModel {
         LevelImportController importer = new LevelImportController(state.levelPath);
         List<GameObject> levelGameObjects = importer.getGameObjects();
 
-        // Clear dropped objects to avoid duplicates when resetting simulation
-        gameObjects.droppedObjects.clear();
-        gameObjects.droppedVisualPairs.clear();
-        
-        // In sandbox mode, add level objects to droppedObjects so they can be manipulated
-        if (!state.isPuzzleMode()) {
-            for (GameObject obj : levelGameObjects) {
-                // Skip adding no-place zones and win zones to droppable objects
-                if (!obj.getName().equals("noPlaceZone") && !obj.getName().equals("winZone")) {
-                    // Create a copy of the object to avoid reference issues
-                    GameObject objCopy = cloneGameObject(obj);
-                    gameObjects.droppedObjects.add(objCopy);
-                }
-            }
-        }
-
-        // Add all level objects to the physics world
+        // Add level objects
         for (GameObject obj : levelGameObjects) {
             PhysicsVisualPair pair = GameObjectController.convert(obj, physics.world);
             addPhysicsVisualPair(pair);
             if (obj.getName().equals("noPlaceZone")) {
                 gameObjects.noPlaceZones.add(pair);
             }
-            
-            // Add to droppedVisualPairs for objects that should be manipulable in sandbox mode
-            if (!state.isPuzzleMode() && !obj.getName().equals("noPlaceZone") && !obj.getName().equals("winZone")) {
-                gameObjects.droppedVisualPairs.add(pair);
+        }
+
+        // Add dropped objects
+        for (GameObject obj : gameObjects.droppedObjects) {
+            PhysicsVisualPair pair = GameObjectController.convert(obj, physics.world);
+            addPhysicsVisualPair(pair);
+            if (obj.getName().equals("noPlaceZone")) {
+                gameObjects.noPlaceZones.add(pair);
             }
         }
 
@@ -373,29 +362,6 @@ public class SimulationModel {
         physics.timer = new PhysicsAnimationController(physics.world, physics.pairs, this);
 
         contactEventService.setupContactListener();
-    }
-
-    /**
-     * Creates a deep copy of a GameObject to avoid reference issues.
-     * 
-     * @param original The original GameObject to clone
-     * @return A new GameObject with the same properties
-     */
-    private GameObject cloneGameObject(GameObject original) {
-        GameObject clone = new GameObject(
-            original.getName(),
-            original.getType(),
-            new Position(original.getPosition().getX(), original.getPosition().getY()),
-            new Size(original.getSize().getWidth(), original.getSize().getHeight())
-        );
-        
-        clone.setAngle(original.getAngle());
-        clone.setColour(original.getColour());
-        clone.setSprite(original.getSprite());
-        clone.setPhysics(original.getPhysics());
-        clone.setWinning(original.isWinning());
-        
-        return clone;
     }
 
     /**
@@ -467,6 +433,7 @@ public class SimulationModel {
          */
         void onWin();
     }
+
     /**
      * Sets the win listener for the simulation.
      * <p>
@@ -544,7 +511,7 @@ public class SimulationModel {
     public UndoRedoController getUndoRedoManager() {
         return undoRedoController;
     }
-    
+
     /**
      * Increments the inventory count for a specific item.
      * Used when undoing object placement.
@@ -552,7 +519,7 @@ public class SimulationModel {
     public void incrementInventoryCount(String itemName) {
         inventoryManagementService.incrementInventoryCount(itemName);
     }
-    
+
     /**
      * Decrements the inventory count for a specific item.
      * Used when redoing object placement.
@@ -566,8 +533,8 @@ public class SimulationModel {
      * Delegates to the collision detection service.
      * 
      * @param movingPair The physics-visual pair being moved
-     * @param newX The proposed new X position
-     * @param newY The proposed new Y position
+     * @param newX       The proposed new X position
+     * @param newY       The proposed new Y position
      * @return true if collision would occur, false otherwise
      */
     public boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY) {
@@ -579,9 +546,9 @@ public class SimulationModel {
      * Delegates to the collision detection service.
      * 
      * @param movingPair The physics-visual pair being moved
-     * @param newX The proposed new X position
-     * @param newY The proposed new Y position
-     * @param newAngle The proposed new angle
+     * @param newX       The proposed new X position
+     * @param newY       The proposed new Y position
+     * @param newAngle   The proposed new angle
      * @return true if collision would occur, false otherwise
      */
     public boolean wouldCauseOverlap(PhysicsVisualPair movingPair, double newX, double newY, float newAngle) {
@@ -612,31 +579,31 @@ public class SimulationModel {
     public boolean updateFromJson(String jsonString) {
         try {
             JsonStateService.SimulationState state = jsonService.parseStateJson(jsonString);
-            
+
             // Clear current state
             gameObjects.droppedObjects.clear();
             gameObjects.droppedVisualPairs.clear();
-            
+
             // Update dropped objects
             gameObjects.droppedObjects.addAll(state.getDroppedObjects());
-            
+
             // Update inventory counts
             updateInventoryFromState(state.getInventoryObjects());
-            
+
             return true;
         } catch (Exception e) {
             System.err.println("Failed to update from JSON: " + e.getMessage());
             return false;
         }
     }
-    
+
     /**
      * Validates JSON format without applying changes.
      */
     public boolean isValidSimulationJson(String jsonString) {
         return jsonService.isValidJson(jsonString);
     }
-    
+
     /**
      * Validates JSON format and provides detailed error information.
      */
@@ -644,12 +611,13 @@ public class SimulationModel {
         // Get simulation space bounds for validation
         double simSpaceWidth = getSimulationSpaceWidth();
         double simSpaceHeight = getSimulationSpaceHeight();
-        
+
         return jsonService.validateJson(jsonString, simSpaceWidth, simSpaceHeight);
     }
-    
+
     /**
      * Gets the current simulation space width.
+     * 
      * @return the width of the simulation space, or 0 if not available
      */
     private double getSimulationSpaceWidth() {
@@ -658,9 +626,10 @@ public class SimulationModel {
         }
         return 0;
     }
-    
+
     /**
      * Gets the current simulation space height.
+     * 
      * @return the height of the simulation space, or 0 if not available
      */
     private double getSimulationSpaceHeight() {
@@ -669,16 +638,16 @@ public class SimulationModel {
         }
         return 0;
     }
-    
+
     private void updateInventoryFromState(List<InventoryObject> newInventoryObjects) {
         // Create a set of names from new inventory for quick lookup
         java.util.Set<String> newInventoryNames = newInventoryObjects.stream()
                 .map(InventoryObject::getName)
                 .collect(java.util.stream.Collectors.toSet());
-        
+
         // Remove items that are not in the new inventory (deletion)
         gameObjects.inventoryObjects.removeIf(existing -> !newInventoryNames.contains(existing.getName()));
-        
+
         // Update existing items and add new ones
         for (InventoryObject newObj : newInventoryObjects) {
             InventoryObject existing = findInventoryObjectByName(newObj.getName());
@@ -691,7 +660,7 @@ public class SimulationModel {
                 existing.setSprite(newObj.getSprite());
                 existing.setWinning(newObj.isWinning());
                 existing.setColour(newObj.getColour());
-                
+
                 // Remove item if count is 0 or negative
                 if (existing.getCount() <= 0) {
                     gameObjects.inventoryObjects.remove(existing);
@@ -705,30 +674,31 @@ public class SimulationModel {
 
     /**
      * Refreshes the simulation using the current model state.
-     * Unlike setupSimulation(), this doesn't reload from file and preserves modifications.
+     * Unlike setupSimulation(), this doesn't reload from file and preserves
+     * modifications.
      */
     public void refreshSimulationFromModel() {
         // Recreate physics world
         physics.world = new World(new Vec2(0.0f, 9.8f));
         physics.pairs = new ArrayList<>();
         physics.geometryPairs = new ArrayList<>();
-        
+
         // Keep existing dropped objects but recreate their physics representations
         for (GameObject obj : gameObjects.droppedObjects) {
             PhysicsVisualPair pair = GameObjectController.convert(obj, physics.world);
             addPhysicsVisualPair(pair);
-            
+
             // Add to visual pairs if not a special zone
             if (!obj.getName().equals("noPlaceZone") && !obj.getName().equals("winZone")) {
                 gameObjects.droppedVisualPairs.add(pair);
             }
-            
+
             // Track special zones
             if (obj.getName().equals("noPlaceZone")) {
                 gameObjects.noPlaceZones.add(pair);
             }
         }
-        
+
         // Initialize timer without simSpace - will be connected by controller later
         physics.timer = new PhysicsAnimationController(physics.world, physics.pairs, this);
         contactEventService.setupContactListener();

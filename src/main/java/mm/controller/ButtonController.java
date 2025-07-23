@@ -20,28 +20,31 @@ import java.util.regex.Pattern;
 
 /**
  * Manages all button setup and event handling for the simulation interface.
- * This class is responsible for configuring all UI buttons and their associated behaviors,
- * including play/stop controls, undo/redo functionality, file operations, and overlay toggles.
- * It follows the separation of concerns principle by extracting UI interaction logic from
+ * This class is responsible for configuring all UI buttons and their associated
+ * behaviors,
+ * including play/stop controls, undo/redo functionality, file operations, and
+ * overlay toggles.
+ * It follows the separation of concerns principle by extracting UI interaction
+ * logic from
  * the main simulation controller.
  */
 public class ButtonController {
-    
+
     /**
      * Contains UI-related components needed by the ButtonManager.
      */
     private final UIComponents uiComponents;
-    
+
     /**
      * Contains model-related components needed by the ButtonManager.
      */
     private final ModelComponents modelComponents;
-    
+
     /**
      * Contains callback functions for various operations.
      */
     private final CallbackComponents callbackComponents;
-    
+
     /**
      * Contains state information for the ButtonManager.
      */
@@ -55,16 +58,16 @@ public class ButtonController {
         private final Stage primaryStage;
         private final double originalWidth;
         private final double originalHeight;
-        
+
         /**
          * Constructs UIComponents with the specified values.
          * 
-         * @param view The simulation view
-         * @param primaryStage The primary JavaFX stage
-         * @param originalWidth The original window width
+         * @param view           The simulation view
+         * @param primaryStage   The primary JavaFX stage
+         * @param originalWidth  The original window width
          * @param originalHeight The original window height
          */
-        public UIComponents(SimulationView view, Stage primaryStage, 
+        public UIComponents(SimulationView view, Stage primaryStage,
                 double originalWidth, double originalHeight) {
             this.view = view;
             this.primaryStage = primaryStage;
@@ -72,7 +75,7 @@ public class ButtonController {
             this.originalHeight = originalHeight;
         }
     }
-    
+
     /**
      * Groups model-related components.
      */
@@ -80,15 +83,15 @@ public class ButtonController {
         private final SimulationModel model;
         private final Map<GameObject, PhysicsVisualPair> gameObjectToPairMap;
         private final InventoryManager inventoryManager;
-        
+
         /**
          * Constructs ModelComponents with the specified values.
          * 
-         * @param model The simulation model
+         * @param model               The simulation model
          * @param gameObjectToPairMap The map of game objects to physics-visual pairs
-         * @param inventoryManager The inventory manager
+         * @param inventoryManager    The inventory manager
          */
-        public ModelComponents(SimulationModel model, 
+        public ModelComponents(SimulationModel model,
                 Map<GameObject, PhysicsVisualPair> gameObjectToPairMap,
                 InventoryManager inventoryManager) {
             this.model = model;
@@ -96,34 +99,34 @@ public class ButtonController {
             this.inventoryManager = inventoryManager;
         }
     }
-    
+
     /**
      * Groups callback functions.
      */
     public static class CallbackComponents {
         private final Runnable updateJsonViewerCallback;
         private final Runnable setupSimulationCallback;
-        
+
         /**
          * Constructs CallbackComponents with the specified values.
          * 
          * @param updateJsonViewerCallback Callback to update the JSON viewer
-         * @param setupSimulationCallback Callback to set up the simulation
+         * @param setupSimulationCallback  Callback to set up the simulation
          */
-        public CallbackComponents(Runnable updateJsonViewerCallback, 
+        public CallbackComponents(Runnable updateJsonViewerCallback,
                 Runnable setupSimulationCallback) {
             this.updateJsonViewerCallback = updateJsonViewerCallback;
             this.setupSimulationCallback = setupSimulationCallback;
         }
     }
-    
+
     /**
      * Groups state information.
      */
     public static class StateComponents {
         private final String selectedSkin;
         private final boolean atPuzzlesEnd;
-        
+
         /**
          * Constructs StateComponents with the specified values.
          * 
@@ -220,8 +223,8 @@ public class ButtonController {
              * @throws IllegalStateException If any required parameter is null
              */
             public Params build() {
-                if (uiComponents == null || modelComponents == null || 
-                    callbackComponents == null || stateComponents == null) {
+                if (uiComponents == null || modelComponents == null ||
+                        callbackComponents == null || stateComponents == null) {
                     throw new IllegalStateException("Required components must not be null");
                 }
                 return new Params(this);
@@ -244,7 +247,8 @@ public class ButtonController {
 
     /**
      * Sets up all menu buttons and their event handlers.
-     * This method initializes all UI button actions by calling individual setup methods.
+     * This method initializes all UI button actions by calling individual setup
+     * methods.
      */
     public void setupAllButtons() {
         SimulationView.SimulationButtons simButtons = uiComponents.view.getSimulationButtons();
@@ -280,7 +284,8 @@ public class ButtonController {
 
     /**
      * Sets up the stop button action.
-     * Configures the stop button to halt the physics simulation, reset to initial state,
+     * Configures the stop button to halt the physics simulation, reset to initial
+     * state,
      * and re-enable inventory interactions.
      * 
      * @param simButtons Container object holding all simulation buttons
@@ -293,12 +298,14 @@ public class ButtonController {
                     timer.stop();
                     timer.reset();
 
-                    // Clear undo/redo history when stopping simulation to prevent inconsistent state
+                    // Clear undo/redo history when stopping simulation to prevent inconsistent
+                    // state
                     modelComponents.model.getUndoRedoManager().clear();
 
-                    // Reset simulation to state before play was pressed
-                    modelComponents.model.setDroppedObjects(modelComponents.model.getDroppedObjects());
-                    modelComponents.model.setDroppedVisualPairs(modelComponents.model.getDroppedPhysicsVisualPairs());
+                    // The PhysicsAnimationController.reset() method already handles:
+                    // - Restoring culled objects via Object Culling System
+                    // - Clearing visual pairs
+                    // - Resetting simulation state
                     modelComponents.gameObjectToPairMap.clear();
                     modelComponents.inventoryManager.setInventoryItemsDisabled(false);
                     callbackComponents.setupSimulationCallback.run();
@@ -310,7 +317,8 @@ public class ButtonController {
 
     /**
      * Sets up the settings button action.
-     * Configures the settings button to pause the simulation and display the settings overlay.
+     * Configures the settings button to pause the simulation and display the
+     * settings overlay.
      * 
      * @param simButtons Container object holding all simulation buttons
      */
@@ -381,7 +389,8 @@ public class ButtonController {
 
     /**
      * Sets up the import and save button actions.
-     * Configures file operations for importing levels from JSON files and saving the current level.
+     * Configures file operations for importing levels from JSON files and saving
+     * the current level.
      * 
      * @param simButtons Container object holding all simulation buttons
      */
@@ -397,10 +406,10 @@ public class ButtonController {
                 if (file != null) {
                     // Clear everything before importing new level
                     clearSimulationForImport();
-                    
+
                     // Set new level path
                     modelComponents.model.setLevelPath("/level/" + file.getName());
-                    
+
                     // Setup simulation with imported level
                     callbackComponents.setupSimulationCallback.run();
                     modelComponents.inventoryManager.setupInventory(true); // Reload data when importing new level
@@ -424,15 +433,16 @@ public class ButtonController {
     /**
      * Clears all simulation state before importing a new level.
      * This ensures that only objects from the imported level are present
-     * by clearing undo/redo history, restoring inventory counts, and removing all objects.
+     * by clearing undo/redo history, restoring inventory counts, and removing all
+     * objects.
      */
     private void clearSimulationForImport() {
         // Clear undo/redo history when importing new level
         modelComponents.model.getUndoRedoManager().clear();
-        
+
         // Restore inventory counts before clearing objects
         modelComponents.model.restoreInventoryCounts();
-        
+
         // Clear all dropped objects
         modelComponents.model.setDroppedObjects(new ArrayList<>());
         modelComponents.model.setDroppedVisualPairs(new ArrayList<>());
@@ -481,11 +491,11 @@ public class ButtonController {
 
         overlayButtons.overlayBackButton.setOnAction(e -> {
             uiComponents.view.getOverlaySettings().setVisible(false);
-            
+
             // Create new title screen
             TitleScreenController titleScreenController = new TitleScreenController(uiComponents.primaryStage);
             uiComponents.primaryStage.setScene(titleScreenController.getScene());
-            
+
             // Restore original window dimensions
             uiComponents.primaryStage.setWidth(uiComponents.originalWidth);
             uiComponents.primaryStage.setHeight(uiComponents.originalHeight);
@@ -504,11 +514,11 @@ public class ButtonController {
             winButtons.btnWinHome.setOnAction(e -> {
                 TitleScreenController titleScreenController = new TitleScreenController(uiComponents.primaryStage);
                 uiComponents.primaryStage.setScene(titleScreenController.getScene());
-            
+
                 uiComponents.primaryStage.setWidth(uiComponents.originalWidth);
                 uiComponents.primaryStage.setHeight(uiComponents.originalHeight);
             });
-            
+
         }
     }
 
@@ -521,8 +531,8 @@ public class ButtonController {
     private void setupWinNextLevel() {
         int currentLevel = extractLevelNumber(modelComponents.model.getLevelPath());
         String nextLevel = "1";
-        final boolean[] nextLevelAtPuzzlesEnd = {false};
-        
+        final boolean[] nextLevelAtPuzzlesEnd = { false };
+
         switch (currentLevel) {
             case 1:
                 nextLevel = "2";
@@ -535,25 +545,24 @@ public class ButtonController {
             default:
                 break;
         }
-        
+
         String nextLevelPath = "/level/level" + nextLevel + ".json";
         if (uiComponents.view.getWinScreenButtons().btnWinNext != null) {
             uiComponents.view.getWinScreenButtons().btnWinNext.setOnAction(e -> {
                 SimulationController simController = new SimulationController(
                         new SimulationController.SimulationControllerParams.Builder()
-                            .setPrimaryStage(uiComponents.primaryStage)
-                            .setLevelPath(nextLevelPath)
-                            .setPuzzleMode(true)
-                            .setAtPuzzlesEnd(nextLevelAtPuzzlesEnd[0])
-                            .setSelectedSkin(stateComponents.selectedSkin)
-                            .build()
-                );
+                                .setPrimaryStage(uiComponents.primaryStage)
+                                .setLevelPath(nextLevelPath)
+                                .setPuzzleMode(true)
+                                .setAtPuzzlesEnd(nextLevelAtPuzzlesEnd[0])
+                                .setSelectedSkin(stateComponents.selectedSkin)
+                                .build());
                 Scene simScene = simController.getScene();
                 uiComponents.primaryStage.setScene(simScene);
             });
         }
     }
-    
+
     /**
      * Extracts the level number from the level path.
      * Uses regular expressions to find the level number in the file name.
