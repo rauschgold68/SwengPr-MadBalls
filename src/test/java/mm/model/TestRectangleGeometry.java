@@ -247,6 +247,7 @@ public class TestRectangleGeometry {
      * </p>
      * <ul>
      * <li>Zero-size rectangles cannot be created and Exception is thrown</li>
+     * </ul>
      * 
      * @see RectangleGeometry#RectangleGeometry(Position, double, double)
      * @see RectangleGeometry#containsPoint(double, double)

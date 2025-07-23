@@ -257,6 +257,8 @@
                         <exclude>mm/controller/ApplicationController.class</exclude>
                         <exclude>mm/controller/TitleScreenController.class</exclude>
                         <exclude>mm/controller/FxToGameObjectController.class</exclude>
+                        <exclude>mm/controller/JsonViewController.class</exclude>
+                        <exclude>mm/controller/VisualUpdateController.class</exclude>
                         <exclude>mm/model/CollisionDetection.class</exclude>
 
                         <!-- Lambda functions are compiled to synthetic methods with specific patterns -->
