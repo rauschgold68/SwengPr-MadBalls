@@ -29,6 +29,18 @@ import mm.model.Size;
  */
 public class TestInventoryObjectController {
 
+    // Test constants to avoid duplicate literals
+    private static final String RECTANGLE_TYPE = "rectangle";
+    private static final String CIRCLE_TYPE = "circle";
+    private static final String BUCKET_TYPE = "bucket";
+    private static final String RED_COLOR = "#FF0000";
+    private static final String GREEN_COLOR = "#00FF00";
+    private static final String BLUE_COLOR = "#0000FF";
+    private static final String YELLOW_COLOR = "#FFFF00";
+    private static final String WHITE_COLOR = "#FFFFFF";
+    private static final String NULL_PAIR_MSG = "PhysicsVisualPair should not be null";
+    private static final String TEST_OBJECT = "testObject";
+
     @Mock
     private World mockWorld;
     
@@ -64,9 +76,9 @@ public class TestInventoryObjectController {
         testSize.setHeight(50.0f);
         
         // Create basic test inventory object
-        testInventoryObject = new InventoryObject("testObject", "rectangle", testSize);
+        testInventoryObject = new InventoryObject(TEST_OBJECT, RECTANGLE_TYPE, testSize);
         testInventoryObject.setPhysics(testPhysics);
-        testInventoryObject.setColour("#FF0000");
+        testInventoryObject.setColour(RED_COLOR);
         testInventoryObject.setCount(5);
     }
     
@@ -78,7 +90,7 @@ public class TestInventoryObjectController {
     public void testConvertRectangleInventoryObject() {
         PhysicsVisualPair result = InventoryObjectController.convert(testInventoryObject, mockWorld);
         
-        assertNotNull(result, "PhysicsVisualPair should not be null");
+        assertNotNull(result, NULL_PAIR_MSG);
         assertNotNull(result.visual, "Visual component should not be null");
         assertNotNull(result.body, "Physics body should not be null");
         
@@ -91,7 +103,7 @@ public class TestInventoryObjectController {
         // Verify world interaction
         verify(mockWorld, times(1)).createBody(any());
         verify(mockBody, times(1)).createFixture(any());
-        verify(mockBody, times(1)).setUserData("testObject");
+        verify(mockBody, times(1)).setUserData(TEST_OBJECT);
     }
     
     /**
@@ -104,13 +116,13 @@ public class TestInventoryObjectController {
         Size circleSize = new Size();
         circleSize.setRadius(25.0f);
         
-        InventoryObject circleObject = new InventoryObject("circleTest", "circle", circleSize);
+        InventoryObject circleObject = new InventoryObject("circleTest", CIRCLE_TYPE, circleSize);
         circleObject.setPhysics(testPhysics);
-        circleObject.setColour("#00FF00");
+        circleObject.setColour(GREEN_COLOR);
         
         PhysicsVisualPair result = InventoryObjectController.convert(circleObject, mockWorld);
         
-        assertNotNull(result, "PhysicsVisualPair should not be null");
+        assertNotNull(result, NULL_PAIR_MSG);
         assertTrue(result.visual instanceof Circle, "Visual should be a Circle");
         
         Circle circle = (Circle) result.visual;
@@ -126,13 +138,13 @@ public class TestInventoryObjectController {
      */
     @Test
     public void testConvertBucketInventoryObject() {
-        InventoryObject bucketObject = new InventoryObject("bucketTest", "bucket", testSize);
+        InventoryObject bucketObject = new InventoryObject("bucketTest", BUCKET_TYPE, testSize);
         bucketObject.setPhysics(testPhysics);
-        bucketObject.setColour("#0000FF");
+        bucketObject.setColour(BLUE_COLOR);
         
         PhysicsVisualPair result = InventoryObjectController.convert(bucketObject, mockWorld);
         
-        assertNotNull(result, "PhysicsVisualPair should not be null");
+        assertNotNull(result, NULL_PAIR_MSG);
         assertTrue(result.visual instanceof Polygon, "Visual should be a Polygon for bucket");
         
         Polygon bucket = (Polygon) result.visual;
@@ -169,13 +181,13 @@ public class TestInventoryObjectController {
      */
     @Test
     public void testConvertWithDifferentNames() {
-        InventoryObject namedObject = new InventoryObject("specialObject", "rectangle", testSize);
+        InventoryObject namedObject = new InventoryObject("specialObject", RECTANGLE_TYPE, testSize);
         namedObject.setPhysics(testPhysics);
-        namedObject.setColour("#FF0000");
+        namedObject.setColour(RED_COLOR);
         
         PhysicsVisualPair result = InventoryObjectController.convert(namedObject, mockWorld);
         
-        assertNotNull(result, "PhysicsVisualPair should not be null");
+        assertNotNull(result, NULL_PAIR_MSG);
         assertTrue(result.visual instanceof Rectangle, "Visual should be Rectangle");
         
         verify(mockBody, atLeastOnce()).setUserData("specialObject");
@@ -187,13 +199,13 @@ public class TestInventoryObjectController {
      */
     @Test
     public void testConvertWithPattern() {
-        InventoryObject patternObject = new InventoryObject("patternTest", "rectangle", testSize);
+        InventoryObject patternObject = new InventoryObject("patternTest", RECTANGLE_TYPE, testSize);
         patternObject.setPhysics(testPhysics);
-        patternObject.setColour("#00FF00");
+        patternObject.setColour(GREEN_COLOR);
         
         PhysicsVisualPair result = InventoryObjectController.convert(patternObject, mockWorld);
         
-        assertNotNull(result, "PhysicsVisualPair should not be null");
+        assertNotNull(result, NULL_PAIR_MSG);
         assertTrue(result.visual instanceof Rectangle, "Visual should be Rectangle");
         
         verify(mockBody, atLeastOnce()).setUserData("patternTest");
@@ -227,8 +239,8 @@ public class TestInventoryObjectController {
         Size circleSize = new Size();
         circleSize.setRadius(30.0f);
         
-        InventoryObject circleObject = new InventoryObject("previewCircle", "circle", circleSize);
-        circleObject.setColour("#00FF00"); // Set color to avoid null issues
+        InventoryObject circleObject = new InventoryObject("previewCircle", CIRCLE_TYPE, circleSize);
+        circleObject.setColour(GREEN_COLOR); // Set color to avoid null issues
         circleObject.setAngle(90.0f);
         
         Node preview = InventoryObjectController.createPreviewVisual(circleObject);
@@ -247,8 +259,8 @@ public class TestInventoryObjectController {
      */
     @Test
     public void testCreatePreviewVisualBucket() {
-        InventoryObject bucketObject = new InventoryObject("previewBucket", "bucket", testSize);
-        bucketObject.setColour("#0000FF"); // Set color to avoid null issues
+        InventoryObject bucketObject = new InventoryObject("previewBucket", BUCKET_TYPE, testSize);
+        bucketObject.setColour(BLUE_COLOR); // Set color to avoid null issues
         bucketObject.setAngle(30.0f);
         
         Node preview = InventoryObjectController.createPreviewVisual(bucketObject);
@@ -360,7 +372,7 @@ public class TestInventoryObjectController {
         // Set physics for all objects
         for (InventoryObject obj : objects) {
             obj.setPhysics(testPhysics);
-            obj.setColour("#FFFFFF");
+            obj.setColour(WHITE_COLOR);
         }
         
         List<PhysicsVisualPair> results = new ArrayList<>();
@@ -427,9 +439,9 @@ public class TestInventoryObjectController {
         Size circleSize = new Size();
         circleSize.setRadius(25.0f);
         
-        InventoryObject circleObject = new InventoryObject("circleSprite", "circle", circleSize);
+        InventoryObject circleObject = new InventoryObject("circleSprite", CIRCLE_TYPE, circleSize);
         circleObject.setPhysics(testPhysics);
-        circleObject.setColour("#00FF00");
+        circleObject.setColour(GREEN_COLOR);
         circleObject.setSprite(null); // No sprite, should use color
         
         PhysicsVisualPair result = InventoryObjectController.convert(circleObject, mockWorld);
@@ -450,9 +462,9 @@ public class TestInventoryObjectController {
         Size circleSize = new Size();
         circleSize.setRadius(25.0f);
         
-        InventoryObject circleObject = new InventoryObject("circleSpriteFail", "circle", circleSize);
+        InventoryObject circleObject = new InventoryObject("circleSpriteFail", CIRCLE_TYPE, circleSize);
         circleObject.setPhysics(testPhysics);
-        circleObject.setColour("#00FF00");
+        circleObject.setColour(GREEN_COLOR);
         circleObject.setSprite("/invalid/path.png");
         
         // Should throw RuntimeException for invalid sprite
@@ -476,9 +488,9 @@ public class TestInventoryObjectController {
         rectPhysics.setFriction(0.5f);
         rectPhysics.setRestitution(0.3f);
         
-        InventoryObject rectObject = new InventoryObject("rectTest", "rectangle", testSize);
+        InventoryObject rectObject = new InventoryObject("rectTest", RECTANGLE_TYPE, testSize);
         rectObject.setPhysics(rectPhysics);
-        rectObject.setColour("#FFFF00"); // Set color to avoid null issues
+        rectObject.setColour(YELLOW_COLOR); // Set color to avoid null issues
         
         PhysicsVisualPair rectResult = InventoryObjectController.convert(rectObject, mockWorld);
         assertNotNull(rectResult, "Rectangle with Dynamic physics should convert");
@@ -492,9 +504,9 @@ public class TestInventoryObjectController {
         
         Size circleSize = new Size();
         circleSize.setRadius(30.0f);
-        InventoryObject circleObject = new InventoryObject("circleTest", "circle", circleSize);
+        InventoryObject circleObject = new InventoryObject("circleTest", CIRCLE_TYPE, circleSize);
         circleObject.setPhysics(circlePhysics);
-        circleObject.setColour("#FFFF00"); // Set color to avoid null issues
+        circleObject.setColour(YELLOW_COLOR); // Set color to avoid null issues
         
         PhysicsVisualPair circleResult = InventoryObjectController.convert(circleObject, mockWorld);
         assertNotNull(circleResult, "Circle with DYNAMIC physics should convert");

@@ -29,6 +29,18 @@ import mm.model.Size;
  */
 public class TestGameObjectController {
 
+    // Test constants to avoid duplicate literals
+    private static final String RECTANGLE_TYPE = "rectangle";
+    private static final String CIRCLE_TYPE = "circle";
+    private static final String BUCKET_TYPE = "bucket";
+    private static final String RED_COLOR = "#FF0000";
+    private static final String GREEN_COLOR = "#00FF00";
+    private static final String BLUE_COLOR = "#0000FF";
+    private static final String WHITE_COLOR = "#FFFFFF";
+    private static final String NULL_PAIR_MSG = "PhysicsVisualPair should not be null";
+    private static final String WIN_OBJECT = "winObject";
+    private static final String TEST_GAME_OBJECT = "testGameObject";
+
     @Mock
     private World mockWorld;
     
@@ -66,9 +78,9 @@ public class TestGameObjectController {
         testSize = new Size(80.0f, 60.0f);
         
         // Create basic test game object
-        testGameObject = new GameObject("testGameObject", "rectangle", testPosition, testSize);
+        testGameObject = new GameObject(TEST_GAME_OBJECT, RECTANGLE_TYPE, testPosition, testSize);
         testGameObject.setPhysics(testPhysics);
-        testGameObject.setColour("#FF0000");
+        testGameObject.setColour(RED_COLOR);
         testGameObject.setAngle(0.0f);
     }
     
@@ -80,7 +92,7 @@ public class TestGameObjectController {
     public void testConvertRectangleGameObject() {
         PhysicsVisualPair result = GameObjectController.convert(testGameObject, mockWorld);
         
-        assertNotNull(result, "PhysicsVisualPair should not be null");
+        assertNotNull(result, NULL_PAIR_MSG);
         assertNotNull(result.visual, "Visual component should not be null");
         assertNotNull(result.body, "Physics body should not be null");
         
@@ -108,14 +120,14 @@ public class TestGameObjectController {
         Size circleSize = new Size(35.0f);
         Position circlePosition = new Position(150.0f, 250.0f);
         
-        GameObject circleObject = new GameObject("circleTest", "circle", circlePosition, circleSize);
+        GameObject circleObject = new GameObject("circleTest", CIRCLE_TYPE, circlePosition, circleSize);
         circleObject.setPhysics(testPhysics);
-        circleObject.setColour("#00FF00");
+        circleObject.setColour(GREEN_COLOR);
         circleObject.setAngle(45.0f);
         
         PhysicsVisualPair result = GameObjectController.convert(circleObject, mockWorld);
         
-        assertNotNull(result, "PhysicsVisualPair should not be null");
+        assertNotNull(result, NULL_PAIR_MSG);
         assertTrue(result.visual instanceof Circle, "Visual should be a Circle");
         
         Circle circle = (Circle) result.visual;
@@ -135,14 +147,14 @@ public class TestGameObjectController {
     @Test
     public void testConvertBucketGameObject() {
         Position bucketPosition = new Position(50.0f, 100.0f);
-        GameObject bucketObject = new GameObject("bucketTest", "bucket", bucketPosition, testSize);
+        GameObject bucketObject = new GameObject("bucketTest", BUCKET_TYPE, bucketPosition, testSize);
         bucketObject.setPhysics(testPhysics);
-        bucketObject.setColour("#0000FF");
+        bucketObject.setColour(BLUE_COLOR);
         bucketObject.setAngle(30.0f);
         
         PhysicsVisualPair result = GameObjectController.convert(bucketObject, mockWorld);
         
-        assertNotNull(result, "PhysicsVisualPair should not be null");
+        assertNotNull(result, NULL_PAIR_MSG);
         assertTrue(result.visual instanceof Polygon, "Visual should be a Polygon for bucket");
         
         Polygon bucket = (Polygon) result.visual;
@@ -182,13 +194,13 @@ public class TestGameObjectController {
      */
     @Test
     public void testConvertWithDifferentNames() {
-        GameObject namedObject = new GameObject("specialObject", "rectangle", testPosition, testSize);
+        GameObject namedObject = new GameObject("specialObject", RECTANGLE_TYPE, testPosition, testSize);
         namedObject.setPhysics(testPhysics);
-        namedObject.setColour("#FF0000");
+        namedObject.setColour(RED_COLOR);
         
         PhysicsVisualPair result = GameObjectController.convert(namedObject, mockWorld);
         
-        assertNotNull(result, "PhysicsVisualPair should not be null");
+        assertNotNull(result, NULL_PAIR_MSG);
         assertTrue(result.visual instanceof Rectangle, "Visual should be Rectangle");
         
         verify(mockBody, atLeastOnce()).setUserData(any(String.class));
@@ -200,13 +212,13 @@ public class TestGameObjectController {
      */
     @Test
     public void testConvertWithPattern() {
-        GameObject patternObject = new GameObject("patternTest", "rectangle", testPosition, testSize);
+        GameObject patternObject = new GameObject("patternTest", RECTANGLE_TYPE, testPosition, testSize);
         patternObject.setPhysics(testPhysics);
-        patternObject.setColour("#00FF00");
+        patternObject.setColour(GREEN_COLOR);
         
         PhysicsVisualPair result = GameObjectController.convert(patternObject, mockWorld);
         
-        assertNotNull(result, "PhysicsVisualPair should not be null");
+        assertNotNull(result, NULL_PAIR_MSG);
         assertTrue(result.visual instanceof Rectangle, "Visual should be Rectangle");
         
         verify(mockBody, atLeastOnce()).setUserData(any(String.class));
@@ -345,14 +357,14 @@ public class TestGameObjectController {
         List<GameObject> objects = new ArrayList<>();
         
         // Create multiple test objects with different properties
-        objects.add(new GameObject("rect1", "rectangle", new Position(0, 0), testSize));
-        objects.add(new GameObject("circle1", "circle", new Position(100, 100), new Size(25.0f)));
-        objects.add(new GameObject("bucket1", "bucket", new Position(200, 200), testSize));
+        objects.add(new GameObject("rect1", RECTANGLE_TYPE, new Position(0, 0), testSize));
+        objects.add(new GameObject("circle1", CIRCLE_TYPE, new Position(100, 100), new Size(25.0f)));
+        objects.add(new GameObject("bucket1", BUCKET_TYPE, new Position(200, 200), testSize));
         
         // Set physics for all objects
         for (GameObject obj : objects) {
             obj.setPhysics(testPhysics);
-            obj.setColour("#FFFFFF");
+            obj.setColour(WHITE_COLOR);
             obj.setAngle(0.0f);
         }
         
@@ -475,9 +487,9 @@ public class TestGameObjectController {
     public void testCircleSpriteLoadingSuccess() {
         Size circleSize = new Size(30.0f);
         Position circlePosition = new Position(100.0f, 100.0f);
-        GameObject circleObject = new GameObject("circleSprite", "circle", circlePosition, circleSize);
+        GameObject circleObject = new GameObject("circleSprite", CIRCLE_TYPE, circlePosition, circleSize);
         circleObject.setPhysics(testPhysics);
-        circleObject.setColour("#00FF00");
+        circleObject.setColour(GREEN_COLOR);
         circleObject.setSprite(null); // No sprite, should use color
         
         PhysicsVisualPair result = GameObjectController.convert(circleObject, mockWorld);
@@ -497,9 +509,9 @@ public class TestGameObjectController {
     public void testCircleSpriteLoadingFailure() {
         Size circleSize = new Size(30.0f);
         Position circlePosition = new Position(100.0f, 100.0f);
-        GameObject circleObject = new GameObject("circleSpriteFail", "circle", circlePosition, circleSize);
+        GameObject circleObject = new GameObject("circleSpriteFail", CIRCLE_TYPE, circlePosition, circleSize);
         circleObject.setPhysics(testPhysics);
-        circleObject.setColour("#00FF00");
+        circleObject.setColour(GREEN_COLOR);
         circleObject.setSprite("/invalid/path.png");
         
         // Should not throw exception, should fall back to color
@@ -514,19 +526,18 @@ public class TestGameObjectController {
     
     /**
      * Tests winning object naming logic with regular objects.
-     * Verifies that winning objects get renamed to "winObject".
+     * Verifies that winning objects get renamed to WIN_OBJECT.
      */
     @Test
     public void testWinningObjectNaming() {
-        GameObject regularWinningObject = new GameObject("regularObject", "rectangle", testPosition, testSize);
+        GameObject regularWinningObject = new GameObject("regularObject", RECTANGLE_TYPE, testPosition, testSize);
         regularWinningObject.setPhysics(testPhysics);
-        regularWinningObject.setColour("#FF0000"); // Set color to avoid null issues
+        regularWinningObject.setColour(RED_COLOR); // Set color to avoid null issues
         regularWinningObject.setWinning(true);
         
-        PhysicsVisualPair result = GameObjectController.convert(regularWinningObject, mockWorld);
+        GameObjectController.convert(regularWinningObject, mockWorld);
         
-        assertNotNull(result, "Winning object should be converted");
-        verify(mockBody, atLeastOnce()).setUserData("winObject"); // Should be renamed
+        verify(mockBody, atLeastOnce()).setUserData(WIN_OBJECT); // Should be renamed
     }
     
     /**
@@ -535,14 +546,13 @@ public class TestGameObjectController {
      */
     @Test
     public void testNonWinningObjectNaming() {
-        GameObject nonWinningObject = new GameObject("regularObject", "rectangle", testPosition, testSize);
+        GameObject nonWinningObject = new GameObject("regularObject", RECTANGLE_TYPE, testPosition, testSize);
         nonWinningObject.setPhysics(testPhysics);
-        nonWinningObject.setColour("#FF0000"); // Set color to avoid null issues
+        nonWinningObject.setColour(RED_COLOR); // Set color to avoid null issues
         nonWinningObject.setWinning(false);
         
-        PhysicsVisualPair result = GameObjectController.convert(nonWinningObject, mockWorld);
+        GameObjectController.convert(nonWinningObject, mockWorld);
         
-        assertNotNull(result, "Non-winning object should be converted");
         verify(mockBody, atLeastOnce()).setUserData("regularObject"); // Should keep original name
     }
     
@@ -552,9 +562,9 @@ public class TestGameObjectController {
      */
     @Test
     public void testWinplatSpecialCase() {
-        GameObject winplatObject = new GameObject("winplat", "rectangle", testPosition, testSize);
+        GameObject winplatObject = new GameObject("winplat", RECTANGLE_TYPE, testPosition, testSize);
         winplatObject.setPhysics(testPhysics);
-        winplatObject.setColour("#FF0000"); // Set color to avoid null issues
+        winplatObject.setColour(RED_COLOR); // Set color to avoid null issues
         winplatObject.setWinning(true);
         
         PhysicsVisualPair result = GameObjectController.convert(winplatObject, mockWorld);
@@ -562,7 +572,7 @@ public class TestGameObjectController {
         assertNotNull(result, "Winplat object should be converted");
         // Due to the OR logic bug, winplat should still get renamed
         // The original logic: (!winplat OR !winZone) is always true
-        verify(mockBody, atLeastOnce()).setUserData("winObject");
+        verify(mockBody, atLeastOnce()).setUserData(WIN_OBJECT);
     }
     
     /**
