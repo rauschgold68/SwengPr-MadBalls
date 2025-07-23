@@ -1,31 +1,19 @@
 package mm.controller;
-
 import javafx.application.Platform;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.shape.*;
 import javafx.stage.Stage;
-import javafx.stage.FileChooser;
 import mm.model.GameObject;
-import mm.model.InventoryObject;
 import mm.model.PhysicsVisualPair;
 import mm.model.Position;
 import mm.model.SimulationModel;
+import mm.model.SimulationState;
 import mm.view.SimulationView;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.io.File;
 
 /**
  * The {@code SimulationController} class coordinates the interaction between
@@ -68,65 +56,237 @@ import java.io.File;
  */
 public class SimulationController {
 
-    private String selectedSkin = "Default";
-
+    // Core components
     public final SimulationModel model;
     public final SimulationView view;
-    private final List<StackPane> inventoryWrappers = new ArrayList<>();
     private final Stage primaryStage;
-    private boolean atPuzzlesEnd;
-    // Map to track correspondence between GameObjects and their PhysicsVisualPairs
-    private final java.util.Map<GameObject, PhysicsVisualPair> gameObjectToPairMap = new java.util.HashMap<>();
-
-    // Store original window dimensions to restore them when returning to title
-    // screen
-    private final double originalWidth;
-    private final double originalHeight;
-
-    // Drag start position and angle for undo functionality
-    private Position dragStartPosition;
-    private float dragStartAngle;
-
+    
+    // State container
+    private final SimulationState state;
+    
+    // Specialized controllers
     private JsonViewController jsonViewController;
+    private InventoryManager inventoryManager;
+    private DragAndDropController dragAndDropController;
+
+    /**
+     * Parameter object for SimulationController constructor to reduce parameter count.
+     * <p>
+     * This class encapsulates all the configuration parameters needed to create a SimulationController
+     * instance, following the parameter object pattern to avoid excessive parameter lists.
+     * Uses the Builder pattern for flexible and readable object construction.
+     * </p>
+     * 
+     * @see SimulationController#SimulationController(SimulationControllerParams)
+     * @see Builder
+     */
+    public static class SimulationControllerParams {
+        /** The primary stage of the JavaFX application */
+        public final Stage primaryStage;
+        
+        /** The resource path to the level JSON file to load */
+        public final String levelPath;
+        
+        /** Whether the simulation is running in puzzle mode (true) or sandbox mode (false) */
+        public final boolean isPuzzleMode;
+        
+        /** Whether the player has reached the end of all puzzle levels */
+        public final boolean atPuzzlesEnd;
+        
+        /** The selected visual skin theme ("Default" or "Legacy") */
+        public final String selectedSkin;
+        
+        /**
+         * Private constructor to enforce use of the Builder pattern.
+         * 
+         * @param builder the builder instance containing all configuration values
+         */
+        private SimulationControllerParams(Builder builder) {
+            this.primaryStage = builder.primaryStage;
+            this.levelPath = builder.levelPath;
+            this.isPuzzleMode = builder.isPuzzleMode;
+            this.atPuzzlesEnd = builder.atPuzzlesEnd;
+            this.selectedSkin = builder.selectedSkin;
+        }
+        
+        /**
+         * Builder class for constructing SimulationControllerParams instances.
+         * <p>
+         * Provides a fluent API for setting configuration parameters with sensible defaults.
+         * Required parameters (primaryStage and levelPath) are validated in the build() method.
+         * </p>
+         * 
+         * <h3>Usage Example:</h3>
+         * <pre>{@code
+         * SimulationControllerParams params = new SimulationControllerParams.Builder()
+         *     .setPrimaryStage(stage)
+         *     .setLevelPath("/level/level1.json")
+         *     .setPuzzleMode(true)
+         *     .setSelectedSkin("Legacy")
+         *     .build();
+         * }</pre>
+         */
+        public static class Builder {
+            /** The primary stage - required parameter */
+            private Stage primaryStage;
+            
+            /** The level path - required parameter */
+            private String levelPath;
+            
+            /** Whether puzzle mode is enabled - defaults to false (sandbox mode) */
+            private boolean isPuzzleMode = false;
+            
+            /** Whether at the end of puzzles - defaults to false */
+            private boolean atPuzzlesEnd = false;
+            
+            /** The selected skin - defaults to "Default" */
+            private String selectedSkin = "Default";
+            
+            /**
+             * Sets the primary stage for the simulation.
+             * 
+             * @param primaryStage the JavaFX primary stage (required)
+             * @return this builder instance for method chaining
+             */
+            public Builder setPrimaryStage(Stage primaryStage) {
+                this.primaryStage = primaryStage;
+                return this;
+            }
+            
+            /**
+             * Sets the path to the level JSON file.
+             * 
+             * @param levelPath the resource path to the level file (required)
+             * @return this builder instance for method chaining
+             */
+            public Builder setLevelPath(String levelPath) {
+                this.levelPath = levelPath;
+                return this;
+            }
+            
+            /**
+             * Sets whether the simulation should run in puzzle mode.
+             * 
+             * @param isPuzzleMode true for puzzle mode, false for sandbox mode
+             * @return this builder instance for method chaining
+             */
+            public Builder setPuzzleMode(boolean isPuzzleMode) {
+                this.isPuzzleMode = isPuzzleMode;
+                return this;
+            }
+            
+            /**
+             * Sets whether the player has reached the end of all puzzle levels.
+             * 
+             * @param atPuzzlesEnd true if at the end of puzzles, false otherwise
+             * @return this builder instance for method chaining
+             */
+            public Builder setAtPuzzlesEnd(boolean atPuzzlesEnd) {
+                this.atPuzzlesEnd = atPuzzlesEnd;
+                return this;
+            }
+            
+            /**
+             * Sets the selected visual skin theme.
+             * 
+             * @param selectedSkin the skin name ("Default" or "Legacy")
+             * @return this builder instance for method chaining
+             */
+            public Builder setSelectedSkin(String selectedSkin) {
+                this.selectedSkin = selectedSkin;
+                return this;
+            }
+            
+            /**
+             * Builds and returns a new SimulationControllerParams instance.
+             * <p>
+             * Validates that all required parameters (primaryStage and levelPath) have been set.
+             * </p>
+             * 
+             * @return a new SimulationControllerParams instance with the configured values
+             * @throws IllegalStateException if primaryStage or levelPath is null
+             */
+            public SimulationControllerParams build() {
+                if (primaryStage == null || levelPath == null) {
+                    throw new IllegalStateException("Primary stage and level path are required");
+                }
+                return new SimulationControllerParams(this);
+            }
+        }
+    }
 
     /**
      * Constructs the SimulationController, sets up the model and view, and wires up
      * event handlers.
      *
-     * @param primaryStage the primary stage of the application
-     * @param levelPath    the resource path to the level JSON file
-     * @param isPuzzleMode whether puzzle mode is enabled
-     * @param atPuzzlesEnd whether at the end of puzzles
-     * @param selectedSkin the selected skin ("Default" or "Legacy")
+     * @param params the parameter object containing all configuration values
      */
-    public SimulationController(Stage primaryStage, String levelPath, boolean isPuzzleMode, boolean atPuzzlesEnd,
-            String selectedSkin) {
-        this.primaryStage = primaryStage;
+    public SimulationController(SimulationControllerParams params) {
+        this.primaryStage = params.primaryStage;
 
-        // Store original window dimensions before any changes
-        this.originalWidth = primaryStage.getWidth();
-        this.originalHeight = primaryStage.getHeight();
+        // Initialize state container
+        this.state = new SimulationState(
+            params.primaryStage.getWidth(),
+            params.primaryStage.getHeight(),
+            params.selectedSkin != null ? params.selectedSkin : "Default"
+        );
 
-        this.model = new SimulationModel(levelPath);
-        this.view = new SimulationView(primaryStage, isPuzzleMode, atPuzzlesEnd);
-        this.selectedSkin = selectedSkin != null ? selectedSkin : "Default";
-
+        this.model = new SimulationModel(params.levelPath);
+        this.view = new SimulationView(params.primaryStage, params.isPuzzleMode, params.atPuzzlesEnd);
+        
         // Set win listener
         this.model.setWinListener(() -> {
             Platform.runLater(() -> view.getWinScreenOverlay().setVisible(true));
         });
 
         setupSimulation();
-        setupInventory(true); // Load data from file on initial setup
-        updateInventorySpritesForSkin(); // Update sprites AFTER inventory is loaded
-        refreshInventoryDisplay(); // Refresh the display with updated sprite paths
-        setupDragAndDrop();
-        setupMenuButtons();
-        setupOverlayToggle();
-        setupWinNextLevel();
-        updateJsonViewer(); // Initialize JSON viewer
-
-        // Initialize JSON controller if in sandbox mode
+        inventoryManager = new InventoryManager(
+            model, 
+            view.getInventoryItemBox(), 
+            this::updateJsonViewer
+        );
+        inventoryManager.setupInventory(true);
+        inventoryManager.updateInventorySpritesForSkin();
+        inventoryManager.refreshInventoryDisplay();
+        
+        // Create and use the DragAndDropController
+        dragAndDropController = new DragAndDropController(
+            new DragAndDropController.Params.Builder()
+                .setModel(model)
+                .setSimSpace(view.getSimSpace())
+                .setGameObjectToPairMap(state.getGameObjectToPairMap())
+                .setOnInventoryUpdated(this::refreshInventoryDisplay)
+                .setSetupMoveHandlers(this::addMoveHandlersToDroppedVisual)
+                .build()
+        );
+        dragAndDropController.setupDragAndDrop();
+        
+        // Replace all button setup methods with ButtonManager
+        // First create the component groups
+        ButtonManager.UIComponents uiComponents = new ButtonManager.UIComponents(
+            view, primaryStage, state.getOriginalWidth(), state.getOriginalHeight());
+            
+        ButtonManager.ModelComponents modelComponents = new ButtonManager.ModelComponents(
+            model, state.getGameObjectToPairMap(), inventoryManager);
+            
+        ButtonManager.CallbackComponents callbackComponents = new ButtonManager.CallbackComponents(
+            this::updateJsonViewer, this::setupSimulation);
+            
+        ButtonManager.StateComponents stateComponents = new ButtonManager.StateComponents(
+            state.getSelectedSkin(), params.atPuzzlesEnd);
+        
+        // Then use the component groups with the builder
+        ButtonManager buttonManager = new ButtonManager(
+            new ButtonManager.Params.Builder()
+                .setUIComponents(uiComponents)
+                .setModelComponents(modelComponents)
+                .setCallbackComponents(callbackComponents)
+                .setStateComponents(stateComponents)
+                .build()
+        );
+        buttonManager.setupAllButtons();
+        
+        updateJsonViewer();
         setupJsonController();
     }
 
@@ -140,7 +300,7 @@ public class SimulationController {
             // Create callback for when simulation needs to be refreshed
             Runnable onSimulationUpdate = () -> {
                 setupSimulation();
-                refreshInventoryDisplay();
+                inventoryManager.refreshInventoryDisplay();
             };
 
             jsonViewController = new JsonViewController(model, jsonViewer, statusLabel, onSimulationUpdate);
@@ -157,23 +317,16 @@ public class SimulationController {
     }
 
     /**
-     * Updates all inventory object sprite paths to use the selected skin folder.
-     */
-    private void updateInventorySpritesForSkin() {
-        SkinManagerController.getInstance().updateInventorySpritesForSkin(model.getInventoryObjects());
-    }
-
-    /**
      * Updates the skin choice and refreshes the inventory display.
      * This method should be called when returning from the title screen.
      */
     public void updateSkinChoice() {
         String currentSkin = SkinManagerController.getInstance().getSelectedSkin();
 
-        if (!currentSkin.equals(this.selectedSkin)) {
-            this.selectedSkin = currentSkin;
-            updateInventorySpritesForSkin();
-            refreshInventoryDisplay();
+        if (!currentSkin.equals(state.getSelectedSkin())) {
+            state.setSelectedSkin(currentSkin);
+            inventoryManager.updateInventorySpritesForSkin();
+            inventoryManager.refreshInventoryDisplay();
         }
     }
 
@@ -201,7 +354,7 @@ public class SimulationController {
         model.setupSimulation();
         model.connectToView(simSpace);
         // Clear the mapping and rebuild it during setup
-        gameObjectToPairMap.clear();
+        state.getGameObjectToPairMap().clear();
 
         // Process all physics-visual pairs
         List<GameObject> dropped = model.getDroppedObjects();
@@ -249,74 +402,14 @@ public class SimulationController {
     private boolean isMatchingObject(PhysicsVisualPair pair, GameObject obj) {
         Object userData = pair.body.getUserData();
         boolean nameMatches = obj.getName().equals(userData)
-                // Also match if this is the winning object
                 || (obj.isWinning() && "winObject".equals(userData));
         if (!nameMatches) {
             return false;
         }
-        ExpectedPosition expectedPos = calculateExpectedPosition(pair);
-        return isPositionMatch(obj, expectedPos);
+        PositionCalculator.ExpectedPosition expectedPos = PositionCalculator.calculateExpectedPosition(pair);
+        return PositionCalculator.isPositionMatch(obj, expectedPos);
     }
 
-    /**
-     * Helper class to hold expected position coordinates.
-     */
-    private static class ExpectedPosition {
-        final float x;
-        final float y;
-
-        ExpectedPosition(float x, float y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
-    /**
-     * Calculates the expected visual position from the physics body position.
-     */
-    private ExpectedPosition calculateExpectedPosition(PhysicsVisualPair pair) {
-        org.jbox2d.common.Vec2 bodyPos = pair.body.getPosition();
-
-        if (pair.visual instanceof javafx.scene.shape.Rectangle) {
-            return calculateRectanglePosition(pair, bodyPos);
-        } else if (pair.visual instanceof javafx.scene.shape.Polygon) {
-            return calculatePolygonPosition(pair, bodyPos);
-        } else {
-            // Default case for circles and other shapes
-            return new ExpectedPosition(bodyPos.x * 50.0f, bodyPos.y * 50.0f);
-        }
-    }
-
-    /**
-     * Calculates expected position for rectangle shapes.
-     */
-    private ExpectedPosition calculateRectanglePosition(PhysicsVisualPair pair, org.jbox2d.common.Vec2 bodyPos) {
-        javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
-        float expectedX = (float) (bodyPos.x * 50.0f - rect.getWidth() / 2);
-        float expectedY = (float) (bodyPos.y * 50.0f - rect.getHeight() / 2);
-        return new ExpectedPosition(expectedX, expectedY);
-    }
-
-    /**
-     * Calculates expected position for polygon shapes (buckets).
-     */
-    private ExpectedPosition calculatePolygonPosition(PhysicsVisualPair pair, org.jbox2d.common.Vec2 bodyPos) {
-        javafx.scene.shape.Polygon polygon = (javafx.scene.shape.Polygon) pair.visual;
-        javafx.geometry.Bounds bounds = polygon.getBoundsInLocal();
-        float expectedX = (float) (bodyPos.x * 50.0f - bounds.getWidth() / 2);
-        float expectedY = (float) (bodyPos.y * 50.0f - bounds.getHeight() / 2);
-        return new ExpectedPosition(expectedX, expectedY);
-    }
-
-    /**
-     * Checks if a GameObject's position matches the expected position within
-     * tolerance.
-     */
-    private boolean isPositionMatch(GameObject obj, ExpectedPosition expected) {
-        float tolerance = 1.0f; // Small tolerance for floating point precision
-        return Math.abs(obj.getPosition().getX() - expected.x) < tolerance &&
-                Math.abs(obj.getPosition().getY() - expected.y) < tolerance;
-    }
 
     /**
      * Configures a matched object by setting its rotation and adding handlers.
@@ -324,106 +417,7 @@ public class SimulationController {
     private void configureMatchedObject(PhysicsVisualPair pair, GameObject matchedDroppedObject) {
         pair.visual.setRotate(matchedDroppedObject.getAngle());
         addMoveHandlersToDroppedVisual(pair, matchedDroppedObject);
-        gameObjectToPairMap.put(matchedDroppedObject, pair);
-    }
-
-    /**
-     * Initializes or refreshes the inventory area.
-     * <p>
-     * Clears the inventory UI, optionally reloads inventory data from file,
-     * and creates drag sources for each item.
-     * </p>
-     * 
-     * @param reloadData if true, reloads inventory data from JSON file;
-     *                   if false, uses existing data with current counts
-     */
-    private void setupInventory(boolean reloadData) {
-        VBox inventoryItemBox = view.getInventoryItemBox();
-        inventoryItemBox.getChildren().clear();
-        inventoryWrappers.clear();
-
-        // Only reload data from file if explicitly requested
-        if (reloadData) {
-            model.setupInvetoryData();
-        }
-
-        // Delegate inventory item creation to the view
-        for (InventoryObject obj : model.getInventoryObjects()) {
-            StackPane itemWrapper = createInventoryItemWrapper(obj);
-            if (itemWrapper != null) {
-                inventoryWrappers.add(itemWrapper);
-                setupInventoryItemHandlers(itemWrapper, obj);
-                inventoryItemBox.getChildren().add(itemWrapper);
-            }
-        }
-
-        // Configure inventory layout
-        inventoryItemBox.setSpacing(15);
-    }
-
-    /**
-     * Creates a wrapper for an inventory item with visual styling.
-     * <p>
-     * This is a temporary helper method that should eventually be moved to the view
-     * layer
-     * for better MVC compliance.
-     * </p>
-     * 
-     * @param obj the inventory object to create a wrapper for
-     * @return a StackPane wrapper containing the visual representation
-     */
-    private StackPane createInventoryItemWrapper(InventoryObject obj) {
-        Node visual = InventoryObjectController.createPreviewVisual(obj);
-        if (visual == null) {
-            return null;
-        }
-
-        // Dynamically adjust wrapper size based on rotated dimensions
-        double rotatedWidth = visual.getBoundsInParent().getWidth();
-        double rotatedHeight = visual.getBoundsInParent().getHeight();
-
-        StackPane wrapper = new StackPane(visual);
-        wrapper.setPrefSize(rotatedWidth + 20, rotatedHeight + 20);
-
-        Label countLabel = new Label(Integer.toString(obj.getCount()));
-        countLabel.setMouseTransparent(true);
-
-        // Apply appropriate CSS class based on count
-        if (obj.getCount() <= 0) {
-            countLabel.getStyleClass().add("item-count-no");
-            wrapper.setStyle("-fx-opacity: 0.5;");
-        } else {
-            countLabel.getStyleClass().add("item-count-yes");
-            wrapper.setStyle("");
-        }
-
-        wrapper.getChildren().add(countLabel);
-        StackPane.setAlignment(countLabel, javafx.geometry.Pos.CENTER_RIGHT);
-
-        return wrapper;
-    }
-
-    /**
-     * Sets up event handlers for an inventory item wrapper.
-     * <p>
-     * This method contains the controller logic for drag-and-drop behavior
-     * while keeping UI creation in the view.
-     * </p>
-     * 
-     * @param wrapper the inventory item wrapper
-     * @param obj     the inventory object associated with this wrapper
-     */
-    private void setupInventoryItemHandlers(StackPane wrapper, InventoryObject obj) {
-        wrapper.setOnDragDetected(event -> {
-            // Business logic: check if drag should be allowed
-            if (!isDragAllowed(obj)) {
-                event.consume();
-                return;
-            }
-
-            // Delegate drag setup to helper method
-            startInventoryItemDrag(wrapper, obj, event);
-        });
+        state.getGameObjectToPairMap().put(matchedDroppedObject, pair);
     }
 
     /**
@@ -440,41 +434,6 @@ public class SimulationController {
     }
 
     /**
-     * Determines if an inventory item can be dragged.
-     * <p>
-     * Business logic method that checks game state and item availability.
-     * </p>
-     * 
-     * @param obj the inventory object to check
-     * @return true if the item can be dragged, false otherwise
-     */
-    private boolean isDragAllowed(InventoryObject obj) {
-        return isInteractionAllowed() && obj.getCount() > 0;
-    }
-
-    /**
-     * Starts the drag operation for an inventory item.
-     * <p>
-     * Helper method to reduce complexity in the main drag handler.
-     * </p>
-     */
-    private void startInventoryItemDrag(StackPane wrapper, InventoryObject obj, javafx.scene.input.MouseEvent event) {
-        Dragboard db = wrapper.startDragAndDrop(TransferMode.COPY);
-        ClipboardContent content = new ClipboardContent();
-        content.putString(obj.getName());
-        db.setContent(content);
-
-        // Create drag image from the visual component
-        javafx.scene.Node visual = wrapper.getChildren().get(0); // First child should be the visual
-        javafx.scene.SnapshotParameters snapshotParameters = new javafx.scene.SnapshotParameters();
-        snapshotParameters.setFill(javafx.scene.paint.Color.TRANSPARENT);
-        javafx.scene.image.WritableImage snapshot = visual.snapshot(snapshotParameters, null);
-
-        db.setDragView(snapshot, snapshot.getWidth() / 2, snapshot.getHeight() / 2);
-        event.consume();
-    }
-
-    /**
      * Refreshes the inventory display without reloading data from file.
      * <p>
      * This method updates the visual representation of inventory items
@@ -482,421 +441,10 @@ public class SimulationController {
      * </p>
      */
     private void refreshInventoryDisplay() {
-        setupInventory(false);
+        inventoryManager.refreshInventoryDisplay();
         updateJsonViewer(); // Update JSON viewer when inventory changes
     }
 
-    /**
-     * Sets the visual state of all inventory item wrappers to indicate whether they
-     * are enabled or disabled.
-     * 
-     * @param disabled {@code true} to visually disable inventory items,
-     *                 {@code false} to enable them
-     */
-    private void setInventoryItemsDisabled(boolean disabled) {
-        for (StackPane wrapper : inventoryWrappers) {
-            if (disabled) {
-                if (!wrapper.getStyleClass().contains("inventory-item-disabled")) {
-                    wrapper.getStyleClass().add("inventory-item-disabled");
-                }
-            } else {
-                wrapper.getStyleClass().remove("inventory-item-disabled");
-            }
-        }
-    }
-
-    /**
-     * Sets up drag-and-drop functionality for placing inventory objects into the
-     * simulation area.
-     * <p>
-     * Handles drag-over and drag-dropped events on the simulation area, checks
-     * placement restrictions,
-     * and updates the model and view with new objects as needed.
-     * </p>
-     */
-    private void setupDragAndDrop() {
-        Pane simSpace = view.getSimSpace();
-
-        simSpace.setOnDragOver(event -> {
-            PhysicsAnimationController timer = model.getTimer();
-            if ((timer == null || !timer.isRunning()) && event.getGestureSource() != simSpace
-                    && event.getDragboard().hasString()) {
-                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-            }
-            event.consume();
-        });
-
-        simSpace.setOnDragDropped(event -> {
-            PhysicsAnimationController timer = model.getTimer();
-            if (timer != null && timer.isRunning()) {
-                event.setDropCompleted(false);
-                event.consume();
-                return;
-            }
-
-            double x = event.getX();
-            double y = event.getY();
-
-            if (model.isInNoPlaceZone(x, y)) {
-                event.setDropCompleted(false);
-                event.consume();
-                return;
-            }
-
-            Dragboard db = event.getDragboard();
-            boolean success = false;
-
-            if (db.hasString()) {
-                String name = db.getString();
-                InventoryObject template = model.findInventoryObjectByName(name);
-
-                if (template != null) {
-                    // Create the GameObject but don't modify inventory count yet
-                    GameObject simObj = new GameObject(
-                            template.getName(),
-                            template.getType(),
-                            new Position((float) x - template.getSize().getWidth() / 2,
-                                    (float) y - template.getSize().getHeight() / 2),
-                            template.getSize());
-
-                    // Set additional properties
-                    simObj.setPhysics(template.getPhysics());
-                    simObj.setAngle(template.getAngle());
-                    simObj.setColour(template.getColour());
-                    simObj.setSprite(template.getSprite());
-                    simObj.setWinning(template.isWinning());
-
-                    PhysicsVisualPair pair = mm.controller.GameObjectController.convert(simObj, model.getWorld());
-                    if (pair.visual != null) {
-                        // Position the visual at the calculated position
-                        pair.visual.setTranslateX(simObj.getPosition().getX());
-                        pair.visual.setTranslateY(simObj.getPosition().getY());
-                        pair.visual.setRotate(simObj.getAngle());
-
-                        // Check for collision before placing the object
-                        if (!wouldCauseOverlap(pair, simObj.getPosition().getX(), simObj.getPosition().getY(),
-                                simObj.getAngle())) {
-                            // Create parameter object for AddObjectController
-                            AddObjectController.AddObjectParams params = new AddObjectController.AddObjectParams(
-                                    model, simSpace, gameObjectToPairMap, this::refreshInventoryDisplay);
-
-                            // Create and execute add command
-                            AddObjectController addCommand = new AddObjectController(params, simObj, pair);
-                            model.getUndoRedoManager().executeCommand(addCommand);
-
-                            addMoveHandlersToDroppedVisual(pair, simObj);
-                            success = true;
-                        }
-                        // If collision would occur, don't place the object
-                    }
-                }
-            }
-
-            event.setDropCompleted(success);
-            event.consume();
-        });
-    }
-
-    /**
-     * Sets up menu button actions (play, stop, settings, delete, import, save).
-     * <p>
-     * Retrieves button groups from the refactored view and wires up event handlers.
-     * </p>
-     */
-    private void setupMenuButtons() {
-        // Get button groups from the refactored view
-        SimulationView.SimulationButtons simButtons = view.getSimulationButtons();
-
-        setupPlayButton(simButtons);
-        setupStopButton(simButtons);
-        setupSettingsButton(simButtons);
-        setupUndoRedoButtons(simButtons);
-        setupDeleteButton(simButtons);
-        setupFileButtons(simButtons);
-        setupCrownButton(simButtons);
-    }
-
-    /**
-     * Sets up the play button action.
-     */
-    private void setupPlayButton(SimulationView.SimulationButtons simButtons) {
-        if (simButtons.playButton != null) {
-            simButtons.playButton.setOnAction(e -> {
-                PhysicsAnimationController timer = model.getTimer();
-                if (timer != null && !timer.isRunning()) {
-                    timer.start();
-                    setInventoryItemsDisabled(true);
-                }
-            });
-        }
-    }
-
-    /**
-     * Sets up the stop button action.
-     */
-    private void setupStopButton(SimulationView.SimulationButtons simButtons) {
-        if (simButtons.stopButton != null) {
-            simButtons.stopButton.setOnAction(e -> {
-                PhysicsAnimationController timer = model.getTimer();
-                if (timer != null && timer.isRunning()) {
-                    timer.stop();
-                    timer.reset();
-
-                    // Clear undo/redo history when stopping simulation to prevent inconsistent
-                    // state
-                    model.getUndoRedoManager().clear();
-
-                    // Reset simulation to state before play was pressed
-                    model.setDroppedObjects(model.getDroppedObjects());
-                    model.setDroppedVisualPairs(model.getDroppedPhysicsVisualPairs());
-                    gameObjectToPairMap.clear();
-                    setInventoryItemsDisabled(false);
-                    setupSimulation();
-                    refreshInventoryDisplay();
-                }
-            });
-        }
-    }
-
-    /**
-     * Sets up the settings button action.
-     */
-    private void setupSettingsButton(SimulationView.SimulationButtons simButtons) {
-        if (simButtons.settingsButton != null) {
-            simButtons.settingsButton.setOnAction(e -> {
-                PhysicsAnimationController timer = model.getTimer();
-                if (timer != null && timer.isRunning()) {
-                    timer.stop();
-                }
-                view.getOverlaySettings().setVisible(true);
-            });
-        }
-    }
-
-    /**
-     * Sets up the undo and redo button actions.
-     */
-    private void setupUndoRedoButtons(SimulationView.SimulationButtons simButtons) {
-        if (simButtons.undoButton != null) {
-            simButtons.undoButton.setOnAction(e -> {
-                if (isInteractionAllowed()) {
-                    model.getUndoRedoManager().undo();
-                    updateJsonViewer(); // Update JSON viewer after undo
-                }
-            });
-        }
-
-        if (simButtons.redoButton != null) {
-            simButtons.redoButton.setOnAction(e -> {
-                if (isInteractionAllowed()) {
-                    model.getUndoRedoManager().redo();
-                    updateJsonViewer(); // Update JSON viewer after redo
-                }
-            });
-        }
-    }
-
-    /**
-     * Sets up the delete button action.
-     */
-    private void setupDeleteButton(SimulationView.SimulationButtons simButtons) {
-        if (simButtons.deleteButton != null) {
-            simButtons.deleteButton.setOnAction(e -> {
-                // Clear undo/redo history when deleting all objects
-                model.getUndoRedoManager().clear();
-
-                // Restore inventory counts before clearing objects
-                model.restoreInventoryCounts();
-
-                model.setDroppedObjects(new ArrayList<>());
-                model.setDroppedVisualPairs(new ArrayList<>());
-                gameObjectToPairMap.clear();
-                setInventoryItemsDisabled(false);
-                setupSimulation();
-                refreshInventoryDisplay();
-                updateJsonViewer(); // Update JSON viewer after deleting all
-            });
-        }
-    }
-
-    /**
-     * Sets up the import and save button actions.
-     */
-    private void setupFileButtons(SimulationView.SimulationButtons simButtons) {
-        if (simButtons.importButton != null) {
-            simButtons.importButton.setOnAction(e -> {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Import your level!");
-                fileChooser.getExtensionFilters().add(
-                        new FileChooser.ExtensionFilter("JSON Files", "*.json"));
-                File file = fileChooser.showOpenDialog(primaryStage);
-                if (file != null) {
-                    // Clear everything before importing new level
-                    clearSimulationForImport();
-                    
-                    // Set new level path
-                    model.setLevelPath("/level/" + file.getName());
-                    
-                    // Setup simulation with imported level
-                    setupSimulation();
-                    setupInventory(true); // Reload data when importing new level
-                    updateJsonViewer(); // Update JSON viewer after import
-                }
-            });
-        }
-
-        if (simButtons.saveButton != null) {
-            simButtons.saveButton.setOnAction(e -> {
-                PhysicsAnimationController timer = model.getTimer();
-                if (timer != null && !timer.isRunning()) {
-                    model.exportLevel();
-                }
-            });
-        }
-    }
-
-    /**
-     * Clears all simulation state before importing a new level.
-     * This ensures that only objects from the imported level are present.
-     */
-    private void clearSimulationForImport() {
-        // Clear undo/redo history
-        model.getUndoRedoManager().clear();
-        
-        // Clear all dropped objects and their visual pairs
-        model.setDroppedObjects(new ArrayList<>());
-        model.setDroppedVisualPairs(new ArrayList<>());
-        
-        // Clear the mapping between GameObjects and PhysicsVisualPairs
-        gameObjectToPairMap.clear();
-        
-        // Re-enable inventory items (in case they were disabled)
-        setInventoryItemsDisabled(false);
-        
-        // Clear the simulation space visually
-        Pane simSpace = view.getSimSpace();
-        simSpace.getChildren().clear();
-    }
-
-    /**
-     * Sets up the crown button action.
-     */
-    private void setupCrownButton(SimulationView.SimulationButtons simButtons) {
-        if (simButtons.crownButton != null) {
-            simButtons.crownButton.setOnAction(e -> {
-                view.getWinScreenOverlay().setVisible(true);
-            });
-        }
-    }
-
-    /**
-     * Sets up the ESC key to toggle the overlay menu.
-     * <p>
-     * Adds a key event handler to the scene to show or hide the overlay settings
-     * menu when ESC is pressed.
-     * </p>
-     */
-    private void setupOverlayToggle() {
-        Scene scene = view.getScene();
-        StackPane overlaySettings = view.getOverlaySettings();
-
-        scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ESCAPE && !model.isWinScreenVisible()) {
-                overlaySettings.setVisible(!overlaySettings.isVisible());
-                event.consume();
-            }
-        });
-
-        // Get button groups from the refactored view
-        SimulationView.OverlayButtons overlayButtons = view.getOverlayButtons();
-        SimulationView.WinScreenButtons winButtons = view.getWinScreenButtons();
-
-        overlayButtons.overlayCloseButton.setOnAction(e -> {
-            view.getOverlaySettings().setVisible(false);
-        });
-
-        overlayButtons.overlayBackButton.setOnAction(e -> {
-            // Hide the overlay before switching scenes to avoid overlay showing on title
-            // screen
-            view.getOverlaySettings().setVisible(false);
-            Scene newScreen = ApplicationController.titleScreenController.getScene();
-            primaryStage.setScene(newScreen);
-            // Reset to original application dimensions to avoid size drift
-            primaryStage.setWidth(originalWidth);
-            primaryStage.setHeight(originalHeight);
-        });
-
-        overlayButtons.overlayQuitButton.setOnAction(e -> {
-            Platform.exit();
-        });
-
-        // win screen overlay functions
-        winButtons.btnWinHome.setOnAction(e -> {
-            view.getWinScreenOverlay().setVisible(false);
-            Scene newScreen = ApplicationController.titleScreenController.getScene();
-            primaryStage.setScene(newScreen);
-            // Reset to original application dimensions to avoid size drift
-            primaryStage.setWidth(originalWidth);
-            primaryStage.setHeight(originalHeight);
-        });
-
-        if (winButtons.btnWinExport != null) {
-            winButtons.btnWinExport.setOnAction(e -> {
-                PhysicsAnimationController timer = model.getTimer();
-                if (timer != null && !timer.isRunning()) {
-                    model.exportLevel();
-                }
-            });
-        }
-    }
-
-    /**
-     * Extracts the level number from the level path.
-     * 
-     * @param levelPath the resource path to the level JSON file
-     * @return the extracted level number, or -1 if not found
-     */
-    private int extractLevelNumber(String levelPath) {
-        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("level(\\d+)\\.json").matcher(levelPath);
-        if (matcher.find()) {
-            return Integer.parseInt(matcher.group(1));
-        }
-        return -1; // oder eine andere Fehlerbehandlung
-    }
-
-    /**
-     * Sets up the next level button on the win screen.
-     * <p>
-     * This method determines the next level based on the current level number and
-     * wires up the button to start the next level.
-     * </p>
-     */
-    private void setupWinNextLevel() {
-        int currentLevel = extractLevelNumber(model.getLevelPath());
-        String nextLevel = "1";
-        switch (currentLevel) {
-            case 1:
-                nextLevel = "2";
-                atPuzzlesEnd = false;
-                break;
-
-            case 2:
-                nextLevel = "3";
-                atPuzzlesEnd = true;
-                break;
-            default:
-                break;
-        }
-        String nextLevelPath = "/level/level" + nextLevel + ".json";
-        if (view.getWinScreenButtons().btnWinNext != null) {
-            view.getWinScreenButtons().btnWinNext.setOnAction(e -> {
-                SimulationController simController = new SimulationController(primaryStage, nextLevelPath,
-                        true, atPuzzlesEnd, selectedSkin);
-                Scene simScene = simController.getScene();
-                primaryStage.setScene(simScene);
-            });
-        }
-    }
 
     /**
      * Adds mouse event handlers to a dropped object's visual node to enable moving
@@ -915,10 +463,10 @@ public class SimulationController {
                 return;
             }
 
-            // Store starting position and angle for undo
-            dragStartPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
-            dragStartAngle = simObj.getAngle();
-
+            // Store starting position and angle for undo in the state object
+            state.setDragStartPosition(new Position(simObj.getPosition().getX(), simObj.getPosition().getY()));
+            state.setDragStartAngle(simObj.getAngle());
+            
             dragDelta[0] = event.getSceneX() - visual.getTranslateX();
             dragDelta[1] = event.getSceneY() - visual.getTranslateY();
             event.consume();
@@ -983,16 +531,16 @@ public class SimulationController {
             Position currentPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
             float currentAngle = simObj.getAngle();
 
-            if (dragStartPosition != null &&
-                    (Math.abs(dragStartPosition.getX() - currentPosition.getX()) > 1.0f ||
-                            Math.abs(dragStartPosition.getY() - currentPosition.getY()) > 1.0f ||
-                            Math.abs(dragStartAngle - currentAngle) > 1.0f)) {
+            if (state.getDragStartPosition() != null &&
+                    (Math.abs(state.getDragStartPosition().getX() - currentPosition.getX()) > 1.0f ||
+                            Math.abs(state.getDragStartPosition().getY() - currentPosition.getY()) > 1.0f ||
+                            Math.abs(state.getDragStartAngle() - currentAngle) > 1.0f)) {
 
                 MoveObjectController.MoveObjectParams moveParams = new MoveObjectController.MoveObjectParams.Builder()
                         .setGameObject(simObj)
                         .setPair(pair)
-                        .setPositions(dragStartPosition, currentPosition)
-                        .setAngles(dragStartAngle, currentAngle)
+                        .setPositions(state.getDragStartPosition(), currentPosition)
+                        .setAngles(state.getDragStartAngle(), currentAngle)
                         .build();
                 MoveObjectController moveCommand = new MoveObjectController(moveParams);
                 model.getUndoRedoManager().executeCommand(moveCommand);

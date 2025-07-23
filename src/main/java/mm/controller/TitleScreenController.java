@@ -92,11 +92,16 @@ public class TitleScreenController {
         view.menuButtons.btnPuzzle.setOnAction(e -> view.uiContainers.overlayBackgroundPuzzle.setVisible(true));
 
         // Start sandbox mode
-
         view.menuButtons.btnSandbox.setOnAction(e -> {
             String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
-            SimulationController simController = new SimulationController(primaryStage, "/level/basic_sandbox.json",
-                    false, false, selectedSkin);
+            SimulationController.SimulationControllerParams params = new SimulationController.SimulationControllerParams.Builder()
+                .setPrimaryStage(primaryStage)
+                .setLevelPath("/level/basic_sandbox.json")
+                .setPuzzleMode(false)
+                .setAtPuzzlesEnd(false)
+                .setSelectedSkin(selectedSkin)
+                .build();
+            SimulationController simController = new SimulationController(params);
             ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
@@ -115,24 +120,42 @@ public class TitleScreenController {
         // Level card click handlers
         view.levelCards.levelCard1.setOnMouseClicked(e -> {
             String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
-            SimulationController simController = new SimulationController(primaryStage, "/level/level1.json", true,
-                    false, selectedSkin);
+            SimulationController.SimulationControllerParams params = new SimulationController.SimulationControllerParams.Builder()
+                .setPrimaryStage(primaryStage)
+                .setLevelPath("/level/level1.json")
+                .setPuzzleMode(true)
+                .setAtPuzzlesEnd(false)
+                .setSelectedSkin(selectedSkin)
+                .build();
+            SimulationController simController = new SimulationController(params);
             ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
         });
         view.levelCards.levelCard2.setOnMouseClicked(e -> {
             String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
-            SimulationController simController = new SimulationController(primaryStage, "/level/level2.json", true,
-                    false, selectedSkin);
+            SimulationController.SimulationControllerParams params = new SimulationController.SimulationControllerParams.Builder()
+                .setPrimaryStage(primaryStage)
+                .setLevelPath("/level/level2.json")
+                .setPuzzleMode(true)
+                .setAtPuzzlesEnd(false)
+                .setSelectedSkin(selectedSkin)
+                .build();
+            SimulationController simController = new SimulationController(params);
             ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
         });
         view.levelCards.levelCard3.setOnMouseClicked(e -> {
             String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
-            SimulationController simController = new SimulationController(primaryStage, "/level/level3.json", true,
-                    true, selectedSkin);
+            SimulationController.SimulationControllerParams params = new SimulationController.SimulationControllerParams.Builder()
+                .setPrimaryStage(primaryStage)
+                .setLevelPath("/level/level3.json")
+                .setPuzzleMode(true)
+                .setAtPuzzlesEnd(true)
+                .setSelectedSkin(selectedSkin)
+                .build();
+            SimulationController simController = new SimulationController(params);
             ApplicationController.currentSimulationController = simController;
             Scene simScene = simController.getScene();
             primaryStage.setScene(simScene);
