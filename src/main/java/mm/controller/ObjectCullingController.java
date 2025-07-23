@@ -9,6 +9,7 @@ import org.jbox2d.common.Vec2;
 
 import mm.model.GameObject;
 import mm.model.PhysicsVisualPair;
+import mm.model.SimulationBounds;
 import mm.model.SimulationModel;
 
 /**
@@ -73,22 +74,21 @@ public class ObjectCullingController {
      * 
      * @param scaledX the scaled X position
      * @param scaledY the scaled Y position
-     * @param simSpaceWidth the simulation space width
-     * @param simSpaceHeight the simulation space height
+     * @param bounds the simulation bounds containing width and height
      * @param objectName the object name for type-specific checks
      * @return true if the object should be culled
      */
-    public boolean shouldCullObject(double scaledX, double scaledY, double simSpaceWidth, 
-                                   double simSpaceHeight, String objectName) {
+    public boolean shouldCullObject(double scaledX, double scaledY, SimulationBounds bounds, 
+                                   String objectName) {
         boolean isBalloon = "ballon".equalsIgnoreCase(objectName);
         double margin = isBalloon ? 50.0 : 100.0;
         
-        boolean shouldCull = scaledX < -margin || scaledX > simSpaceWidth + margin || 
-                           scaledY < -margin || scaledY > simSpaceHeight + margin;
+        boolean shouldCull = scaledX < -margin || scaledX > bounds.getWidth() + margin || 
+                           scaledY < -margin || scaledY > bounds.getHeight() + margin;
                            
         if (isBalloon) {
             // Additional early culling check for balloons going up
-            shouldCull = shouldCull || scaledY < simSpaceHeight * 0.1;
+            shouldCull = shouldCull || scaledY < bounds.getHeight() * 0.1;
         }
         
         return shouldCull;

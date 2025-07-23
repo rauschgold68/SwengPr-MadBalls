@@ -4,6 +4,7 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.layout.Pane;
 import mm.Generated;
 import mm.model.PhysicsVisualPair;
+import mm.model.SimulationBounds;
 import mm.model.SimulationModel;
 
 import org.jbox2d.common.Vec2;
@@ -50,8 +51,8 @@ public class PhysicsAnimationController extends AnimationTimer {
     
     // Helper classes following MVC pattern
     private final PhysicsPerformanceMonitor performanceMonitor;
-    private final ObjectCullingManager cullingManager;
-    private final VisualUpdateHandler visualHandler;
+    private final ObjectCullingController cullingManager;
+    private final VisualUpdateController visualHandler;
 
     /**
      * Constructs a PhysicsAnimationController for the given physics world and visual pairs.
@@ -69,8 +70,8 @@ public class PhysicsAnimationController extends AnimationTimer {
         
         // Initialize helper classes
         this.performanceMonitor = new PhysicsPerformanceMonitor();
-        this.cullingManager = new ObjectCullingManager(model);
-        this.visualHandler = new VisualUpdateHandler();
+        this.cullingManager = new ObjectCullingController(model);
+        this.visualHandler = new VisualUpdateController();
         
         // Get actual simulation space bounds
         this.simSpaceWidth = simSpace.getWidth();
@@ -97,8 +98,8 @@ public class PhysicsAnimationController extends AnimationTimer {
         
         // Initialize helper classes
         this.performanceMonitor = new PhysicsPerformanceMonitor();
-        this.cullingManager = new ObjectCullingManager(model);
-        this.visualHandler = new VisualUpdateHandler();
+        this.cullingManager = new ObjectCullingController(model);
+        this.visualHandler = new VisualUpdateController();
         
         // Default dimensions - will be updated when simSpace is set
         this.simSpaceWidth = 800.0;
@@ -239,8 +240,11 @@ public class PhysicsAnimationController extends AnimationTimer {
     private boolean shouldCullPair(PhysicsVisualPair pair, Vec2 pos, String objectName) {
         double scaledX = pos.x * 50.0f; // Using SCALE constant
         double scaledY = pos.y * 50.0f;
-        
-        return cullingManager.shouldCullObject(scaledX, scaledY, simSpaceWidth, simSpaceHeight, objectName);
+
+        // Create SimulationBounds object using simSpaceWidth and simSpaceHeight
+        SimulationBounds bounds = new SimulationBounds(simSpaceWidth, simSpaceHeight);
+
+        return cullingManager.shouldCullObject(scaledX, scaledY, bounds, objectName);
     }
     
     /**
