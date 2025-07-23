@@ -73,17 +73,10 @@ public class TitleScreenView {
     public OverlayButtons overlayButtons = new OverlayButtons();
     /** Level selection cards. */
     public LevelCards levelCards = new LevelCards();
-
-    /** Overlay background for options/settings screen. */
-    public StackPane overlayBackgroundOptions;
-    /** Overlay background for puzzle/level selection screen. */
-    public StackPane overlayBackgroundPuzzle;
-    /** The options overlay window container with settings controls. */
-    public VBox optionsWindow;
-    /** The root StackPane containing all UI layers (main screen and overlays). */
-    public StackPane root;
-    /** The JavaFX Scene for the title screen. */
-    public Scene scene;
+    /** Main UI containers and overlays. */
+    public UIContainers uiContainers = new UIContainers();
+    /** Options screen components. */
+    public OptionsComponents optionsComponents = new OptionsComponents();
 
     /**
      * CSS class name for title screen buttons to avoid duplicate string literals.
@@ -128,16 +121,41 @@ public class TitleScreenView {
         public VBox levelCard3;
     }
 
-    // Skin-Auswahl persistent speichern
-    private SkinManagerController skinManager = SkinManagerController.getInstance();
-    public ChoiceBox<String> skinChoiceBox;
-    public Button btnSaveSkin;
+    /**
+     * Container class for main UI containers and overlays.
+     */
+    public static class UIContainers {
+        /** Overlay background for options/settings screen. */
+        public StackPane overlayBackgroundOptions;
+        /** Overlay background for puzzle/level selection screen. */
+        public StackPane overlayBackgroundPuzzle;
+        /** The options overlay window container with settings controls. */
+        public VBox optionsWindow;
+        /** The root StackPane containing all UI layers (main screen and overlays). */
+        public StackPane root;
+        /** The JavaFX Scene for the title screen. */
+        public Scene scene;
+    }
+
+    /**
+     * Container class for options screen components.
+     */
+    public static class OptionsComponents {
+        /** Skin manager controller instance. */
+        public SkinManagerController skinManager = SkinManagerController.getInstance();
+        /** Choice box for selecting skin/texture pack. */
+        public ChoiceBox<String> skinChoiceBox;
+        /** Button for saving skin selection. */
+        public Button btnSaveSkin;
+    }
+
+    
 
     /**
      * Returns the currently saved skin choice ("Default" or "Legacy").
      */
     public String getSavedSkinChoice() {
-        return skinManager.getSelectedSkin();
+        return optionsComponents.skinManager.getSelectedSkin();
     }
 
     /**
@@ -256,19 +274,19 @@ public class TitleScreenView {
      * image and contains a styled options window with various controls.
      */
     private void createOptionsOverlay() {
-        overlayBackgroundOptions = new StackPane();
-        overlayBackgroundOptions.setVisible(false);
+        uiContainers.overlayBackgroundOptions = new StackPane();
+        uiContainers.overlayBackgroundOptions.setVisible(false);
 
         setupOptionsBackground();
         createOptionsWindow();
 
-        overlayBackgroundOptions.getChildren().add(optionsWindow);
-        StackPane.setAlignment(optionsWindow, Pos.CENTER);
+        uiContainers.overlayBackgroundOptions.getChildren().add(uiContainers.optionsWindow);
+        StackPane.setAlignment(uiContainers.optionsWindow, Pos.CENTER);
 
         // Reset ChoiceBox auf gespeicherten Wert, wenn Overlay geschlossen wird
-        overlayBackgroundOptions.visibleProperty().addListener((obs, wasVisible, isNowVisible) -> {
+        uiContainers.overlayBackgroundOptions.visibleProperty().addListener((obs, wasVisible, isNowVisible) -> {
             if (!isNowVisible) {
-                skinChoiceBox.setValue(skinManager.getSelectedSkin());
+                optionsComponents.skinChoiceBox.setValue(optionsComponents.skinManager.getSelectedSkin());
             }
         });
     }
@@ -284,19 +302,19 @@ public class TitleScreenView {
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundPosition.CENTER,
                 new BackgroundSize(1920, 1080, true, true, true, true));
-        overlayBackgroundOptions.setBackground(new Background(levelSelectBg));
+        uiContainers.overlayBackgroundOptions.setBackground(new Background(levelSelectBg));
     }
 
     /**
      * Creates the options window with all settings controls.
      */
     private void createOptionsWindow() {
-        optionsWindow = new VBox(25);
-        optionsWindow.setMaxSize(720, 480);
-        optionsWindow.setMinSize(720, 480);
-        optionsWindow.setPadding(new Insets(30));
-        optionsWindow.setAlignment(Pos.TOP_CENTER);
-        optionsWindow.setBackground(new Background(new BackgroundFill(
+        uiContainers.optionsWindow = new VBox(25);
+        uiContainers.optionsWindow.setMaxSize(720, 480);
+        uiContainers.optionsWindow.setMinSize(720, 480);
+        uiContainers.optionsWindow.setPadding(new Insets(30));
+        uiContainers.optionsWindow.setAlignment(Pos.TOP_CENTER);
+        uiContainers.optionsWindow.setBackground(new Background(new BackgroundFill(
                 Color.rgb(10, 10, 20, 0.7), new CornerRadii(20), Insets.EMPTY)));
 
         HBox topBar = createOptionsTopBar();
@@ -304,7 +322,7 @@ public class TitleScreenView {
         HBox soundRow = createSoundVolumeRow();
         HBox textureRow = createTexturePackRow();
 
-        optionsWindow.getChildren().addAll(topBar, musicRow, soundRow, textureRow);
+        uiContainers.optionsWindow.getChildren().addAll(topBar, musicRow, soundRow, textureRow);
     }
 
     /**
@@ -370,19 +388,19 @@ public class TitleScreenView {
         lblTexturePack.setStyle("-fx-text-fill: white;");
 
         // ChoiceBox für Skin-Auswahl
-        skinChoiceBox = new ChoiceBox<>();
-        skinChoiceBox.getItems().addAll("Default", "Legacy");
-        skinChoiceBox.setValue(skinManager.getSelectedSkin());
+        optionsComponents.skinChoiceBox = new ChoiceBox<>();
+        optionsComponents.skinChoiceBox.getItems().addAll("Default", "Legacy");
+        optionsComponents.skinChoiceBox.setValue(optionsComponents.skinManager.getSelectedSkin());
 
         // Save-Button
-        btnSaveSkin = new Button("Save");
-        btnSaveSkin.getStyleClass().add("save-btn");
+        optionsComponents.btnSaveSkin = new Button("Save");
+        optionsComponents.btnSaveSkin.getStyleClass().add("save-btn");
 
-        btnSaveSkin.setOnAction(e -> {
-            skinManager.setSelectedSkin(skinChoiceBox.getValue());
+        optionsComponents.btnSaveSkin.setOnAction(e -> {
+            optionsComponents.skinManager.setSelectedSkin(optionsComponents.skinChoiceBox.getValue());
         });
 
-        HBox textureRow = new HBox(20, lblTexturePack, skinChoiceBox, btnSaveSkin);
+        HBox textureRow = new HBox(20, lblTexturePack, optionsComponents.skinChoiceBox, optionsComponents.btnSaveSkin);
         textureRow.setAlignment(Pos.CENTER_LEFT);
         return textureRow;
     }
@@ -397,8 +415,8 @@ public class TitleScreenView {
      * navigation.
      */
     private void createPuzzleOverlay() {
-        overlayBackgroundPuzzle = new StackPane();
-        overlayBackgroundPuzzle.setVisible(false);
+        uiContainers.overlayBackgroundPuzzle = new StackPane();
+        uiContainers.overlayBackgroundPuzzle.setVisible(false);
 
         Image levelSelectImage = new Image(getClass().getResourceAsStream("/pictures/levelSelect.png"));
         BackgroundImage puzzleBg = new BackgroundImage(
@@ -407,7 +425,7 @@ public class TitleScreenView {
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundPosition.CENTER,
                 new BackgroundSize(1920, 1080, true, true, true, true));
-        overlayBackgroundPuzzle.setBackground(new Background(puzzleBg));
+        uiContainers.overlayBackgroundPuzzle.setBackground(new Background(puzzleBg));
 
         Label puzzleTitle = new Label("Level Selection");
         puzzleTitle.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
@@ -433,7 +451,7 @@ public class TitleScreenView {
         cardWrapper.setAlignment(Pos.TOP_CENTER);
         cardWrapper.setPadding(new Insets(60, 0, 70, 0));
 
-        overlayBackgroundPuzzle.getChildren().addAll(cardWrapper, overlayButtons.btnClosePuzzle);
+        uiContainers.overlayBackgroundPuzzle.getChildren().addAll(cardWrapper, overlayButtons.btnClosePuzzle);
     }
 
     /**
@@ -460,17 +478,17 @@ public class TitleScreenView {
      *                     buttons.
      */
     private void setupRootAndScene(VBox logoANDBoard) {
-        root = new StackPane();
-        root.setStyle("-fx-background-color: #0e1722;");
-        root.getChildren().addAll(logoANDBoard, overlayBackgroundPuzzle, overlayBackgroundOptions);
+        uiContainers.root = new StackPane();
+        uiContainers.root.setStyle("-fx-background-color: #0e1722;");
+        uiContainers.root.getChildren().addAll(logoANDBoard, uiContainers.overlayBackgroundPuzzle, uiContainers.overlayBackgroundOptions);
 
-        scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("/styling/titleScreen.css").toExternalForm());
+        uiContainers.scene = new Scene(uiContainers.root);
+        uiContainers.scene.getStylesheets().add(getClass().getResource("/styling/titleScreen.css").toExternalForm());
 
         // force CSS and layout pass
         Platform.runLater(() -> {
-            root.applyCss();
-            root.layout();
+            uiContainers.root.applyCss();
+            uiContainers.root.layout();
         });
     }
 
@@ -570,6 +588,6 @@ public class TitleScreenView {
      * @return The {@link Scene} object containing the complete title screen UI.
      */
     public Scene getScene() {
-        return scene;
+        return uiContainers.scene;
     }
 }
