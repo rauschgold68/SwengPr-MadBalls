@@ -5,17 +5,61 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Unit tests for the {@link RectangleGeometry} class.
+ * <p>
+ * This test class verifies the correct behavior of RectangleGeometry, which represents
+ * rectangular shapes in the model layer using view-agnostic geometric data. RectangleGeometry
+ * extends GeometryData to provide rectangle-specific functionality including dimension-based
+ * calculations, point containment testing with rotation support, and bounding box computation.
+ * </p>
+ * <p>
+ * The tests cover various scenarios including:
+ * </p>
+ * <ul>
+ * <li>Constructor behavior with and without rotation parameters</li>
+ * <li>Point containment testing for various positions and rotation angles</li>
+ * <li>Bounding box calculation for both non-rotated and rotated rectangles</li>
+ * <li>Edge cases such as zero-size rectangles and extreme rotation angles</li>
+ * </ul>
+ * 
+ * @see RectangleGeometry
+ * @see GeometryData
+ * @see Position
+ */
 public class TestRectangleGeometry {
     
+    /** Test position used for creating rectangle geometries in tests. */
     private Position testPosition;
+    /** Rectangle geometry instance used across multiple test methods. */
     private RectangleGeometry rectangleGeometry;
     
+    /**
+     * Sets up test fixtures before each test method.
+     * <p>
+     * Initializes a test position at coordinates (10, 20) and creates a
+     * RectangleGeometry with width 6.0 and height 4.0 positioned at that location.
+     * This provides a consistent baseline for testing various rectangle operations.
+     * </p>
+     */
     @BeforeEach
     public void setUp() {
         testPosition = new Position(10.0f, 20.0f);
         rectangleGeometry = new RectangleGeometry(testPosition, 6.0, 4.0);
     }
     
+    /**
+     * Tests the constructor that creates a RectangleGeometry without explicit rotation.
+     * <p>
+     * Verifies that:
+     * </p>
+     * <ul>
+     * <li>The rectangle is created successfully</li>
+     * <li>Width and height are correctly stored and retrievable</li>
+     * <li>Position reference is correctly maintained</li>
+     * <li>Rotation defaults to 0.0 when not specified</li>
+     * </ul>
+     */
     @Test
     public void testConstructorWithoutRotation() {
         RectangleGeometry rect = new RectangleGeometry(testPosition, 6.0, 4.0);
@@ -26,6 +70,15 @@ public class TestRectangleGeometry {
         assertEquals(0.0, rect.getRotation(), 0.001);
     }
     
+    /**
+     * Tests the constructor that creates a RectangleGeometry with explicit rotation.
+     * <p>
+     * Verifies that all parameters including rotation are properly stored.
+     * Unlike circles, rectangle rotation significantly affects geometric
+     * calculations, so proper rotation handling is critical for accurate
+     * collision detection and rendering.
+     * </p>
+     */
     @Test
     public void testConstructorWithRotation() {
         RectangleGeometry rect = new RectangleGeometry(testPosition, 6.0, 4.0, 45.0);
@@ -36,6 +89,15 @@ public class TestRectangleGeometry {
         assertEquals(45.0, rect.getRotation(), 0.001);
     }
     
+    /**
+     * Tests point containment for non-rotated rectangles.
+     * <p>
+     * Verifies that the containsPoint method correctly identifies points
+     * within the rectangular boundary when no rotation is applied. This
+     * includes testing points inside the rectangle as well as corner points
+     * to verify boundary condition handling.
+     * </p>
+     */
     @Test
     public void testContainsPointInsideRectangleNoRotation() {
         // Point inside rectangle
@@ -46,6 +108,15 @@ public class TestRectangleGeometry {
         assertTrue(rectangleGeometry.containsPoint(16.0, 24.0)); // top-right
     }
     
+    /**
+     * Tests point containment for points outside non-rotated rectangles.
+     * <p>
+     * Verifies that points located outside the rectangular boundary are
+     * correctly identified as not being contained within the rectangle.
+     * Tests points in all four cardinal directions to ensure comprehensive
+     * boundary checking.
+     * </p>
+     */
     @Test
     public void testContainsPointOutsideRectangleNoRotation() {
         // Points outside rectangle

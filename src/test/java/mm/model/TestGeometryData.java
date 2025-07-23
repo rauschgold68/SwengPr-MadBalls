@@ -5,6 +5,23 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Unit tests for the {@link GeometryData} abstract class and its implementations.
+ * <p>
+ * This test class verifies the correct behavior of GeometryData and its concrete
+ * implementations (such as CircleGeometry) used for view-agnostic geometric
+ * representations in the model layer.
+ * </p>
+ * <p>
+ * GeometryData provides the mathematical foundation for shape collision detection,
+ * rendering calculations, and physics simulation without being tied to any specific
+ * UI framework like JavaFX.
+ * </p>
+ * 
+ * @see GeometryData
+ * @see CircleGeometry
+ * @see Position
+ */
 public class TestGeometryData {
     
     private Position testPosition;

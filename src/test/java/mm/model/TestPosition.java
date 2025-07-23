@@ -5,6 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Unit tests for the {@link Position} class.
+ * <p>
+ * This test class verifies the correct behavior of Position objects, which represent
+ * 2D coordinates in the simulation space. Position is a fundamental data structure
+ * used throughout the model layer for object placement and geometric calculations.
+ * </p>
+ * <p>
+ * The tests cover both constructors (default and parameterized) and verify
+ * that coordinate values are properly stored and retrieved.
+ * </p>
+ * 
+ * @see Position
+ */
 public class TestPosition {
     @Test
     public void testPosition() {

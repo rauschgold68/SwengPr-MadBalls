@@ -6,6 +6,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
+/**
+ * Unit tests for the {@link AbstractObject} class.
+ * <p>
+ * This test class verifies the correct behavior of AbstractObject constructors
+ * and basic functionality. AbstractObject serves as the base class for game objects
+ * in the simulation, providing common fields and methods for name, size, and physics properties.
+ * </p>
+ * <p>
+ * The tests cover all constructor variants to ensure proper initialization
+ * of object properties under different scenarios.
+ * </p>
+ * 
+ * @see AbstractObject
+ * @see Size
+ * @see Physics
+ */
 public class TestAbstractObject {
     @Test
     public void testAbstractObject() {
