@@ -3,13 +3,10 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.*;
 import javafx.stage.Stage;
 import mm.model.GameObject;
-import mm.model.InventoryObject;
 import mm.model.PhysicsVisualPair;
 import mm.model.Position;
 import mm.model.SimulationModel;
@@ -79,6 +76,9 @@ public class SimulationController {
 
     // Inventory manager for handling inventory UI and interactions
     private InventoryManager inventoryManager;
+
+    // Controller for all DragAndDrop Features
+    private DragAndDropController dragAndDropController;
 
     /**
      * Parameter object for SimulationController constructor to reduce parameter count.
@@ -257,7 +257,16 @@ public class SimulationController {
         inventoryManager.setupInventory(true);
         inventoryManager.updateInventorySpritesForSkin();
         inventoryManager.refreshInventoryDisplay();
-        setupDragAndDrop();
+        
+        // Create and use the DragAndDropController
+        dragAndDropController = new DragAndDropController(
+            model,
+            view.getSimSpace(),
+            gameObjectToPairMap,
+            this::refreshInventoryDisplay,
+            this::addMoveHandlersToDroppedVisual
+        );
+        dragAndDropController.setupDragAndDrop();
         
         // Replace all button setup methods with ButtonManager
         ButtonManager buttonManager = new ButtonManager(
@@ -494,97 +503,6 @@ public class SimulationController {
         updateJsonViewer(); // Update JSON viewer when inventory changes
     }
 
-    /**
-     * Sets up drag-and-drop functionality for placing inventory objects into the
-     * simulation area.
-     * <p>
-     * Handles drag-over and drag-dropped events on the simulation area, checks
-     * placement restrictions,
-     * and updates the model and view with new objects as needed.
-     * </p>
-     */
-    private void setupDragAndDrop() {
-        Pane simSpace = view.getSimSpace();
-
-        simSpace.setOnDragOver(event -> {
-            PhysicsAnimationController timer = model.getTimer();
-            if ((timer == null || !timer.isRunning()) && event.getGestureSource() != simSpace
-                    && event.getDragboard().hasString()) {
-                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-            }
-            event.consume();
-        });
-
-        simSpace.setOnDragDropped(event -> {
-            PhysicsAnimationController timer = model.getTimer();
-            if (timer != null && timer.isRunning()) {
-                event.setDropCompleted(false);
-                event.consume();
-                return;
-            }
-
-            double x = event.getX();
-            double y = event.getY();
-
-            if (model.isInNoPlaceZone(x, y)) {
-                event.setDropCompleted(false);
-                event.consume();
-                return;
-            }
-
-            Dragboard db = event.getDragboard();
-            boolean success = false;
-
-            if (db.hasString()) {
-                String name = db.getString();
-                InventoryObject template = model.findInventoryObjectByName(name);
-
-                if (template != null) {
-                    // Create the GameObject but don't modify inventory count yet
-                    GameObject simObj = new GameObject(
-                            template.getName(),
-                            template.getType(),
-                            new Position((float) x - template.getSize().getWidth() / 2,
-                                    (float) y - template.getSize().getHeight() / 2),
-                            template.getSize());
-
-                    // Set additional properties
-                    simObj.setPhysics(template.getPhysics());
-                    simObj.setAngle(template.getAngle());
-                    simObj.setColour(template.getColour());
-                    simObj.setSprite(template.getSprite());
-                    simObj.setWinning(template.isWinning());
-
-                    PhysicsVisualPair pair = mm.controller.GameObjectController.convert(simObj, model.getWorld());
-                    if (pair.visual != null) {
-                        // Position the visual at the calculated position
-                        pair.visual.setTranslateX(simObj.getPosition().getX());
-                        pair.visual.setTranslateY(simObj.getPosition().getY());
-                        pair.visual.setRotate(simObj.getAngle());
-
-                        // Check for collision before placing the object
-                        if (!wouldCauseOverlap(pair, simObj.getPosition().getX(), simObj.getPosition().getY(),
-                                simObj.getAngle())) {
-                            // Create parameter object for AddObjectController
-                            AddObjectController.AddObjectParams params = new AddObjectController.AddObjectParams(
-                                    model, simSpace, gameObjectToPairMap, this::refreshInventoryDisplay);
-
-                            // Create and execute add command
-                            AddObjectController addCommand = new AddObjectController(params, simObj, pair);
-                            model.getUndoRedoManager().executeCommand(addCommand);
-
-                            addMoveHandlersToDroppedVisual(pair, simObj);
-                            success = true;
-                        }
-                        // If collision would occur, don't place the object
-                    }
-                }
-            }
-
-            event.setDropCompleted(success);
-            event.consume();
-        });
-    }
 
     /**
      * Adds mouse event handlers to a dropped object's visual node to enable moving

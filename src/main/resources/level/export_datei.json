@@ -7,7 +7,7 @@
       "height" : 0.0,
       "radius" : 50.0
     },
-    "angle" : 50.0,
+    "angle" : 0.0,
     "sprite" : "madLog.png",
     "colour" : "BLACK",
     "physics" : {
@@ -18,8 +18,8 @@
     },
     "winning" : false,
     "position" : {
-      "x" : 1003.4285,
-      "y" : 324.0
+      "x" : 839.9999,
+      "y" : 386.28574
     }
   }, {
     "name" : "platform",
@@ -29,7 +29,7 @@
       "height" : 20.0,
       "radius" : 0.0
     },
-    "angle" : 30.0,
+    "angle" : 0.0,
     "sprite" : "madPlatform.png",
     "colour" : "BLACK",
     "physics" : {
@@ -40,8 +40,52 @@
     },
     "winning" : false,
     "position" : {
-      "x" : 768.2857,
-      "y" : 431.7143
+      "x" : 692.8572,
+      "y" : 526.5714
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 300.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 380.2857,
+      "y" : 527.1429
+    }
+  }, {
+    "name" : "box1",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 100.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "angle" : 60.0,
+    "sprite" : "madBox.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 830.5714,
+      "y" : 140.85715
     }
   }, {
     "name" : "winZone",
@@ -62,30 +106,30 @@
     },
     "winning" : false,
     "position" : {
-      "x" : 1124.5714,
-      "y" : 434.85715
+      "x" : 721.7143,
+      "y" : 469.7143
     }
   }, {
-    "name" : "box1",
+    "name" : "winZone",
     "type" : "Rectangle",
     "size" : {
-      "width" : 100.0,
-      "height" : 100.0,
+      "width" : 200.0,
+      "height" : 40.0,
       "radius" : 0.0
     },
     "angle" : 0.0,
-    "sprite" : "madBox.png",
-    "colour" : "BLACK",
+    "sprite" : null,
+    "colour" : null,
     "physics" : {
       "density" : 1.0,
-      "friction" : 0.4,
-      "restitution" : 0.1,
-      "shape" : "DYNAMIC"
+      "friction" : 0.0,
+      "restitution" : 0.0,
+      "shape" : "STATIC"
     },
     "winning" : false,
     "position" : {
-      "x" : 1144.8572,
-      "y" : 138.57143
+      "x" : 921.71436,
+      "y" : 472.0
     }
   }, {
     "name" : "box1",
@@ -95,7 +139,7 @@
       "height" : 100.0,
       "radius" : 0.0
     },
-    "angle" : 0.0,
+    "angle" : 35.0,
     "sprite" : "madBox.png",
     "colour" : "BLACK",
     "physics" : {
@@ -106,30 +150,8 @@
     },
     "winning" : false,
     "position" : {
-      "x" : 762.0,
-      "y" : 66.57143
-    }
-  }, {
-    "name" : "box1",
-    "type" : "Rectangle",
-    "size" : {
-      "width" : 100.0,
-      "height" : 100.0,
-      "radius" : 0.0
-    },
-    "angle" : 55.0,
-    "sprite" : "madBox.png",
-    "colour" : "BLACK",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.4,
-      "restitution" : 0.1,
-      "shape" : "DYNAMIC"
-    },
-    "winning" : false,
-    "position" : {
-      "x" : 995.7143,
-      "y" : 125.42857
+      "x" : 656.8571,
+      "y" : 77.428566
     }
   } ],
   "inventoryObjects" : [ {
@@ -150,7 +172,7 @@
       "shape" : "DYNAMIC"
     },
     "winning" : false,
-    "count" : 12
+    "count" : 13
   }, {
     "name" : "Domino",
     "type" : "rectangle",
@@ -188,7 +210,7 @@
       "shape" : "STATIC"
     },
     "winning" : false,
-    "count" : 14
+    "count" : 13
   }, {
     "name" : "winPlat",
     "type" : "rectangle",
@@ -226,7 +248,7 @@
       "shape" : "STATIC"
     },
     "winning" : false,
-    "count" : 14
+    "count" : 13
   }, {
     "name" : "log",
     "type" : "circle",
