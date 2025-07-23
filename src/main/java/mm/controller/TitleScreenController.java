@@ -94,7 +94,7 @@ public class TitleScreenController {
         // Start sandbox mode
 
         view.menuButtons.btnSandbox.setOnAction(e -> {
-            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
+            String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/basic_sandbox.json",
                     false, false, selectedSkin);
             ApplicationController.currentSimulationController = simController;
@@ -114,7 +114,7 @@ public class TitleScreenController {
 
         // Level card click handlers
         view.levelCards.levelCard1.setOnMouseClicked(e -> {
-            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
+            String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/level1.json", true,
                     false, selectedSkin);
             ApplicationController.currentSimulationController = simController;
@@ -122,7 +122,7 @@ public class TitleScreenController {
             primaryStage.setScene(simScene);
         });
         view.levelCards.levelCard2.setOnMouseClicked(e -> {
-            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
+            String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/level2.json", true,
                     false, selectedSkin);
             ApplicationController.currentSimulationController = simController;
@@ -130,7 +130,7 @@ public class TitleScreenController {
             primaryStage.setScene(simScene);
         });
         view.levelCards.levelCard3.setOnMouseClicked(e -> {
-            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
+            String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/level3.json", true,
                     true, selectedSkin);
             ApplicationController.currentSimulationController = simController;

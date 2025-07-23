@@ -13,7 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import mm.controller.SkinManager;
+import mm.controller.SkinManagerController;
 
 /**
  * The {@code TitleScreenView} class constructs and exposes all JavaFX UI
@@ -129,7 +129,7 @@ public class TitleScreenView {
     }
 
     // Skin-Auswahl persistent speichern
-    private SkinManager skinManager = SkinManager.getInstance();
+    private SkinManagerController skinManager = SkinManagerController.getInstance();
     public ChoiceBox<String> skinChoiceBox;
     public Button btnSaveSkin;
 

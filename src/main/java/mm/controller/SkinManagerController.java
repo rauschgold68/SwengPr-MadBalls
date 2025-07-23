@@ -12,8 +12,8 @@ import mm.model.InventoryObject;
  * Ensures that the skin choice persists across different controllers and
  * scenes.
  */
-public class SkinManager {
-    private static SkinManager instance;
+public class SkinManagerController {
+    private static SkinManagerController instance;
     private String selectedSkin = "Default";
 
     // Constants for string literals
@@ -37,7 +37,7 @@ public class SkinManager {
     /**
      * Private constructor to prevent instantiation.
      */
-    private SkinManager() {
+    private SkinManagerController() {
     }
 
     /**
@@ -45,9 +45,9 @@ public class SkinManager {
      * 
      * @return the singleton instance
      */
-    public static SkinManager getInstance() {
+    public static SkinManagerController getInstance() {
         if (instance == null) {
-            instance = new SkinManager();
+            instance = new SkinManagerController();
         }
         return instance;
     }
