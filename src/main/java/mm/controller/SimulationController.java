@@ -116,7 +116,7 @@ public class SimulationController {
          * Required parameters (primaryStage and levelPath) are validated in the build() method.
          * </p>
          * 
-         * <h3>Usage Example:</h3>
+         * <h2>Usage Example:</h2>
          * <pre>{@code
          * SimulationControllerParams params = new SimulationControllerParams.Builder()
          *     .setPrimaryStage(stage)

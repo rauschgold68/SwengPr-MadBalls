@@ -19,5 +19,5 @@ module mm {
     exports mm.view;
 
     opens mm.model;
-    opens mm.controller to javafx.graphics;
+    opens mm.controller;
 }

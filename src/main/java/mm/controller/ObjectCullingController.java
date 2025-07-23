@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.jbox2d.common.Vec2;
 
+import mm.Generated;
 import mm.model.GameObject;
 import mm.model.PhysicsVisualPair;
 import mm.model.SimulationBounds;
@@ -56,6 +57,7 @@ public class ObjectCullingController {
      * Gets the list of visuals marked for removal.
      * @return the visuals to remove list
      */
+    @Generated
     public List<javafx.scene.Node> getVisualsToRemove() {
         return visualsToRemove;
     }

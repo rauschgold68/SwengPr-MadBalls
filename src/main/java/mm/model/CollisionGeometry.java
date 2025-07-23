@@ -1,6 +1,7 @@
 package mm.model;
 
 import javafx.scene.shape.Rectangle;
+import mm.Generated;
 
 /**
  * Contains geometric collision detection algorithms and helper classes.
@@ -265,6 +266,7 @@ class CollisionGeometry {
     /**
      * Gets the rotated bounding box of a rectangle.
      */
+    @Generated
     javafx.geometry.Bounds getRotatedBounds(Rectangle rect, double x, double y, double rotation) {
         // Create a temporary rectangle at the specified position and rotation
         Rectangle tempRect = new Rectangle(rect.getWidth(), rect.getHeight());
