@@ -277,6 +277,52 @@
       "winning": false
     },
     {
+      "name": "platform",
+      "type": "Rectangle",
+      "size": {
+        "width": 50.0,
+        "height": 20.0,
+        "radius": 0.0
+      },
+      "angle": 0.0,
+      "sprite": "madPlatform.png",
+      "colour": "BLACK",
+      "physics": {
+        "density": 1.0,
+        "friction": 0.4,
+        "restitution": 0.1,
+        "shape": "STATIC"
+      },
+      "winning": false,
+      "position": {
+        "x": 1136.0,
+        "y": 480.0
+      }
+    },
+    {
+      "name": "noPlaceZone",
+      "type": "rectangle",
+      "position": {
+        "x": 551.9,
+        "y": 489.8
+      },
+      "angle": 90.0,
+      "size": {
+        "width": 350.0,
+        "height": 130.0,
+        "radius": 0.0
+      },
+      "sprite": null,
+      "colour": "noplaceZone",
+      "physics": {
+        "density": 1.0,
+        "friction": 1.0,
+        "restitution": 0.0,
+        "shape": "STATIC"
+      },
+      "winning": false
+    },
+    {
       "name": "noPlaceZone",
       "type": "rectangle",
       "position": {
@@ -663,26 +709,6 @@
         "friction": 0.4,
         "restitution": 0.1,
         "shape": "DYNAMIC"
-      },
-      "winning": false
-    },
-    {
-      "name": "platform",
-      "type": "rectangle",
-      "count": 1,
-      "angle": 0.0,
-      "size": {
-        "width": 50.0,
-        "height": 20.0,
-        "radius": 0.0
-      },
-      "sprite": "/objectSkins/Default/madPlatform.png",
-      "colour": "BLACK",
-      "physics": {
-        "density": 1.0,
-        "friction": 0.4,
-        "restitution": 0.1,
-        "shape": "STATIC"
       },
       "winning": false
     },

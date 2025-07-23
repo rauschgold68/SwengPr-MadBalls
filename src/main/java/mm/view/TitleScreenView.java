@@ -149,8 +149,6 @@ public class TitleScreenView {
         public Button btnSaveSkin;
     }
 
-    
-
     /**
      * Returns the currently saved skin choice ("Default" or "Legacy").
      */
@@ -431,7 +429,7 @@ public class TitleScreenView {
         puzzleTitle.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
         puzzleTitle.setPadding(new Insets(30, 0, 0, 0));
 
-        levelCards.levelCard1 = createLevelCard("Level 1 - LoopHole", "Difficulty: Easy",
+        levelCards.levelCard1 = createLevelCard("Level 1 - Double Eagle", "Difficulty: Easy",
                 "/pictures/level1Preview.png");
         levelCards.levelCard2 = createLevelCard("Level 2 - Chain Reaction", "Difficulty: Medium",
                 "/pictures/level2Preview.png");
@@ -480,7 +478,8 @@ public class TitleScreenView {
     private void setupRootAndScene(VBox logoANDBoard) {
         uiContainers.root = new StackPane();
         uiContainers.root.setStyle("-fx-background-color: #0e1722;");
-        uiContainers.root.getChildren().addAll(logoANDBoard, uiContainers.overlayBackgroundPuzzle, uiContainers.overlayBackgroundOptions);
+        uiContainers.root.getChildren().addAll(logoANDBoard, uiContainers.overlayBackgroundPuzzle,
+                uiContainers.overlayBackgroundOptions);
 
         uiContainers.scene = new Scene(uiContainers.root);
         uiContainers.scene.getStylesheets().add(getClass().getResource("/styling/titleScreen.css").toExternalForm());
