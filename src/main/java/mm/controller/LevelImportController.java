@@ -66,7 +66,7 @@ public class LevelImportController {
      * This ensures that imported levels use the correct skin textures.
      */
     private void applySkinToLoadedObjects() {
-        SkinManager skinManager = SkinManager.getInstance();
+        SkinManagerController skinManager = SkinManagerController.getInstance();
 
         // Apply skin to inventory objects
         if (level.getInventoryObjects() != null) {

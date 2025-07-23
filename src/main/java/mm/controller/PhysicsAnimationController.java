@@ -1,18 +1,15 @@
 package mm.controller;
 
 import javafx.animation.AnimationTimer;
-import javafx.application.Platform;
-import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
 import mm.Generated;
 import mm.model.PhysicsVisualPair;
+import mm.model.SimulationBounds;
 import mm.model.SimulationModel;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,41 +37,18 @@ import java.util.List;
  * </pre>
  */
 public class PhysicsAnimationController extends AnimationTimer {
-    /** The last timestamp when the timer was handled (nanoseconds). */
-    private long lastTime = 0;
-    /** The Box2D world to step. */
-    private World world;
-    /** The list of physics-visual pairs to update. */
-    private List<PhysicsVisualPair> pairs;
-    /** Whether the timer is currently running. */
-    private boolean running = false;
-
-    // Add new fields
-    private double simSpaceWidth;
-    private double simSpaceHeight;
+    // Core simulation components
+    private final World world;
+    private final List<PhysicsVisualPair> pairs;
     private final SimulationModel model;
-
-    // Add new field to store culled objects
-    private final List<mm.model.GameObject> culledObjects = new ArrayList<>();
-    private final List<Vec2> originalPositions = new ArrayList<>();
     
-    // Physics timing accumulator for fixed time step
-    private float accumulator = 0.0f;
+    // State management
+    private final SimulationStateManager stateManager;
     
-    // Cache for object-to-pair mapping to avoid linear searches
-    private final java.util.Map<String, mm.model.GameObject> objectNameMap = new java.util.HashMap<>();
-    
-    // Pre-allocated lists for removal to avoid creating new objects each frame
-    private final List<PhysicsVisualPair> pairsToRemove = new ArrayList<>();
-    private final List<mm.model.GameObject> objectsToRemove = new ArrayList<>();
-    private final List<javafx.scene.Node> visualsToRemove = new ArrayList<>();
-    
-    // Adaptive performance settings
-    private int velocityIterations = 6;
-    private int positionIterations = 2;
-    private long frameTimeHistory = 0;
-    private int frameCount = 0;
-    private static final long TARGET_FRAME_TIME_NS = 16_666_666L; // ~60 FPS in nanoseconds
+    // Helper classes following MVC pattern
+    private final PhysicsPerformanceMonitor performanceMonitor;
+    private final ObjectCullingController cullingManager;
+    private final VisualUpdateController visualHandler;
 
     /**
      * Constructs a PhysicsAnimationController for the given physics world and visual pairs.
@@ -90,15 +64,16 @@ public class PhysicsAnimationController extends AnimationTimer {
         this.pairs = pairs;
         this.model = model;
         
-        // Get actual simulation space bounds
-        this.simSpaceWidth = simSpace.getWidth();
-        this.simSpaceHeight = simSpace.getHeight();
+        // Initialize helper classes
+        this.performanceMonitor = new PhysicsPerformanceMonitor();
+        this.cullingManager = new ObjectCullingController(model);
+        this.visualHandler = new VisualUpdateController();
         
-        // Listen for size changes
-        simSpace.widthProperty().addListener((obs, old, newVal) -> 
-            this.simSpaceWidth = newVal.doubleValue());
-        simSpace.heightProperty().addListener((obs, old, newVal) -> 
-            this.simSpaceHeight = newVal.doubleValue());
+        // Initialize unified state manager
+        this.stateManager = new SimulationStateManager();
+        
+        // Setup space tracking
+        this.stateManager.setupSpaceTracking(simSpace);
     }
 
     /**
@@ -113,9 +88,13 @@ public class PhysicsAnimationController extends AnimationTimer {
         this.pairs = pairs;
         this.model = model;
         
-        // Default dimensions - will be updated when simSpace is set
-        this.simSpaceWidth = 800.0;
-        this.simSpaceHeight = 600.0;
+        // Initialize helper classes
+        this.performanceMonitor = new PhysicsPerformanceMonitor();
+        this.cullingManager = new ObjectCullingController(model);
+        this.visualHandler = new VisualUpdateController();
+        
+        // Initialize unified state manager with default dimensions
+        this.stateManager = new SimulationStateManager();
     }
 
     /**
@@ -125,15 +104,7 @@ public class PhysicsAnimationController extends AnimationTimer {
      */
     @Generated
     public void setSimSpace(Pane simSpace) {
-        // Get actual simulation space bounds
-        this.simSpaceWidth = simSpace.getWidth();
-        this.simSpaceHeight = simSpace.getHeight();
-        
-        // Listen for size changes
-        simSpace.widthProperty().addListener((obs, old, newVal) -> 
-            this.simSpaceWidth = newVal.doubleValue());
-        simSpace.heightProperty().addListener((obs, old, newVal) -> 
-            this.simSpaceHeight = newVal.doubleValue());
+        this.stateManager.setupSpaceTracking(simSpace);
     }
 
     /**
@@ -142,7 +113,7 @@ public class PhysicsAnimationController extends AnimationTimer {
     @Generated
     @Override
     public void start(){
-        running = true;
+        stateManager.setRunning(true);
         super.start();
     }
     
@@ -151,7 +122,7 @@ public class PhysicsAnimationController extends AnimationTimer {
      * @return the width of the simulation space
      */
     public double getSimSpaceWidth() {
-        return simSpaceWidth;
+        return stateManager.getSimSpaceWidth();
     }
     
     /**
@@ -159,7 +130,7 @@ public class PhysicsAnimationController extends AnimationTimer {
      * @return the height of the simulation space
      */
     public double getSimSpaceHeight() {
-        return simSpaceHeight;
+        return stateManager.getSimSpaceHeight();
     }
 
     /**
@@ -173,157 +144,152 @@ public class PhysicsAnimationController extends AnimationTimer {
      */
     @Override
     public void handle(long now) {
-        if (lastTime == 0) {
-            lastTime = now;
+        if (stateManager.getLastTime() == 0) {
+            stateManager.setLastTime(now);
             return;
         }
 
-        // Use fixed time step with accumulation for deterministic physics
-        float frameTime = (now - lastTime) / 1_000_000_000.0f;
-        long actualFrameTimeNs = now - lastTime;
-        lastTime = now;
+        long actualFrameTimeNs = now - stateManager.getLastTime();
+        float frameTime = actualFrameTimeNs / 1_000_000_000.0f;
+        stateManager.setLastTime(now);
         
-        // Adaptive quality adjustment based on performance
-        updateAdaptiveQuality(actualFrameTimeNs);
+        // Update performance monitoring
+        performanceMonitor.updatePerformance(actualFrameTimeNs);
         
+        // Step physics simulation
+        stepPhysicsSimulation(frameTime);
+        
+        // Process all physics-visual pairs
+        processPhysicsVisualPairs();
+        
+        // Handle object removal
+        handleObjectRemoval();
+    }
+    
+    /**
+     * Steps the physics simulation with fixed time steps.
+     * 
+     * @param frameTime the frame time in seconds
+     */
+    private void stepPhysicsSimulation(float frameTime) {
         // Cap maximum frame time to prevent physics instability
-        frameTime = Math.min(frameTime, 0.05f); // Max 50ms frame time
+        float cappedFrameTime = Math.min(frameTime, 0.05f); // Max 50ms frame time
         
         // Fixed time step for deterministic physics (60 FPS)
         final float fixedTimeStep = 1.0f / 60.0f;
         
         // Accumulate time and step physics in fixed intervals
-        accumulator += frameTime;
+        stateManager.addToAccumulator(cappedFrameTime);
         
-        // Reduced iteration counts for better performance on older hardware
-        while (accumulator >= fixedTimeStep) {
-            world.step(fixedTimeStep, velocityIterations, positionIterations);
-            accumulator -= fixedTimeStep;
+        while (stateManager.getAccumulator() >= fixedTimeStep) {
+            world.step(fixedTimeStep, performanceMonitor.getVelocityIterations(), 
+                      performanceMonitor.getPositionIterations());
+            stateManager.subtractFromAccumulator(fixedTimeStep);
         }
-
-        // Clear pre-allocated removal lists for reuse
-        pairsToRemove.clear();
-        objectsToRemove.clear();
-        visualsToRemove.clear();
+    }
+    
+    /**
+     * Processes all physics-visual pairs for culling and updates.
+     */
+    private void processPhysicsVisualPairs() {
+        cullingManager.clearRemovalLists();
 
         for (PhysicsVisualPair pair : pairs) {
-            if (pair.body != null) {
-                float SCALE = 50.0f;
-                Vec2 pos = pair.body.getPosition();
-                double angle = Math.toDegrees(pair.body.getAngle());
-
-                // Check if object is out of bounds
-                double scaledX = pos.x * SCALE;
-                double scaledY = pos.y * SCALE;
-                
-                // Get object type - cache the string to avoid repeated getUserData() calls
-                String objectName = (String) pair.body.getUserData();
-                boolean isBalloon = "ballon".equalsIgnoreCase(objectName);
-                
-                // Use smaller margin for balloons to cull them faster
-                double margin = isBalloon ? 50.0 : 100.0;
-                
-                // Add extra vertical check for balloons to catch them earlier when rising
-                boolean shouldCull = scaledX < -margin || scaledX > simSpaceWidth + margin || 
-                                   scaledY < -margin || scaledY > simSpaceHeight + margin;
-                                   
-                if (isBalloon) {
-                    // Additional early culling check for balloons going up
-                    shouldCull = shouldCull || scaledY < simSpaceHeight * 0.1; // Cull if in top 1% of screen
-                }
-
-                if (shouldCull) {
-                    pairsToRemove.add(pair);
-                    
-                    // Use cached mapping if available, otherwise fall back to linear search
-                    mm.model.GameObject matchedObj = objectNameMap.get(objectName);
-                    if (matchedObj == null) {
-                        // Fall back to linear search and cache the result
-                        for (mm.model.GameObject obj : model.getDroppedObjects()) {
-                            if (obj.getName().equals(objectName)) {
-                                matchedObj = obj;
-                                objectNameMap.put(objectName, obj);
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (matchedObj != null) {
-                        objectsToRemove.add(matchedObj);
-                        culledObjects.add(matchedObj);
-                        originalPositions.add(new Vec2(matchedObj.getPosition().getX(), matchedObj.getPosition().getY()));
-                    }
-                    
-                    // Queue visual for removal
-                    if (pair.visual.getParent() != null) {
-                        visualsToRemove.add(pair.visual);
-                    }
-                    continue;
-                }
-
-                if (isBalloon) {
-    
-                    Vec2 buoyancy = new Vec2(0f, -3.8f);
-                    pair.body.applyForceToCenter(buoyancy);
-                }
-
-                if (pair.visual != null) {
-                    // Update visual positions as before
-                    if (pair.visual instanceof javafx.scene.shape.Rectangle) {
-                        javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
-                        rect.setTranslateX(pos.x * SCALE - rect.getWidth() / 2);
-                        rect.setTranslateY(pos.y * SCALE - rect.getHeight() / 2);
-                        rect.setRotate(angle);
-                    } else if (pair.visual instanceof javafx.scene.shape.Circle) {
-                        javafx.scene.shape.Circle circ = (javafx.scene.shape.Circle) pair.visual;
-                        circ.setTranslateX(pos.x * SCALE);
-                        circ.setTranslateY(pos.y * SCALE);
-                        circ.setRotate(angle);
-                    } else if (pair.visual instanceof javafx.scene.shape.Polygon) {
-                    // Handle bucket (polygon) positioning - center like rectangles
-                    javafx.scene.shape.Polygon polygon = (javafx.scene.shape.Polygon) pair.visual;
-                    javafx.geometry.Bounds bounds = polygon.getBoundsInLocal();
-                    polygon.setTranslateX(pos.x * SCALE - bounds.getWidth() / 2);
-                    polygon.setTranslateY(pos.y * SCALE - bounds.getHeight() / 2);
-                    polygon.setRotate(angle);
-                    }
-                }
-            }
-        }
-
-        // Remove culled objects
-        if (!pairsToRemove.isEmpty()) {
-            // Remove physics bodies from world
-            for (PhysicsVisualPair pair : pairsToRemove) {
-                world.destroyBody(pair.body);
-                System.out.println(pair.getBody().getUserData());
+            if (pair.body == null) {
+                continue;
             }
             
-            // Batch visual removal in a single Platform.runLater call for better performance
-            if (!visualsToRemove.isEmpty()) {
-                Platform.runLater(() -> {
-                    for (javafx.scene.Node visual : visualsToRemove) {
-                        Parent parent = visual.getParent();
-                        if (parent instanceof Group) {
-                            ((Group) parent).getChildren().remove(visual);
-                        } else if (parent instanceof Pane) {
-                            ((Pane) parent).getChildren().remove(visual);
-                        }
-                    }
-                });
+            Vec2 pos = pair.body.getPosition();
+            double angle = Math.toDegrees(pair.body.getAngle());
+            String objectName = (String) pair.body.getUserData();
+            
+            // Check for culling
+            if (shouldCullPair(pos, objectName)) {
+                cullingManager.cullObject(pair, objectName);
+                continue;
             }
+            
+            // Apply balloon physics if needed
+            applyBalloonPhysics(pair, objectName);
+            
+            // Update visual position
+            visualHandler.updateVisualPosition(pair, pos, angle);
+        }
+    }
+    
+    /**
+     * Determines if a pair should be culled based on position.
+     */
+    private boolean shouldCullPair(Vec2 pos, String objectName) {
+        double scaledX = pos.x * 50.0f; // Using SCALE constant
+        double scaledY = pos.y * 50.0f;
 
-            // Update model collections
-            pairs.removeAll(pairsToRemove);
-            model.getDroppedObjects().removeAll(objectsToRemove);
-            model.getDroppedPhysicsVisualPairs().removeAll(pairsToRemove);
+        // Create SimulationBounds object using stateManager dimensions
+        SimulationBounds bounds = new SimulationBounds(
+            stateManager.getSimSpaceWidth(), 
+            stateManager.getSimSpaceHeight()
+        );
 
-            // Restore inventory counts for removed objects
-            for (mm.model.GameObject obj : objectsToRemove) {
-                model.incrementInventoryCount(obj.getName());
-                // Remove from cache since object is being removed
-                objectNameMap.remove(obj.getName());
-            }
+        return cullingManager.shouldCullObject(scaledX, scaledY, bounds, objectName);
+    }
+    
+    /**
+     * Applies balloon-specific physics forces.
+     */
+    private void applyBalloonPhysics(PhysicsVisualPair pair, String objectName) {
+        if ("ballon".equalsIgnoreCase(objectName)) {
+            Vec2 buoyancy = new Vec2(0f, -3.8f);
+            pair.body.applyForceToCenter(buoyancy);
+        }
+    }
+    
+    /**
+     * Handles removal of culled objects from simulation.
+     */
+    private void handleObjectRemoval() {
+        if (cullingManager.getPairsToRemove().isEmpty()) {
+            return;
+        }
+        
+        // Remove physics bodies from world
+        removePhysicsBodies();
+        
+        // Remove visuals from scene
+        visualHandler.batchRemoveVisuals(cullingManager.getVisualsToRemove());
+        
+        // Update model collections
+        updateModelCollections();
+        
+        // Restore inventory counts
+        restoreInventoryCounts();
+    }
+    
+    /**
+     * Removes physics bodies from the world.
+     */
+    private void removePhysicsBodies() {
+        for (PhysicsVisualPair pair : cullingManager.getPairsToRemove()) {
+            world.destroyBody(pair.body);
+            System.out.println(pair.getBody().getUserData());
+        }
+    }
+    
+    /**
+     * Updates model collections after object removal.
+     */
+    private void updateModelCollections() {
+        pairs.removeAll(cullingManager.getPairsToRemove());
+        model.getDroppedObjects().removeAll(cullingManager.getObjectsToRemove());
+        model.getDroppedPhysicsVisualPairs().removeAll(cullingManager.getPairsToRemove());
+    }
+    
+    /**
+     * Restores inventory counts for removed objects.
+     */
+    private void restoreInventoryCounts() {
+        for (mm.model.GameObject obj : cullingManager.getObjectsToRemove()) {
+            model.incrementInventoryCount(obj.getName());
+            cullingManager.removeFromCache(obj.getName());
         }
     }
 
@@ -332,34 +298,11 @@ public class PhysicsAnimationController extends AnimationTimer {
      */
     @Generated
     public void reset() {
-        lastTime = 0;
-        accumulator = 0.0f; // Reset physics accumulator
+        stateManager.reset();
         
-        // Clear object cache since we're resetting
-        objectNameMap.clear();
-        
-        // Restore all culled objects to their original positions
-        for (int i = 0; i < culledObjects.size(); i++) {
-            mm.model.GameObject obj = culledObjects.get(i);
-            Vec2 originalPos = originalPositions.get(i);
-            
-            // Reset object position
-            obj.getPosition().setX(originalPos.x);
-            obj.getPosition().setY(originalPos.y);
-            
-            // Add back to model
-            model.addDroppedObject(obj);
-            
-            // Update cache
-            objectNameMap.put(obj.getName(), obj);
-            
-            // Decrement inventory count since object is being restored
-            model.decrementInventoryCount(obj.getName());
-        }
-        
-        // Clear the culled objects lists
-        culledObjects.clear();
-        originalPositions.clear();
+        // Clear object cache and restore objects
+        cullingManager.clearObjectCache();
+        cullingManager.restoreAllCulledObjects();
     }
     
     /**
@@ -367,38 +310,7 @@ public class PhysicsAnimationController extends AnimationTimer {
      * This should be called when objects are added to the simulation.
      */
     public void updateObjectCache() {
-        objectNameMap.clear();
-        for (mm.model.GameObject obj : model.getDroppedObjects()) {
-            objectNameMap.put(obj.getName(), obj);
-        }
-    }
-    
-    /**
-     * Adaptively adjusts physics quality based on frame performance.
-     * Reduces iteration counts when performance is poor to maintain smooth simulation.
-     */
-    private void updateAdaptiveQuality(long frameTimeNs) {
-        frameCount++;
-        frameTimeHistory += frameTimeNs;
-        
-        // Adjust quality every 60 frames (about once per second at 60 FPS)
-        if (frameCount >= 60) {
-            long avgFrameTime = frameTimeHistory / frameCount;
-            
-            if (avgFrameTime > TARGET_FRAME_TIME_NS * 1.5) {
-                // Performance is poor, reduce quality
-                if (velocityIterations > 3) velocityIterations--;
-                if (positionIterations > 1) positionIterations--;
-            } else if (avgFrameTime < TARGET_FRAME_TIME_NS * 0.8) {
-                // Performance is good, can increase quality
-                if (velocityIterations < 8) velocityIterations++;
-                if (positionIterations < 3) positionIterations++;
-            }
-            
-            // Reset counters
-            frameCount = 0;
-            frameTimeHistory = 0;
-        }
+        cullingManager.updateObjectCache();
     }
 
     /**
@@ -407,13 +319,13 @@ public class PhysicsAnimationController extends AnimationTimer {
      * @return {@code true} if the timer is running, {@code false} otherwise
      */
     public boolean isRunning(){
-        return running;
+        return stateManager.isRunning();
     }
 
     @Generated
     @Override
     public void stop() {
-        running = false;
+        stateManager.setRunning(false);
         super.stop();
     }
 }

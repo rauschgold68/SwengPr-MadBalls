@@ -9,13 +9,64 @@ import java.util.List;
  * geometric calculations without any UI framework dependencies.
  * This allows the model to remain independent of JavaFX or any other view technology.
  * </p>
+ * <p>
+ * The class provides collision detection for various geometry types including rectangles
+ * and circles, with support for rotation and special zone handling. It uses a two-phase
+ * approach: broad-phase detection using bounding boxes, followed by detailed geometric
+ * intersection calculations.
+ * </p>
+ * 
+ * @author MadBalls Team
+ * @version 1.0
+ * @since 1.0
  */
 public class GeometricCollisionDetection {
     
+    /** Reference to the simulation model that owns this collision detection service */
     private final SimulationModel model;
+
+    /**
+     * Data class to hold transformation parameters for collision detection.
+     * <p>
+     * This immutable data structure encapsulates the position and rotation
+     * parameters needed for geometric transformations during collision testing.
+     * It helps reduce parameter lists and groups related transformation data.
+     * </p>
+     */
+    private static class TransformData {
+        /** The x-coordinate of the transformation */
+        final double x;
+        /** The y-coordinate of the transformation */
+        final double y;
+        /** The rotation angle in degrees */
+        final double angle;
+        
+        /**
+         * Creates a new transformation data object.
+         *
+         * @param x the x-coordinate
+         * @param y the y-coordinate
+         * @param angle the rotation angle in degrees
+         */
+        TransformData(double x, double y, double angle) {
+            this.x = x;
+            this.y = y;
+            this.angle = angle;
+        }
+    }
+    
     
     /**
      * Package-private constructor - only the SimulationModel should create this service.
+     * <p>
+     * This constructor is intentionally package-private to enforce that collision
+     * detection services are only created by the simulation model, maintaining
+     * proper encapsulation and preventing external instantiation.
+     * </p>
+     *
+     * @param model the simulation model that owns this collision detection service,
+     *              must not be null
+     * @throws NullPointerException if model is null
      */
     GeometricCollisionDetection(SimulationModel model) {
         this.model = model;
@@ -23,12 +74,23 @@ public class GeometricCollisionDetection {
 
     /**
      * Checks if moving an object to a new position would cause it to overlap with other objects.
-     * Excludes objects that are in the win zone from collision detection.
+     * <p>
+     * This method performs collision detection by testing the proposed position against
+     * all other objects in the simulation. It excludes special zone objects (win zones,
+     * no-place zones) from collision testing, allowing objects to be placed in or moved
+     * through these areas.
+     * </p>
+     * <p>
+     * The collision detection uses the object's current rotation and only changes the
+     * position for testing purposes.
+     * </p>
      * 
-     * @param movingPair The physics-geometry pair being moved
-     * @param newX The proposed new X position
-     * @param newY The proposed new Y position
-     * @return true if the new position would cause an overlap, false otherwise
+     * @param movingPair the physics-geometry pair being moved, must not be null
+     * @param newX the proposed new X position in world coordinates
+     * @param newY the proposed new Y position in world coordinates
+     * @return {@code true} if the new position would cause an overlap with another object,
+     *         {@code false} otherwise
+     * @throws NullPointerException if movingPair is null
      */
     public boolean wouldCauseOverlap(PhysicsGeometryPair movingPair, double newX, double newY) {
         List<PhysicsGeometryPair> allPairs = model.getGeometryPairs();
@@ -47,7 +109,24 @@ public class GeometricCollisionDetection {
     }
     
     /**
-     * Checks collision with rotation.
+     * Checks if moving an object to a new position with rotation would cause overlap.
+     * <p>
+     * This overloaded method extends the basic overlap detection to include rotation
+     * testing. It's particularly useful for objects that can be rotated during placement
+     * or movement, ensuring that the rotated geometry doesn't intersect with other objects.
+     * </p>
+     * <p>
+     * Like the basic version, this method excludes special zone objects from collision
+     * testing and uses geometric intersection algorithms appropriate for each shape type.
+     * </p>
+     *
+     * @param movingPair the physics-geometry pair being moved, must not be null
+     * @param newX the proposed new X position in world coordinates
+     * @param newY the proposed new Y position in world coordinates
+     * @param newAngle the proposed new rotation angle in degrees
+     * @return {@code true} if the new position and rotation would cause an overlap,
+     *         {@code false} otherwise
+     * @throws NullPointerException if movingPair is null
      */
     public boolean wouldCauseOverlap(PhysicsGeometryPair movingPair, double newX, double newY, double newAngle) {
         List<PhysicsGeometryPair> allPairs = model.getGeometryPairs();
@@ -57,7 +136,8 @@ public class GeometricCollisionDetection {
                 continue;
             }
             
-            if (hasCollisionWithRotation(movingPair, otherPair, newX, newY, newAngle)) {
+            TransformData transform = new TransformData(newX, newY, newAngle);
+            if (hasCollisionWithRotation(movingPair, otherPair, transform)) {
                 return true;
             }
         }
@@ -67,6 +147,18 @@ public class GeometricCollisionDetection {
     
     /**
      * Determines whether collision checking should be skipped between two pairs.
+     * <p>
+     * This method implements the business rules for collision detection exclusions:
+     * <ul>
+     *   <li>Self-collision: An object cannot collide with itself</li>
+     *   <li>Special zones: Objects in win zones, win platforms, or no-place zones
+     *       are excluded from collision detection to allow free movement</li>
+     * </ul>
+     * </p>
+     *
+     * @param movingPair the pair being moved, must not be null
+     * @param otherPair the pair being tested against, must not be null
+     * @return {@code true} if collision checking should be skipped, {@code false} otherwise
      */
     private boolean shouldSkipCollisionCheck(PhysicsGeometryPair movingPair, PhysicsGeometryPair otherPair) {
         // Skip self-collision
@@ -76,15 +168,22 @@ public class GeometricCollisionDetection {
         
         // Skip if other object is in win zone or no-place zone
         Object userData = otherPair.body.getUserData();
-        if ("winZone".equals(userData) || "winPlat".equals(userData) || "noPlace".equals(userData)) {
-            return true;
-        }
-        
-        return false;
+        return "winZone".equals(userData) || "winPlat".equals(userData) || "noPlace".equals(userData);
     }
     
     /**
-     * Checks if two geometry pairs would collide at given positions.
+     * Checks if two geometry pairs would collide at the given positions.
+     * <p>
+     * This method creates a temporary geometry instance at the proposed new position
+     * while maintaining the original rotation, then tests for intersection with the
+     * other geometry. It handles null geometry cases gracefully by returning false.
+     * </p>
+     *
+     * @param movingPair the pair being moved, must not be null
+     * @param otherPair the pair being tested against, must not be null
+     * @param newX the proposed X position for the moving object
+     * @param newY the proposed Y position for the moving object
+     * @return {@code true} if the geometries would intersect, {@code false} otherwise
      */
     private boolean hasCollision(PhysicsGeometryPair movingPair, PhysicsGeometryPair otherPair, double newX, double newY) {
         GeometryData movingGeom = movingPair.getGeometry();
@@ -101,10 +200,20 @@ public class GeometricCollisionDetection {
     }
     
     /**
-     * Checks collision with rotation.
+     * Checks if two geometry pairs would collide with rotation applied.
+     * <p>
+     * Similar to the basic collision check, but includes rotation testing by creating
+     * a temporary geometry with both the new position and new rotation angle.
+     * This is essential for accurate collision detection when objects can be rotated.
+     * </p>
+     *
+     * @param movingPair the pair being moved, must not be null
+     * @param otherPair the pair being tested against, must not be null
+     * @param transform the transformation data containing position and rotation
+     * @return {@code true} if the geometries would intersect, {@code false} otherwise
      */
     private boolean hasCollisionWithRotation(PhysicsGeometryPair movingPair, PhysicsGeometryPair otherPair, 
-                                           double newX, double newY, double newAngle) {
+                                           TransformData transform) {
         GeometryData movingGeom = movingPair.getGeometry();
         GeometryData otherGeom = otherPair.getGeometry();
         
@@ -113,13 +222,27 @@ public class GeometricCollisionDetection {
         }
         
         // Create temporary geometry at new position and angle
-        GeometryData tempMovingGeom = createGeometryAtPosition(movingGeom, newX, newY, newAngle);
+        GeometryData tempMovingGeom = createGeometryAtPosition(movingGeom, transform.x, transform.y, transform.angle);
         
         return geometriesIntersect(tempMovingGeom, otherGeom);
     }
     
     /**
      * Creates a new geometry instance at the specified position and rotation.
+     * <p>
+     * This factory method creates temporary geometry instances for collision testing
+     * without modifying the original objects. It supports all geometry types used
+     * in the simulation and preserves the original dimensions while applying the
+     * new transformation parameters.
+     * </p>
+     *
+     * @param original the original geometry to base the new instance on, must not be null
+     * @param x the new x-coordinate for the geometry
+     * @param y the new y-coordinate for the geometry  
+     * @param rotation the new rotation angle in degrees
+     * @return a new geometry instance at the specified position and rotation
+     * @throws IllegalArgumentException if the geometry type is not supported
+     * @throws NullPointerException if original is null
      */
     private GeometryData createGeometryAtPosition(GeometryData original, double x, double y, double rotation) {
         Position newPos = new Position((float) x, (float) y);
@@ -136,7 +259,28 @@ public class GeometricCollisionDetection {
     }
     
     /**
-     * Checks if two geometries intersect using bounding box and detailed collision detection.
+     * Checks if two geometries intersect using a two-phase collision detection approach.
+     * <p>
+     * This method implements a broad-phase/narrow-phase collision detection strategy:
+     * <ol>
+     *   <li><strong>Broad-phase:</strong> Quick bounding box intersection test to eliminate
+     *       obviously non-intersecting geometries</li>
+     *   <li><strong>Narrow-phase:</strong> Detailed geometric intersection calculations
+     *       based on the specific geometry types involved</li>
+     * </ol>
+     * </p>
+     * <p>
+     * Supported geometry combinations:
+     * <ul>
+     *   <li>Rectangle vs Rectangle</li>
+     *   <li>Circle vs Circle</li>
+     *   <li>Rectangle vs Circle</li>
+     * </ul>
+     * </p>
+     *
+     * @param geom1 the first geometry, must not be null
+     * @param geom2 the second geometry, must not be null
+     * @return {@code true} if the geometries intersect, {@code false} otherwise
      */
     private boolean geometriesIntersect(GeometryData geom1, GeometryData geom2) {
         // Quick bounding box check first
@@ -163,7 +307,16 @@ public class GeometricCollisionDetection {
     }
     
     /**
-     * Quick bounding box intersection check.
+     * Performs a quick bounding box intersection check for broad-phase collision detection.
+     * <p>
+     * This method tests whether two axis-aligned bounding boxes intersect. It's used
+     * as a fast preliminary test before more expensive detailed collision detection.
+     * The bounding boxes are represented as arrays of [minX, minY, maxX, maxY].
+     * </p>
+     *
+     * @param bounds1 the first bounding box as [minX, minY, maxX, maxY]
+     * @param bounds2 the second bounding box as [minX, minY, maxX, maxY]
+     * @return {@code true} if the bounding boxes intersect, {@code false} otherwise
      */
     private boolean boundingBoxesIntersect(double[] bounds1, double[] bounds2) {
         return !(bounds1[2] < bounds2[0] || bounds2[2] < bounds1[0] || 
@@ -171,7 +324,17 @@ public class GeometricCollisionDetection {
     }
     
     /**
-     * Detailed rectangle-rectangle intersection.
+     * Performs detailed rectangle-rectangle intersection testing.
+     * <p>
+     * This method handles collision detection between two rectangular geometries.
+     * For non-rotated rectangles, it uses efficient Axis-Aligned Bounding Box (AABB)
+     * collision detection. For rotated rectangles, it falls back to bounding box
+     * approximation for simplicity.
+     * </p>
+     *
+     * @param rect1 the first rectangle geometry, must not be null
+     * @param rect2 the second rectangle geometry, must not be null
+     * @return {@code true} if the rectangles intersect, {@code false} otherwise
      */
     private boolean rectanglesIntersect(RectangleGeometry rect1, RectangleGeometry rect2) {
         // For simplicity, if either rectangle is rotated, use bounding box collision
@@ -191,7 +354,16 @@ public class GeometricCollisionDetection {
     }
     
     /**
-     * Circle-circle intersection.
+     * Performs circle-circle intersection testing using distance calculation.
+     * <p>
+     * This method calculates the distance between the centers of two circles
+     * and compares it with the sum of their radii. Two circles intersect if
+     * the distance between their centers is less than the sum of their radii.
+     * </p>
+     *
+     * @param circle1 the first circle geometry, must not be null
+     * @param circle2 the second circle geometry, must not be null
+     * @return {@code true} if the circles intersect, {@code false} otherwise
      */
     private boolean circlesIntersect(CircleGeometry circle1, CircleGeometry circle2) {
         double centerX1 = circle1.getPosition().getX() + circle1.getRadius();
@@ -204,7 +376,22 @@ public class GeometricCollisionDetection {
     }
     
     /**
-     * Rectangle-circle intersection.
+     * Performs rectangle-circle intersection testing using closest point calculation.
+     * <p>
+     * This method implements precise collision detection between a rectangle and a circle
+     * by finding the closest point on the rectangle to the circle's center, then checking
+     * if this point is within the circle's radius.
+     * </p>
+     * <p>
+     * For rotated rectangles, the method falls back to bounding box approximation for
+     * performance reasons. For axis-aligned rectangles, it uses the more accurate
+     * closest-point algorithm.
+     * </p>
+     * <p>
+     *
+     * @param rect the rectangle geometry, must not be null
+     * @param circle the circle geometry, must not be null
+     * @return {@code true} if the rectangle and circle intersect, {@code false} otherwise
      */
     private boolean rectangleCircleIntersect(RectangleGeometry rect, CircleGeometry circle) {
         // For rotated rectangles, use bounding box approximation

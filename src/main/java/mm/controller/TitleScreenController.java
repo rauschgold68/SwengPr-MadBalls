@@ -76,7 +76,7 @@ public class TitleScreenController {
         if (ApplicationController.currentSimulationController != null) {
             ApplicationController.currentSimulationController.updateSkinChoice();
         }
-        return view.scene;
+        return view.uiContainers.scene;
     }
 
     /**
@@ -89,12 +89,12 @@ public class TitleScreenController {
      */
     private void setupEventHandlers() {
         // Show puzzle/level selection overlay
-        view.menuButtons.btnPuzzle.setOnAction(e -> view.overlayBackgroundPuzzle.setVisible(true));
+        view.menuButtons.btnPuzzle.setOnAction(e -> view.uiContainers.overlayBackgroundPuzzle.setVisible(true));
 
         // Start sandbox mode
 
         view.menuButtons.btnSandbox.setOnAction(e -> {
-            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
+            String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/basic_sandbox.json",
                     false, false, selectedSkin);
             ApplicationController.currentSimulationController = simController;
@@ -103,18 +103,18 @@ public class TitleScreenController {
         });
 
         // Show options overlay
-        view.menuButtons.btnOptions.setOnAction(e -> view.overlayBackgroundOptions.setVisible(true));
+        view.menuButtons.btnOptions.setOnAction(e -> view.uiContainers.overlayBackgroundOptions.setVisible(true));
 
         // Quit the application
         view.menuButtons.btnQuit.setOnAction(e -> Platform.exit());
 
         // Close overlays
-        view.overlayButtons.btnCloseOptions.setOnAction(e -> view.overlayBackgroundOptions.setVisible(false));
-        view.overlayButtons.btnClosePuzzle.setOnAction(e -> view.overlayBackgroundPuzzle.setVisible(false));
+        view.overlayButtons.btnCloseOptions.setOnAction(e -> view.uiContainers.overlayBackgroundOptions.setVisible(false));
+        view.overlayButtons.btnClosePuzzle.setOnAction(e -> view.uiContainers.overlayBackgroundPuzzle.setVisible(false));
 
         // Level card click handlers
         view.levelCards.levelCard1.setOnMouseClicked(e -> {
-            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
+            String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/level1.json", true,
                     false, selectedSkin);
             ApplicationController.currentSimulationController = simController;
@@ -122,7 +122,7 @@ public class TitleScreenController {
             primaryStage.setScene(simScene);
         });
         view.levelCards.levelCard2.setOnMouseClicked(e -> {
-            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
+            String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/level2.json", true,
                     false, selectedSkin);
             ApplicationController.currentSimulationController = simController;
@@ -130,7 +130,7 @@ public class TitleScreenController {
             primaryStage.setScene(simScene);
         });
         view.levelCards.levelCard3.setOnMouseClicked(e -> {
-            String selectedSkin = SkinManager.getInstance().getSelectedSkin();
+            String selectedSkin = SkinManagerController.getInstance().getSelectedSkin();
             SimulationController simController = new SimulationController(primaryStage, "/level/level3.json", true,
                     true, selectedSkin);
             ApplicationController.currentSimulationController = simController;
@@ -139,13 +139,13 @@ public class TitleScreenController {
         });
 
         // Keyboard shortcut: ESC closes overlays
-        view.scene.setOnKeyPressed(event -> {
+        view.uiContainers.scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
                 case ESCAPE:
-                    if (view.overlayBackgroundOptions.isVisible()) {
-                        view.overlayBackgroundOptions.setVisible(false);
-                    } else if (view.overlayBackgroundPuzzle.isVisible()) {
-                        view.overlayBackgroundPuzzle.setVisible(false);
+                    if (view.uiContainers.overlayBackgroundOptions.isVisible()) {
+                        view.uiContainers.overlayBackgroundOptions.setVisible(false);
+                    } else if (view.uiContainers.overlayBackgroundPuzzle.isVisible()) {
+                        view.uiContainers.overlayBackgroundPuzzle.setVisible(false);
                     }
                     break;
                 default:

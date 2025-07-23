@@ -160,7 +160,7 @@ public class SimulationController {
      * Updates all inventory object sprite paths to use the selected skin folder.
      */
     private void updateInventorySpritesForSkin() {
-        SkinManager.getInstance().updateInventorySpritesForSkin(model.getInventoryObjects());
+        SkinManagerController.getInstance().updateInventorySpritesForSkin(model.getInventoryObjects());
     }
 
     /**
@@ -168,7 +168,7 @@ public class SimulationController {
      * This method should be called when returning from the title screen.
      */
     public void updateSkinChoice() {
-        String currentSkin = SkinManager.getInstance().getSelectedSkin();
+        String currentSkin = SkinManagerController.getInstance().getSelectedSkin();
 
         if (!currentSkin.equals(this.selectedSkin)) {
             this.selectedSkin = currentSkin;

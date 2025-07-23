@@ -220,7 +220,7 @@ public class SimulationView {
 
         initializeMainComponents(isPuzzleMode); // Pass isPuzzleMode parameter
         createSideBarWithMenuButtons(isPuzzleMode);
-        setupMainLayout(isPuzzleMode); // Pass isPuzzleMode parameter
+        setupMainLayout(); // Pass isPuzzleMode parameter
         createOverlays(primaryStage, isPuzzleMode, atPuzzlesEnd);
         setupRootStackAndScene(primaryStage);
     }
@@ -391,7 +391,7 @@ public class SimulationView {
      * 
      * @param isPuzzleMode true if in puzzle mode, false for sandbox mode
      */
-    private void setupMainLayout(boolean isPuzzleMode) {
+    private void setupMainLayout() {
         layout.mainPane.setCenter(layout.simSpace);
         layout.mainPane.setRight(layout.sideBar);
 
@@ -434,6 +434,8 @@ public class SimulationView {
         layout.scene = new Scene(layout.rootStack, primaryStage.getWidth(), primaryStage.getHeight());
         layout.scene.getStylesheets().add(
                 getClass().getResource("/styling/simulation.css").toExternalForm());
+        layout.scene.getStylesheets().add(
+                getClass().getResource("/styling/jsonview.css").toExternalForm());
 
         // Subtle resize trick to fix framebuffer issues on Linux
         // Automatically triggers a minimal window resize after a short delay

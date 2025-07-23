@@ -119,33 +119,64 @@ public class InventoryObjectController {
         float height = obj.getSize().getHeight();
 
         Rectangle rect = new Rectangle(width, height);
+        setRectangleFill(rect, obj, width, height);
+        return rect;
+    }
 
+    /**
+     * Sets the fill pattern for a rectangle based on the InventoryObject properties.
+     * Handles sprite loading, special zone patterns, and fallback to color fill.
+     *
+     * @param rect   The Rectangle to apply the fill to
+     * @param obj    The InventoryObject containing fill properties
+     * @param width  The width of the rectangle
+     * @param height The height of the rectangle
+     */
+    private static void setRectangleFill(Rectangle rect, InventoryObject obj, float width, float height) {
         if (obj.getSprite() != null) {
-            Image image = null;
-            try {
-                String spritePath = obj.getSprite();
-                image = new Image(InventoryObjectController.class.getResource(spritePath).toExternalForm());
-            } catch (Exception e) {
-                // Image loading failed, fall back to color fill
-            }
+            Image image = loadSpriteImage(obj.getSprite());
             if (image != null && !image.isError()) {
                 rect.setFill(new ImagePattern(image));
-            } else if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
-                rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.RED));
-            } else if (obj.getName().equalsIgnoreCase("winZone")) {
-                rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.GREEN));
             } else {
-                rect.setFill(Color.valueOf(obj.getColour()));
+                applyFallbackFill(rect, obj, width, height);
             }
-        } else if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
+        } else {
+            applyFallbackFill(rect, obj, width, height);
+        }
+    }
+
+    /**
+     * Loads a sprite image from the given path.
+     *
+     * @param spritePath The path to the sprite image
+     * @return The loaded Image, or null if loading fails
+     * @throws RuntimeException if the image cannot be loaded
+     */
+    private static Image loadSpriteImage(String spritePath) {
+        try {
+            return new Image(InventoryObjectController.class.getResource(spritePath).toExternalForm());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load sprite image: " + spritePath, e);
+        }
+    }
+
+    /**
+     * Applies fallback fill patterns for rectangles when sprite loading fails or no sprite is provided.
+     * Handles special zone patterns and default color fill.
+     *
+     * @param rect   The Rectangle to apply the fill to
+     * @param obj    The InventoryObject containing fill properties
+     * @param width  The width of the rectangle
+     * @param height The height of the rectangle
+     */
+    private static void applyFallbackFill(Rectangle rect, InventoryObject obj, float width, float height) {
+        if (obj.getName().equalsIgnoreCase("noPlaceZone")) {
             rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.RED));
         } else if (obj.getName().equalsIgnoreCase("winZone")) {
             rect.setFill(PatternViewFactory.createPlaceZone(width, height, Color.GREEN));
         } else {
             rect.setFill(Color.valueOf(obj.getColour()));
         }
-
-        return rect;
     }
 
     /**
@@ -210,7 +241,7 @@ public class InventoryObjectController {
                 String spritePath = obj.getSprite();
                 image = new Image(InventoryObjectController.class.getResource(spritePath).toExternalForm());
             } catch (Exception e) {
-                // Image loading failed, fall back to color fill
+                throw new RuntimeException("Failed to load sprite image: " + obj.getSprite(), e);
             }
             if (image != null && !image.isError()) {
                 circ.setFill(new ImagePattern(image));

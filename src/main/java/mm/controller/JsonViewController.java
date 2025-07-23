@@ -15,6 +15,18 @@ import mm.model.SimulationModel;
  * Handles bidirectional synchronization between JSON viewer and simulation state.
  */
 public class JsonViewController {
+    // CSS class constants
+    private static final String ERROR_BORDER_STYLE = "json-viewer-error";
+    private static final String SUCCESS_BORDER_STYLE = "json-viewer-success";
+    private static final String WARNING_BORDER_STYLE = "json-viewer-warning";
+    private static final String INFO_BORDER_STYLE = "json-viewer-info";
+    
+    // Message type constants
+    private static final String ERROR_TYPE = "error";
+    private static final String SUCCESS_TYPE = "success";
+    private static final String WARNING_TYPE = "warning";
+    private static final String INFO_TYPE = "info";
+    
     private final SimulationModel model;
     private final TextArea jsonViewer;
     private final Label statusLabel;
@@ -24,6 +36,14 @@ public class JsonViewController {
     private String lastJsonContent = "";
     private Timeline debounceTimeline;
     
+    /**
+     * Constructs a new JsonViewController with the specified components and callback.
+     * 
+     * @param model the simulation model to synchronize with
+     * @param jsonViewer the text area for JSON editing and display
+     * @param statusLabel the label for displaying status messages
+     * @param onSimulationUpdate callback to run when simulation is updated from JSON
+     */
     public JsonViewController(SimulationModel model, TextArea jsonViewer, Label statusLabel, Runnable onSimulationUpdate) {
         this.model = model;
         this.jsonViewer = jsonViewer;
@@ -55,12 +75,10 @@ public class JsonViewController {
     private void setupJsonListener() {
         // Text change listener for real-time validation and updates
         jsonViewer.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!isUpdatingFromJson) {
+            if (!isUpdatingFromJson && !newValue.equals(lastJsonContent)) {
                 // Always clear persistent error messages when user types anything
-                if (!newValue.equals(lastJsonContent)) {
-                    clearPersistentMessages();
-                    handleJsonTextChange(newValue);
-                }
+                clearPersistentMessages();
+                handleJsonTextChange(newValue);
             }
         });
         
@@ -86,16 +104,15 @@ public class JsonViewController {
         // This ensures immediate feedback when user begins editing
         Platform.runLater(() -> {
             // Clear the JSON viewer border styling
-            if (jsonViewer.getStyle().contains("border-color")) {
+            if (jsonViewer.getStyleClass().contains(ERROR_BORDER_STYLE) || 
+                jsonViewer.getStyleClass().contains(WARNING_BORDER_STYLE)) {
                 setJsonViewerStyle("");
             }
             
             // Clear status message if it's visible and appears to be an error/warning
             if (statusLabel != null && statusLabel.isVisible()) {
-                String currentStyle = statusLabel.getStyle();
-                boolean isPersistentMessage = currentStyle.contains("darkred") || // error
-                                            currentStyle.contains("#b8860b") ||   // warning
-                                            currentStyle.contains("red");         // any red styling
+                boolean isPersistentMessage = statusLabel.getStyleClass().contains("status-message-error") ||
+                                            statusLabel.getStyleClass().contains("status-message-warning");
                 
                 if (isPersistentMessage) {
                     hideStatusMessage();
@@ -109,8 +126,8 @@ public class JsonViewController {
      */
     private void handleJsonTextChange(String newValue) {
         // Visual feedback for editing
-        setJsonViewerStyle("-fx-border-color: orange; -fx-border-width: 2px;");
-        showStatusMessage("Validating JSON...", "info");
+        setJsonViewerStyle(INFO_BORDER_STYLE);
+        showStatusMessage("Validating JSON...", INFO_TYPE);
         
         // Cancel previous debounce timer
         if (debounceTimeline != null) {
@@ -124,8 +141,8 @@ public class JsonViewController {
             if (validation.isValid() && isUpdateAllowed()) {
                 boolean success = updateSimulationFromJson(newValue);
                 if (success) {
-                    setJsonViewerStyle("-fx-border-color: green; -fx-border-width: 2px;");
-                    showStatusMessage("JSON applied successfully!", "success");
+                    setJsonViewerStyle(SUCCESS_BORDER_STYLE);
+                    showStatusMessage("JSON applied successfully!", SUCCESS_TYPE);
                     // Auto-hide success messages after 2 seconds
                     Timeline successTimeline = new Timeline(new KeyFrame(Duration.millis(2000), reset -> {
                         setJsonViewerStyle("");
@@ -133,17 +150,17 @@ public class JsonViewController {
                     }));
                     successTimeline.play();
                 } else {
-                    setJsonViewerStyle("-fx-border-color: red; -fx-border-width: 2px;");
-                    showStatusMessage("Failed to apply JSON to simulation", "error");
+                    setJsonViewerStyle(ERROR_BORDER_STYLE);
+                    showStatusMessage("Failed to apply JSON to simulation", ERROR_TYPE);
                     // Keep error messages persistent - no auto-hide
                 }
             } else if (!validation.isValid()) {
-                setJsonViewerStyle("-fx-border-color: red; -fx-border-width: 2px;");
-                showStatusMessage(validation.getMessage(), "error");
+                setJsonViewerStyle(ERROR_BORDER_STYLE);
+                showStatusMessage(validation.getMessage(), ERROR_TYPE);
                 // Keep error messages persistent - no auto-hide
             } else if (validation.isValid() && !isUpdateAllowed()) {
-                setJsonViewerStyle("-fx-border-color: yellow; -fx-border-width: 2px;");
-                showStatusMessage("Valid JSON - Stop simulation to apply changes", "warning");
+                setJsonViewerStyle(WARNING_BORDER_STYLE);
+                showStatusMessage("Valid JSON - Stop simulation to apply changes", WARNING_TYPE);
                 // Keep warning messages persistent - no auto-hide
             }
         }));
@@ -161,8 +178,8 @@ public class JsonViewController {
         if (validation.isValid()) {
             boolean success = updateSimulationFromJson(jsonContent);
             if (success) {
-                setJsonViewerStyle("-fx-border-color: green; -fx-border-width: 2px;");
-                showStatusMessage("JSON applied successfully!", "success");
+                setJsonViewerStyle(SUCCESS_BORDER_STYLE);
+                showStatusMessage("JSON applied successfully!", SUCCESS_TYPE);
                 // Auto-hide success messages after 2 seconds
                 Timeline successTimeline = new Timeline(new KeyFrame(Duration.millis(2000), e -> {
                     setJsonViewerStyle("");
@@ -170,13 +187,13 @@ public class JsonViewController {
                 }));
                 successTimeline.play();
             } else {
-                setJsonViewerStyle("-fx-border-color: red; -fx-border-width: 2px;");
-                showStatusMessage("Failed to apply JSON to simulation", "error");
+                setJsonViewerStyle(ERROR_BORDER_STYLE);
+                showStatusMessage("Failed to apply JSON to simulation", ERROR_TYPE);
                 // Keep error messages persistent - no auto-hide
             }
         } else {
-            setJsonViewerStyle("-fx-border-color: red; -fx-border-width: 2px;");
-            showStatusMessage(validation.getMessage(), "error");
+            setJsonViewerStyle(ERROR_BORDER_STYLE);
+            showStatusMessage(validation.getMessage(), ERROR_TYPE);
             // Keep error messages persistent - no auto-hide
         }
     }
@@ -212,14 +229,25 @@ public class JsonViewController {
     }
     
     /**
-     * Sets visual style on JSON viewer.
+     * Sets visual style on JSON viewer using CSS classes.
+     * @param cssClass the CSS class to apply, or empty string to clear styling
      */
-    private void setJsonViewerStyle(String style) {
-        Platform.runLater(() -> jsonViewer.setStyle(style));
+    private void setJsonViewerStyle(String cssClass) {
+        Platform.runLater(() -> {
+            // Clear existing style classes
+            jsonViewer.getStyleClass().removeAll(ERROR_BORDER_STYLE, SUCCESS_BORDER_STYLE, 
+                                                WARNING_BORDER_STYLE, INFO_BORDER_STYLE);
+            // Add new style class if not empty
+            if (!cssClass.isEmpty()) {
+                jsonViewer.getStyleClass().add(cssClass);
+            }
+        });
     }
     
     /**
-     * Shows status message with appropriate styling.
+     * Shows status message with appropriate styling using CSS classes.
+     * @param message the message to display
+     * @param type the message type (success, error, warning, info)
      */
     private void showStatusMessage(String message, String type) {
         if (statusLabel != null) {
@@ -227,21 +255,28 @@ public class JsonViewController {
                 statusLabel.setText(message);
                 statusLabel.setVisible(true);
                 
-                // Set appropriate style based on message type
-                String baseStyle = "-fx-padding: 5px; -fx-font-size: 12px; ";
+                // Clear existing style classes
+                statusLabel.getStyleClass().removeAll("status-message-base", "status-message-success", 
+                                                     "status-message-error", "status-message-warning", 
+                                                     "status-message-info");
+                
+                // Add base style class
+                statusLabel.getStyleClass().add("status-message-base");
+                
+                // Add appropriate style class based on message type
                 switch (type) {
-                    case "success":
-                        statusLabel.setStyle(baseStyle + "-fx-text-fill: green; -fx-background-color: #e8f5e8; -fx-border-color: green; -fx-border-radius: 3px; -fx-background-radius: 3px;");
+                    case SUCCESS_TYPE:
+                        statusLabel.getStyleClass().add("status-message-success");
                         break;
-                    case "error":
-                        statusLabel.setStyle(baseStyle + "-fx-text-fill: darkred; -fx-background-color: #ffeaea; -fx-border-color: darkred; -fx-border-radius: 3px; -fx-background-radius: 3px;");
+                    case ERROR_TYPE:
+                        statusLabel.getStyleClass().add("status-message-error");
                         break;
-                    case "warning":
-                        statusLabel.setStyle(baseStyle + "-fx-text-fill: #b8860b; -fx-background-color: #fffacd; -fx-border-color: #b8860b; -fx-border-radius: 3px; -fx-background-radius: 3px;");
+                    case WARNING_TYPE:
+                        statusLabel.getStyleClass().add("status-message-warning");
                         break;
-                    case "info":
+                    case INFO_TYPE:
                     default:
-                        statusLabel.setStyle(baseStyle + "-fx-text-fill: #0066cc; -fx-background-color: #e6f3ff; -fx-border-color: #0066cc; -fx-border-radius: 3px; -fx-background-radius: 3px;");
+                        statusLabel.getStyleClass().add("status-message-info");
                         break;
                 }
             });

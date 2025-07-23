@@ -1,0 +1,52 @@
+/* JSON Viewer Styling */
+.json-viewer-error {
+  -fx-border-color: red;
+  -fx-border-width: 2px;
+}
+
+.json-viewer-success {
+  -fx-border-color: green;
+  -fx-border-width: 2px;
+}
+
+.json-viewer-warning {
+  -fx-border-color: yellow;
+  -fx-border-width: 2px;
+}
+
+.json-viewer-info {
+  -fx-border-color: orange;
+  -fx-border-width: 2px;
+}
+
+/* Status Message Styling */
+.status-message-base {
+  -fx-padding: 5px;
+  -fx-font-size: 12px;
+  -fx-border-radius: 3px;
+  -fx-background-radius: 3px;
+}
+
+.status-message-success {
+  -fx-text-fill: green;
+  -fx-background-color: #e8f5e8;
+  -fx-border-color: green;
+}
+
+.status-message-error {
+  -fx-text-fill: darkred;
+  -fx-background-color: #ffeaea;
+  -fx-border-color: darkred;
+}
+
+.status-message-warning {
+  -fx-text-fill: #b8860b;
+  -fx-background-color: #fffacd;
+  -fx-border-color: #b8860b;
+}
+
+.status-message-info {
+  -fx-text-fill: #0066cc;
+  -fx-background-color: #e6f3ff;
+  -fx-border-color: #0066cc;
+}

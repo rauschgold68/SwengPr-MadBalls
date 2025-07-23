@@ -10,7 +10,7 @@
         "radius": 0.0
       },
       "angle": 0.0,
-      "sprite": null,
+      "sprite": "madBox.png",
       "colour": "BROWN",
       "physics": {
         "density": 1.0,
@@ -77,18 +77,19 @@
         "friction": 0.4,
         "restitution": 0.1,
         "shape": "STATIC"
-      }
+      },
+      "winning": false,
+      "count": 15
     },
     {
       "name": "platform",
       "type": "rectangle",
-      "count": 15,
-      "angle": 0.0,
       "size": {
         "width": 300.0,
         "height": 20.0,
         "radius": 0.0
       },
+      "angle": 0.0,
       "sprite": "madPlatform.png",
       "colour": "BLACK",
       "physics": {
@@ -96,18 +97,19 @@
         "friction": 0.4,
         "restitution": 0.1,
         "shape": "STATIC"
-      }
+      },
+      "winning": false,
+      "count": 15
     },
     {
       "name": "log",
       "type": "circle",
-      "count": 15,
-      "angle": 0.0,
       "size": {
         "width": 0.0,
         "height": 0.0,
         "radius": 50.0
       },
+      "angle": 0.0,
       "sprite": "madLog.png",
       "colour": "GREEN",
       "physics": {
@@ -115,18 +117,19 @@
         "friction": 0.4,
         "restitution": 0.1,
         "shape": "STATIC"
-      }
+      },
+      "winning": false,
+      "count": 15
     },
     {
       "name": "tennisball",
       "type": "circle",
-      "count": 15,
-      "angle": 0.0,
       "size": {
         "width": 0.0,
         "height": 0.0,
         "radius": 10.0
       },
+      "angle": 0.0,
       "sprite": "madTennis.png",
       "colour": "YELLOW",
       "physics": {
@@ -134,18 +137,19 @@
         "friction": 0.9,
         "restitution": 0.75,
         "shape": "DYNAMIC"
-      }
+      },
+      "winning": false,
+      "count": 15
     },
     {
       "name": "bowlingball",
       "type": "circle",
-      "count": 15,
-      "angle": 0.0,
       "size": {
         "width": 0.0,
         "height": 0.0,
         "radius": 35.0
       },
+      "angle": 0.0,
       "sprite": "madBowling.png",
       "colour": "GREY",
       "physics": {
@@ -153,18 +157,19 @@
         "friction": 0.5,
         "restitution": 0.3,
         "shape": "DYNAMIC"
-      }
+      },
+      "winning": false,
+      "count": 15
     },
     {
       "name": "ball",
       "type": "circle",
-      "count": 15,
-      "angle": 0.0,
       "size": {
         "width": 0.0,
         "height": 0.0,
         "radius": 25.0
       },
+      "angle": 0.0,
       "sprite": "madBall.png",
       "colour": "BLACK",
       "physics": {
@@ -173,18 +178,18 @@
         "restitution": 0.5,
         "shape": "DYNAMIC"
       },
-      "winning": true
+      "winning": true,
+      "count": 15
     },
     {
       "name": "ballon",
       "type": "circle",
-      "count": 15,
-      "angle": 0.0,
       "size": {
         "width": 0.0,
         "height": 0.0,
         "radius": 50.0
       },
+      "angle": 0.0,
       "sprite": "madBalloon.png",
       "colour": "#800080",
       "physics": {
@@ -192,7 +197,9 @@
         "friction": 0.9,
         "restitution": 0.2,
         "shape": "DYNAMIC"
-      }
+      },
+      "winning": false,
+      "count": 15
     },
     {
       "name": "noPlaceZone",
