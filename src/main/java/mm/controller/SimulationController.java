@@ -10,6 +10,7 @@ import mm.model.GameObject;
 import mm.model.PhysicsVisualPair;
 import mm.model.Position;
 import mm.model.SimulationModel;
+import mm.model.SimulationState;
 import mm.view.SimulationView;
 
 import java.util.List;
@@ -55,29 +56,17 @@ import java.util.List;
  */
 public class SimulationController {
 
-    private String selectedSkin = "Default";
-
+    // Core components
     public final SimulationModel model;
     public final SimulationView view;
     private final Stage primaryStage;
-    // Map to track correspondence between GameObjects and their PhysicsVisualPairs
-    private final java.util.Map<GameObject, PhysicsVisualPair> gameObjectToPairMap = new java.util.HashMap<>();
-
-    // Store original window dimensions to restore them when returning to title
-    // screen
-    private final double originalWidth;
-    private final double originalHeight;
-
-    // Drag start position and angle for undo functionality
-    private Position dragStartPosition;
-    private float dragStartAngle;
-
+    
+    // State container
+    private final SimulationState state;
+    
+    // Specialized controllers
     private JsonViewController jsonViewController;
-
-    // Inventory manager for handling inventory UI and interactions
     private InventoryManager inventoryManager;
-
-    // Controller for all DragAndDrop Features
     private DragAndDropController dragAndDropController;
 
     /**
@@ -235,14 +224,16 @@ public class SimulationController {
     public SimulationController(SimulationControllerParams params) {
         this.primaryStage = params.primaryStage;
 
-        // Store original window dimensions before any changes
-        this.originalWidth = params.primaryStage.getWidth();
-        this.originalHeight = params.primaryStage.getHeight();
+        // Initialize state container
+        this.state = new SimulationState(
+            params.primaryStage.getWidth(),
+            params.primaryStage.getHeight(),
+            params.selectedSkin != null ? params.selectedSkin : "Default"
+        );
 
         this.model = new SimulationModel(params.levelPath);
         this.view = new SimulationView(params.primaryStage, params.isPuzzleMode, params.atPuzzlesEnd);
-        this.selectedSkin = params.selectedSkin != null ? params.selectedSkin : "Default";
-
+        
         // Set win listener
         this.model.setWinListener(() -> {
             Platform.runLater(() -> view.getWinScreenOverlay().setVisible(true));
@@ -263,7 +254,7 @@ public class SimulationController {
             new DragAndDropController.Params.Builder()
                 .setModel(model)
                 .setSimSpace(view.getSimSpace())
-                .setGameObjectToPairMap(gameObjectToPairMap)
+                .setGameObjectToPairMap(state.getGameObjectToPairMap())
                 .setOnInventoryUpdated(this::refreshInventoryDisplay)
                 .setSetupMoveHandlers(this::addMoveHandlersToDroppedVisual)
                 .build()
@@ -273,16 +264,16 @@ public class SimulationController {
         // Replace all button setup methods with ButtonManager
         // First create the component groups
         ButtonManager.UIComponents uiComponents = new ButtonManager.UIComponents(
-            view, primaryStage, originalWidth, originalHeight);
+            view, primaryStage, state.getOriginalWidth(), state.getOriginalHeight());
             
         ButtonManager.ModelComponents modelComponents = new ButtonManager.ModelComponents(
-            model, gameObjectToPairMap, inventoryManager);
+            model, state.getGameObjectToPairMap(), inventoryManager);
             
         ButtonManager.CallbackComponents callbackComponents = new ButtonManager.CallbackComponents(
             this::updateJsonViewer, this::setupSimulation);
             
         ButtonManager.StateComponents stateComponents = new ButtonManager.StateComponents(
-            selectedSkin, params.atPuzzlesEnd);
+            state.getSelectedSkin(), params.atPuzzlesEnd);
         
         // Then use the component groups with the builder
         ButtonManager buttonManager = new ButtonManager(
@@ -332,8 +323,8 @@ public class SimulationController {
     public void updateSkinChoice() {
         String currentSkin = SkinManagerController.getInstance().getSelectedSkin();
 
-        if (!currentSkin.equals(this.selectedSkin)) {
-            this.selectedSkin = currentSkin;
+        if (!currentSkin.equals(state.getSelectedSkin())) {
+            state.setSelectedSkin(currentSkin);
             inventoryManager.updateInventorySpritesForSkin();
             inventoryManager.refreshInventoryDisplay();
         }
@@ -363,7 +354,7 @@ public class SimulationController {
         model.setupSimulation();
         model.connectToView(simSpace);
         // Clear the mapping and rebuild it during setup
-        gameObjectToPairMap.clear();
+        state.getGameObjectToPairMap().clear();
 
         // Process all physics-visual pairs
         List<GameObject> dropped = model.getDroppedObjects();
@@ -411,74 +402,14 @@ public class SimulationController {
     private boolean isMatchingObject(PhysicsVisualPair pair, GameObject obj) {
         Object userData = pair.body.getUserData();
         boolean nameMatches = obj.getName().equals(userData)
-                // Also match if this is the winning object
                 || (obj.isWinning() && "winObject".equals(userData));
         if (!nameMatches) {
             return false;
         }
-        ExpectedPosition expectedPos = calculateExpectedPosition(pair);
-        return isPositionMatch(obj, expectedPos);
+        PositionCalculator.ExpectedPosition expectedPos = PositionCalculator.calculateExpectedPosition(pair);
+        return PositionCalculator.isPositionMatch(obj, expectedPos);
     }
 
-    /**
-     * Helper class to hold expected position coordinates.
-     */
-    private static class ExpectedPosition {
-        final float x;
-        final float y;
-
-        ExpectedPosition(float x, float y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
-    /**
-     * Calculates the expected visual position from the physics body position.
-     */
-    private ExpectedPosition calculateExpectedPosition(PhysicsVisualPair pair) {
-        org.jbox2d.common.Vec2 bodyPos = pair.body.getPosition();
-
-        if (pair.visual instanceof javafx.scene.shape.Rectangle) {
-            return calculateRectanglePosition(pair, bodyPos);
-        } else if (pair.visual instanceof javafx.scene.shape.Polygon) {
-            return calculatePolygonPosition(pair, bodyPos);
-        } else {
-            // Default case for circles and other shapes
-            return new ExpectedPosition(bodyPos.x * 50.0f, bodyPos.y * 50.0f);
-        }
-    }
-
-    /**
-     * Calculates expected position for rectangle shapes.
-     */
-    private ExpectedPosition calculateRectanglePosition(PhysicsVisualPair pair, org.jbox2d.common.Vec2 bodyPos) {
-        javafx.scene.shape.Rectangle rect = (javafx.scene.shape.Rectangle) pair.visual;
-        float expectedX = (float) (bodyPos.x * 50.0f - rect.getWidth() / 2);
-        float expectedY = (float) (bodyPos.y * 50.0f - rect.getHeight() / 2);
-        return new ExpectedPosition(expectedX, expectedY);
-    }
-
-    /**
-     * Calculates expected position for polygon shapes (buckets).
-     */
-    private ExpectedPosition calculatePolygonPosition(PhysicsVisualPair pair, org.jbox2d.common.Vec2 bodyPos) {
-        javafx.scene.shape.Polygon polygon = (javafx.scene.shape.Polygon) pair.visual;
-        javafx.geometry.Bounds bounds = polygon.getBoundsInLocal();
-        float expectedX = (float) (bodyPos.x * 50.0f - bounds.getWidth() / 2);
-        float expectedY = (float) (bodyPos.y * 50.0f - bounds.getHeight() / 2);
-        return new ExpectedPosition(expectedX, expectedY);
-    }
-
-    /**
-     * Checks if a GameObject's position matches the expected position within
-     * tolerance.
-     */
-    private boolean isPositionMatch(GameObject obj, ExpectedPosition expected) {
-        float tolerance = 1.0f; // Small tolerance for floating point precision
-        return Math.abs(obj.getPosition().getX() - expected.x) < tolerance &&
-                Math.abs(obj.getPosition().getY() - expected.y) < tolerance;
-    }
 
     /**
      * Configures a matched object by setting its rotation and adding handlers.
@@ -486,7 +417,7 @@ public class SimulationController {
     private void configureMatchedObject(PhysicsVisualPair pair, GameObject matchedDroppedObject) {
         pair.visual.setRotate(matchedDroppedObject.getAngle());
         addMoveHandlersToDroppedVisual(pair, matchedDroppedObject);
-        gameObjectToPairMap.put(matchedDroppedObject, pair);
+        state.getGameObjectToPairMap().put(matchedDroppedObject, pair);
     }
 
     /**
@@ -532,10 +463,10 @@ public class SimulationController {
                 return;
             }
 
-            // Store starting position and angle for undo
-            dragStartPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
-            dragStartAngle = simObj.getAngle();
-
+            // Store starting position and angle for undo in the state object
+            state.setDragStartPosition(new Position(simObj.getPosition().getX(), simObj.getPosition().getY()));
+            state.setDragStartAngle(simObj.getAngle());
+            
             dragDelta[0] = event.getSceneX() - visual.getTranslateX();
             dragDelta[1] = event.getSceneY() - visual.getTranslateY();
             event.consume();
@@ -600,16 +531,16 @@ public class SimulationController {
             Position currentPosition = new Position(simObj.getPosition().getX(), simObj.getPosition().getY());
             float currentAngle = simObj.getAngle();
 
-            if (dragStartPosition != null &&
-                    (Math.abs(dragStartPosition.getX() - currentPosition.getX()) > 1.0f ||
-                            Math.abs(dragStartPosition.getY() - currentPosition.getY()) > 1.0f ||
-                            Math.abs(dragStartAngle - currentAngle) > 1.0f)) {
+            if (state.getDragStartPosition() != null &&
+                    (Math.abs(state.getDragStartPosition().getX() - currentPosition.getX()) > 1.0f ||
+                            Math.abs(state.getDragStartPosition().getY() - currentPosition.getY()) > 1.0f ||
+                            Math.abs(state.getDragStartAngle() - currentAngle) > 1.0f)) {
 
                 MoveObjectController.MoveObjectParams moveParams = new MoveObjectController.MoveObjectParams.Builder()
                         .setGameObject(simObj)
                         .setPair(pair)
-                        .setPositions(dragStartPosition, currentPosition)
-                        .setAngles(dragStartAngle, currentAngle)
+                        .setPositions(state.getDragStartPosition(), currentPosition)
+                        .setAngles(state.getDragStartAngle(), currentAngle)
                         .build();
                 MoveObjectController moveCommand = new MoveObjectController(moveParams);
                 model.getUndoRedoManager().executeCommand(moveCommand);
