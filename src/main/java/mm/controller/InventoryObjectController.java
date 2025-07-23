@@ -241,7 +241,7 @@ public class InventoryObjectController {
                 String spritePath = obj.getSprite();
                 image = new Image(InventoryObjectController.class.getResource(spritePath).toExternalForm());
             } catch (Exception e) {
-                throw new RuntimeException("Failed to load sprite image: " + obj.getSprite(), e);
+                System.err.println("Failed to load sprite image: " + obj.getSprite());
             }
             if (image != null && !image.isError()) {
                 circ.setFill(new ImagePattern(image));
