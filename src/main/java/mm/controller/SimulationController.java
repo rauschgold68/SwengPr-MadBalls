@@ -751,6 +751,9 @@ public class SimulationController {
                 if (timer != null && !timer.isRunning()) {
                     model.exportLevel();
                 }
+                setupSimulation();
+                setupInventory(true);
+                updateJsonViewer();
             });
         }
     }
