@@ -48,7 +48,7 @@ public class SimulationModel {
     private final JsonStateService jsonService;
     private final PositionValidationService positionValidationService;
     private final InventoryManagementService inventoryManagementService;
-    private final ContactEventService contactEventService;
+    private final WinEventService contactEventService;
 
     /**
      * Container for physics-related simulation components.
@@ -105,7 +105,7 @@ public class SimulationModel {
         this.jsonService = new JsonStateService();
         this.positionValidationService = new PositionValidationService(physics, gameObjects);
         this.inventoryManagementService = new InventoryManagementService(gameObjects);
-        this.contactEventService = new ContactEventService(physics, state);
+        this.contactEventService = new WinEventService(physics, state);
     }
 
     /**

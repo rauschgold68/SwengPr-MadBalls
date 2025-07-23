@@ -9,7 +9,7 @@ import org.jbox2d.dynamics.contacts.Contact;
  * Service class responsible for handling collision detection and contact events.
  * This class manages win condition detection and collision event processing.
  */
-public class ContactEventService {
+public class WinEventService {
     
     private final SimulationModel.PhysicsComponents physics;
     private final SimulationModel.SimulationState state;
@@ -20,7 +20,7 @@ public class ContactEventService {
      * @param physics the physics components containing the world
      * @param state the simulation state containing win listener
      */
-    public ContactEventService(SimulationModel.PhysicsComponents physics, 
+    public WinEventService(SimulationModel.PhysicsComponents physics, 
                               SimulationModel.SimulationState state) {
         this.physics = physics;
         this.state = state;
