@@ -276,6 +276,14 @@
                         <exclude>mm/controller/GeometryConverter$*.class</exclude>
                         <exclude>mm/controller/PositionCalculator.class</exclude>
                         <exclude>mm/controller/PositionCalculator$*.class</exclude>
+                        <exclude>mm/controller/AddObjectController.class</exclude>
+                        <exclude>mm/controller/AddObjectController$*.class</exclude>
+                        <exclude>mm/controller/MoveObjectController.class</exclude>
+                        <exclude>mm/controller/MoveObjectController$*.class</exclude>
+                        <exclude>mm/controller/LevelExportController.class</exclude>
+                        <exclude>mm/controller/LevelExportController$*.class</exclude>
+
+
                         <exclude>mm/model/CollisionDetection.class</exclude>
                         <exclude>mm/model/CollisionDetection$*.class</exclude>
                         <exclude>mm/model/CollisonShapeHandler.class</exclude>
