@@ -20,65 +20,234 @@ import java.util.regex.Pattern;
 
 /**
  * Manages all button setup and event handling for the simulation interface.
- * Extracted from SimulationController to improve separation of concerns.
+ * This class is responsible for configuring all UI buttons and their associated behaviors,
+ * including play/stop controls, undo/redo functionality, file operations, and overlay toggles.
+ * It follows the separation of concerns principle by extracting UI interaction logic from
+ * the main simulation controller.
  */
 public class ButtonManager {
-    private final SimulationModel model;
-    private final SimulationView view;
-    private final Stage primaryStage;
-    private final double originalWidth;
-    private final double originalHeight;
-    private final Map<GameObject, PhysicsVisualPair> gameObjectToPairMap;
-    private final InventoryManager inventoryManager;
-    private final Runnable updateJsonViewerCallback;
-    private final Runnable setupSimulationCallback;
-    private String selectedSkin;
+    
+    /**
+     * Contains UI-related components needed by the ButtonManager.
+     */
+    private final UIComponents uiComponents;
+    
+    /**
+     * Contains model-related components needed by the ButtonManager.
+     */
+    private final ModelComponents modelComponents;
+    
+    /**
+     * Contains callback functions for various operations.
+     */
+    private final CallbackComponents callbackComponents;
+    
+    /**
+     * Contains state information for the ButtonManager.
+     */
+    private final StateComponents stateComponents;
 
     /**
-     * Constructs a ButtonManager to handle all button-related functionality.
-     *
-     * @param model The simulation model
-     * @param view The simulation view
-     * @param primaryStage The primary stage
-     * @param originalWidth Original window width
-     * @param originalHeight Original window height
-     * @param gameObjectToPairMap Map of game objects to physics-visual pairs
-     * @param inventoryManager The inventory manager
-     * @param updateJsonViewerCallback Callback to update JSON viewer
-     * @param setupSimulationCallback Callback to setup simulation
-     * @param atPuzzlesEnd Whether at the end of puzzles
-     * @param selectedSkin The selected skin theme
+     * Groups UI-related components.
      */
-    public ButtonManager(
-            SimulationModel model,
-            SimulationView view,
-            Stage primaryStage,
-            double originalWidth,
-            double originalHeight,
-            Map<GameObject, PhysicsVisualPair> gameObjectToPairMap,
-            InventoryManager inventoryManager,
-            Runnable updateJsonViewerCallback,
-            Runnable setupSimulationCallback,
-            boolean atPuzzlesEnd,
-            String selectedSkin) {
+    public static class UIComponents {
+        private final SimulationView view;
+        private final Stage primaryStage;
+        private final double originalWidth;
+        private final double originalHeight;
         
-        this.model = model;
-        this.view = view;
-        this.primaryStage = primaryStage;
-        this.originalWidth = originalWidth;
-        this.originalHeight = originalHeight;
-        this.gameObjectToPairMap = gameObjectToPairMap;
-        this.inventoryManager = inventoryManager;
-        this.updateJsonViewerCallback = updateJsonViewerCallback;
-        this.setupSimulationCallback = setupSimulationCallback;
-        this.selectedSkin = selectedSkin;
+        /**
+         * Constructs UIComponents with the specified values.
+         * 
+         * @param view The simulation view
+         * @param primaryStage The primary JavaFX stage
+         * @param originalWidth The original window width
+         * @param originalHeight The original window height
+         */
+        public UIComponents(SimulationView view, Stage primaryStage, 
+                double originalWidth, double originalHeight) {
+            this.view = view;
+            this.primaryStage = primaryStage;
+            this.originalWidth = originalWidth;
+            this.originalHeight = originalHeight;
+        }
+    }
+    
+    /**
+     * Groups model-related components.
+     */
+    public static class ModelComponents {
+        private final SimulationModel model;
+        private final Map<GameObject, PhysicsVisualPair> gameObjectToPairMap;
+        private final InventoryManager inventoryManager;
+        
+        /**
+         * Constructs ModelComponents with the specified values.
+         * 
+         * @param model The simulation model
+         * @param gameObjectToPairMap The map of game objects to physics-visual pairs
+         * @param inventoryManager The inventory manager
+         */
+        public ModelComponents(SimulationModel model, 
+                Map<GameObject, PhysicsVisualPair> gameObjectToPairMap,
+                InventoryManager inventoryManager) {
+            this.model = model;
+            this.gameObjectToPairMap = gameObjectToPairMap;
+            this.inventoryManager = inventoryManager;
+        }
+    }
+    
+    /**
+     * Groups callback functions.
+     */
+    public static class CallbackComponents {
+        private final Runnable updateJsonViewerCallback;
+        private final Runnable setupSimulationCallback;
+        
+        /**
+         * Constructs CallbackComponents with the specified values.
+         * 
+         * @param updateJsonViewerCallback Callback to update the JSON viewer
+         * @param setupSimulationCallback Callback to set up the simulation
+         */
+        public CallbackComponents(Runnable updateJsonViewerCallback, 
+                Runnable setupSimulationCallback) {
+            this.updateJsonViewerCallback = updateJsonViewerCallback;
+            this.setupSimulationCallback = setupSimulationCallback;
+        }
+    }
+    
+    /**
+     * Groups state information.
+     */
+    public static class StateComponents {
+        private final String selectedSkin;
+        private final boolean atPuzzlesEnd;
+        
+        /**
+         * Constructs StateComponents with the specified values.
+         * 
+         * @param selectedSkin The selected skin name
+         * @param atPuzzlesEnd Whether player is at puzzles end
+         */
+        public StateComponents(String selectedSkin, boolean atPuzzlesEnd) {
+            this.selectedSkin = selectedSkin;
+            this.atPuzzlesEnd = atPuzzlesEnd;
+        }
+    }
+
+    /**
+     * Parameter object for ButtonManager constructor.
+     * Uses the parameter object pattern to avoid excessive parameter lists and
+     * to make the constructor more readable and maintainable.
+     */
+    public static class Params {
+        private final UIComponents uiComponents;
+        private final ModelComponents modelComponents;
+        private final CallbackComponents callbackComponents;
+        private final StateComponents stateComponents;
+
+        /**
+         * Private constructor used by the Builder.
+         * 
+         * @param builder The builder containing parameter values
+         */
+        private Params(Builder builder) {
+            this.uiComponents = builder.uiComponents;
+            this.modelComponents = builder.modelComponents;
+            this.callbackComponents = builder.callbackComponents;
+            this.stateComponents = builder.stateComponents;
+        }
+
+        /**
+         * Builder class for constructing Params objects.
+         * Provides a fluent API for setting all required parameters for ButtonManager.
+         */
+        public static class Builder {
+            private UIComponents uiComponents;
+            private ModelComponents modelComponents;
+            private CallbackComponents callbackComponents;
+            private StateComponents stateComponents;
+
+            /**
+             * Sets UI components.
+             * 
+             * @param components The UI components
+             * @return This builder for method chaining
+             */
+            public Builder setUIComponents(UIComponents components) {
+                this.uiComponents = components;
+                return this;
+            }
+
+            /**
+             * Sets model components.
+             * 
+             * @param components The model components
+             * @return This builder for method chaining
+             */
+            public Builder setModelComponents(ModelComponents components) {
+                this.modelComponents = components;
+                return this;
+            }
+
+            /**
+             * Sets callback components.
+             * 
+             * @param components The callback components
+             * @return This builder for method chaining
+             */
+            public Builder setCallbackComponents(CallbackComponents components) {
+                this.callbackComponents = components;
+                return this;
+            }
+
+            /**
+             * Sets state components.
+             * 
+             * @param components The state components
+             * @return This builder for method chaining
+             */
+            public Builder setStateComponents(StateComponents components) {
+                this.stateComponents = components;
+                return this;
+            }
+
+            /**
+             * Builds and returns a new Params object with the configured values.
+             * 
+             * @return A new Params instance
+             * @throws IllegalStateException If any required parameter is null
+             */
+            public Params build() {
+                if (uiComponents == null || modelComponents == null || 
+                    callbackComponents == null || stateComponents == null) {
+                    throw new IllegalStateException("Required components must not be null");
+                }
+                return new Params(this);
+            }
+        }
+    }
+
+    /**
+     * Constructs a ButtonManager using the parameter object pattern.
+     * Initializes all required components from the provided parameters object.
+     *
+     * @param params Parameter object containing all needed values
+     */
+    public ButtonManager(Params params) {
+        this.uiComponents = params.uiComponents;
+        this.modelComponents = params.modelComponents;
+        this.callbackComponents = params.callbackComponents;
+        this.stateComponents = params.stateComponents;
     }
 
     /**
      * Sets up all menu buttons and their event handlers.
+     * This method initializes all UI button actions by calling individual setup methods.
      */
     public void setupAllButtons() {
-        SimulationView.SimulationButtons simButtons = view.getSimulationButtons();
+        SimulationView.SimulationButtons simButtons = uiComponents.view.getSimulationButtons();
 
         setupPlayButton(simButtons);
         setupStopButton(simButtons);
@@ -93,14 +262,17 @@ public class ButtonManager {
 
     /**
      * Sets up the play button action.
+     * Configures the play button to start the physics simulation when clicked.
+     * 
+     * @param simButtons Container object holding all simulation buttons
      */
     private void setupPlayButton(SimulationView.SimulationButtons simButtons) {
         if (simButtons.playButton != null) {
             simButtons.playButton.setOnAction(e -> {
-                PhysicsAnimationController timer = model.getTimer();
+                PhysicsAnimationController timer = modelComponents.model.getTimer();
                 if (timer != null && !timer.isRunning()) {
                     timer.start();
-                    inventoryManager.setInventoryItemsDisabled(true);
+                    modelComponents.inventoryManager.setInventoryItemsDisabled(true);
                 }
             });
         }
@@ -108,25 +280,29 @@ public class ButtonManager {
 
     /**
      * Sets up the stop button action.
+     * Configures the stop button to halt the physics simulation, reset to initial state,
+     * and re-enable inventory interactions.
+     * 
+     * @param simButtons Container object holding all simulation buttons
      */
     private void setupStopButton(SimulationView.SimulationButtons simButtons) {
         if (simButtons.stopButton != null) {
             simButtons.stopButton.setOnAction(e -> {
-                PhysicsAnimationController timer = model.getTimer();
+                PhysicsAnimationController timer = modelComponents.model.getTimer();
                 if (timer != null && timer.isRunning()) {
                     timer.stop();
                     timer.reset();
 
                     // Clear undo/redo history when stopping simulation to prevent inconsistent state
-                    model.getUndoRedoManager().clear();
+                    modelComponents.model.getUndoRedoManager().clear();
 
                     // Reset simulation to state before play was pressed
-                    model.setDroppedObjects(model.getDroppedObjects());
-                    model.setDroppedVisualPairs(model.getDroppedPhysicsVisualPairs());
-                    gameObjectToPairMap.clear();
-                    inventoryManager.setInventoryItemsDisabled(false);
-                    setupSimulationCallback.run();
-                    inventoryManager.refreshInventoryDisplay();
+                    modelComponents.model.setDroppedObjects(modelComponents.model.getDroppedObjects());
+                    modelComponents.model.setDroppedVisualPairs(modelComponents.model.getDroppedPhysicsVisualPairs());
+                    modelComponents.gameObjectToPairMap.clear();
+                    modelComponents.inventoryManager.setInventoryItemsDisabled(false);
+                    callbackComponents.setupSimulationCallback.run();
+                    modelComponents.inventoryManager.refreshInventoryDisplay();
                 }
             });
         }
@@ -134,28 +310,34 @@ public class ButtonManager {
 
     /**
      * Sets up the settings button action.
+     * Configures the settings button to pause the simulation and display the settings overlay.
+     * 
+     * @param simButtons Container object holding all simulation buttons
      */
     private void setupSettingsButton(SimulationView.SimulationButtons simButtons) {
         if (simButtons.settingsButton != null) {
             simButtons.settingsButton.setOnAction(e -> {
-                PhysicsAnimationController timer = model.getTimer();
+                PhysicsAnimationController timer = modelComponents.model.getTimer();
                 if (timer != null && timer.isRunning()) {
                     timer.stop();
                 }
-                view.getOverlaySettings().setVisible(true);
+                uiComponents.view.getOverlaySettings().setVisible(true);
             });
         }
     }
 
     /**
      * Sets up the undo and redo button actions.
+     * Configures undo/redo functionality when simulation is not running.
+     * 
+     * @param simButtons Container object holding all simulation buttons
      */
     private void setupUndoRedoButtons(SimulationView.SimulationButtons simButtons) {
         if (simButtons.undoButton != null) {
             simButtons.undoButton.setOnAction(e -> {
                 if (isInteractionAllowed()) {
-                    model.getUndoRedoManager().undo();
-                    updateJsonViewerCallback.run();
+                    modelComponents.model.getUndoRedoManager().undo();
+                    callbackComponents.updateJsonViewerCallback.run();
                 }
             });
         }
@@ -163,8 +345,8 @@ public class ButtonManager {
         if (simButtons.redoButton != null) {
             simButtons.redoButton.setOnAction(e -> {
                 if (isInteractionAllowed()) {
-                    model.getUndoRedoManager().redo();
-                    updateJsonViewerCallback.run();
+                    modelComponents.model.getUndoRedoManager().redo();
+                    callbackComponents.updateJsonViewerCallback.run();
                 }
             });
         }
@@ -172,50 +354,57 @@ public class ButtonManager {
 
     /**
      * Sets up the delete button action.
+     * Configures the delete button to clear all objects from the simulation,
+     * restore inventory counts, and reset the simulation state.
+     * 
+     * @param simButtons Container object holding all simulation buttons
      */
     private void setupDeleteButton(SimulationView.SimulationButtons simButtons) {
         if (simButtons.deleteButton != null) {
             simButtons.deleteButton.setOnAction(e -> {
                 // Clear undo/redo history when deleting all objects
-                model.getUndoRedoManager().clear();
+                modelComponents.model.getUndoRedoManager().clear();
 
                 // Restore inventory counts before clearing objects
-                model.restoreInventoryCounts();
+                modelComponents.model.restoreInventoryCounts();
 
-                model.setDroppedObjects(new ArrayList<>());
-                model.setDroppedVisualPairs(new ArrayList<>());
-                gameObjectToPairMap.clear();
-                inventoryManager.setInventoryItemsDisabled(false);
-                setupSimulationCallback.run();
-                inventoryManager.refreshInventoryDisplay();
-                updateJsonViewerCallback.run(); // Update JSON viewer after deleting all
+                modelComponents.model.setDroppedObjects(new ArrayList<>());
+                modelComponents.model.setDroppedVisualPairs(new ArrayList<>());
+                modelComponents.gameObjectToPairMap.clear();
+                modelComponents.inventoryManager.setInventoryItemsDisabled(false);
+                callbackComponents.setupSimulationCallback.run();
+                modelComponents.inventoryManager.refreshInventoryDisplay();
+                callbackComponents.updateJsonViewerCallback.run(); // Update JSON viewer after deleting all
             });
         }
     }
 
     /**
      * Sets up the import and save button actions.
+     * Configures file operations for importing levels from JSON files and saving the current level.
+     * 
+     * @param simButtons Container object holding all simulation buttons
      */
     private void setupFileButtons(SimulationView.SimulationButtons simButtons) {
-        PhysicsAnimationController timer = model.getTimer();
+        PhysicsAnimationController timer = modelComponents.model.getTimer();
         if (simButtons.importButton != null) {
             simButtons.importButton.setOnAction(e -> {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Import your level!");
                 fileChooser.getExtensionFilters().add(
                         new FileChooser.ExtensionFilter("JSON Files", "*.json"));
-                File file = fileChooser.showOpenDialog(primaryStage);
+                File file = fileChooser.showOpenDialog(uiComponents.primaryStage);
                 if (file != null) {
                     // Clear everything before importing new level
                     clearSimulationForImport();
                     
                     // Set new level path
-                    model.setLevelPath("/level/" + file.getName());
+                    modelComponents.model.setLevelPath("/level/" + file.getName());
                     
                     // Setup simulation with imported level
-                    setupSimulationCallback.run();
-                    inventoryManager.setupInventory(true); // Reload data when importing new level
-                    updateJsonViewerCallback.run(); // Update JSON viewer after import
+                    callbackComponents.setupSimulationCallback.run();
+                    modelComponents.inventoryManager.setupInventory(true); // Reload data when importing new level
+                    callbackComponents.updateJsonViewerCallback.run(); // Update JSON viewer after import
                 }
             });
         }
@@ -223,84 +412,90 @@ public class ButtonManager {
         if (simButtons.saveButton != null) {
             simButtons.saveButton.setOnAction(e -> {
                 if (timer != null && !timer.isRunning()) {
-                    model.exportLevel();
+                    modelComponents.model.exportLevel();
                 }
-                setupSimulationCallback.run();
-                inventoryManager.setupInventory(true);
-                updateJsonViewerCallback.run();
+                callbackComponents.setupSimulationCallback.run();
+                modelComponents.inventoryManager.setupInventory(true);
+                callbackComponents.updateJsonViewerCallback.run();
             });
         }
     }
 
     /**
      * Clears all simulation state before importing a new level.
-     * This ensures that only objects from the imported level are present.
+     * This ensures that only objects from the imported level are present
+     * by clearing undo/redo history, restoring inventory counts, and removing all objects.
      */
     private void clearSimulationForImport() {
         // Clear undo/redo history when importing new level
-        model.getUndoRedoManager().clear();
+        modelComponents.model.getUndoRedoManager().clear();
         
         // Restore inventory counts before clearing objects
-        model.restoreInventoryCounts();
+        modelComponents.model.restoreInventoryCounts();
         
         // Clear all dropped objects
-        model.setDroppedObjects(new ArrayList<>());
-        model.setDroppedVisualPairs(new ArrayList<>());
-        gameObjectToPairMap.clear();
+        modelComponents.model.setDroppedObjects(new ArrayList<>());
+        modelComponents.model.setDroppedVisualPairs(new ArrayList<>());
+        modelComponents.gameObjectToPairMap.clear();
     }
 
     /**
      * Sets up the crown button action.
+     * Configures the crown button to display the win screen overlay.
+     * 
+     * @param simButtons Container object holding all simulation buttons
      */
     private void setupCrownButton(SimulationView.SimulationButtons simButtons) {
         if (simButtons.crownButton != null) {
             simButtons.crownButton.setOnAction(e -> {
-                view.getWinScreenOverlay().setVisible(true);
+                uiComponents.view.getWinScreenOverlay().setVisible(true);
             });
         }
     }
 
     /**
      * Sets up the ESC key to toggle the overlay menu.
+     * Configures keyboard shortcuts and buttons for overlay visibility control,
+     * returning to title screen, and exiting the application.
      */
     private void setupOverlayToggle() {
-        Scene scene = view.getScene();
-        StackPane overlaySettings = view.getOverlaySettings();
+        Scene scene = uiComponents.view.getScene();
+        StackPane overlaySettings = uiComponents.view.getOverlaySettings();
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ESCAPE && !model.isWinScreenVisible()) {
+            if (event.getCode() == KeyCode.ESCAPE && !modelComponents.model.isWinScreenVisible()) {
                 overlaySettings.setVisible(!overlaySettings.isVisible());
                 event.consume();
             }
         });
 
         // Get button groups from the refactored view
-        SimulationView.OverlayButtons overlayButtons = view.getOverlayButtons();
-        SimulationView.WinScreenButtons winButtons = view.getWinScreenButtons();
+        SimulationView.OverlayButtons overlayButtons = uiComponents.view.getOverlayButtons();
+        SimulationView.WinScreenButtons winButtons = uiComponents.view.getWinScreenButtons();
 
         overlayButtons.overlayCloseButton.setOnAction(e -> {
-            view.getOverlaySettings().setVisible(false);
+            uiComponents.view.getOverlaySettings().setVisible(false);
         });
 
         overlayButtons.overlayQuitButton.setOnAction(e -> Platform.exit());
 
         overlayButtons.overlayBackButton.setOnAction(e -> {
-            view.getOverlaySettings().setVisible(false);
+            uiComponents.view.getOverlaySettings().setVisible(false);
             
             // Create new title screen
-            TitleScreenController titleScreenController = new TitleScreenController(primaryStage);
-            primaryStage.setScene(titleScreenController.getScene());
+            TitleScreenController titleScreenController = new TitleScreenController(uiComponents.primaryStage);
+            uiComponents.primaryStage.setScene(titleScreenController.getScene());
             
             // Restore original window dimensions
-            primaryStage.setWidth(originalWidth);
-            primaryStage.setHeight(originalHeight);
+            uiComponents.primaryStage.setWidth(uiComponents.originalWidth);
+            uiComponents.primaryStage.setHeight(uiComponents.originalHeight);
         });
 
         if (winButtons.btnWinExport != null) {
             winButtons.btnWinExport.setOnAction(e -> {
-                PhysicsAnimationController timer = model.getTimer();
+                PhysicsAnimationController timer = modelComponents.model.getTimer();
                 if (timer != null && !timer.isRunning()) {
-                    model.exportLevel();
+                    modelComponents.model.exportLevel();
                 }
             });
         }
@@ -308,9 +503,12 @@ public class ButtonManager {
 
     /**
      * Sets up the next level button on the win screen.
+     * Determines the next level path based on the current level number
+     * and configures the next button to load that level when clicked.
+     * The behavior changes depending on whether the player is at the final puzzle.
      */
     private void setupWinNextLevel() {
-        int currentLevel = extractLevelNumber(model.getLevelPath());
+        int currentLevel = extractLevelNumber(modelComponents.model.getLevelPath());
         String nextLevel = "1";
         final boolean[] nextLevelAtPuzzlesEnd = {false};
         
@@ -328,25 +526,29 @@ public class ButtonManager {
         }
         
         String nextLevelPath = "/level/level" + nextLevel + ".json";
-        if (view.getWinScreenButtons().btnWinNext != null) {
-            view.getWinScreenButtons().btnWinNext.setOnAction(e -> {
+        if (uiComponents.view.getWinScreenButtons().btnWinNext != null) {
+            uiComponents.view.getWinScreenButtons().btnWinNext.setOnAction(e -> {
                 SimulationController simController = new SimulationController(
                         new SimulationController.SimulationControllerParams.Builder()
-                            .setPrimaryStage(primaryStage)
+                            .setPrimaryStage(uiComponents.primaryStage)
                             .setLevelPath(nextLevelPath)
                             .setPuzzleMode(true)
                             .setAtPuzzlesEnd(nextLevelAtPuzzlesEnd[0])
-                            .setSelectedSkin(selectedSkin)
+                            .setSelectedSkin(stateComponents.selectedSkin)
                             .build()
                 );
                 Scene simScene = simController.getScene();
-                primaryStage.setScene(simScene);
+                uiComponents.primaryStage.setScene(simScene);
             });
         }
     }
     
     /**
      * Extracts the level number from the level path.
+     * Uses regular expressions to find the level number in the file name.
+     * 
+     * @param levelPath The path to the level file
+     * @return The extracted level number, or -1 if not found
      */
     private int extractLevelNumber(String levelPath) {
         Matcher matcher = Pattern.compile("level(\\d+)\\.json").matcher(levelPath);
@@ -358,9 +560,12 @@ public class ButtonManager {
 
     /**
      * Determines if interaction is allowed based on simulation state.
+     * Interactions are only allowed when the simulation is not running.
+     * 
+     * @return True if interaction is allowed, false otherwise
      */
     private boolean isInteractionAllowed() {
-        PhysicsAnimationController timer = model.getTimer();
+        PhysicsAnimationController timer = modelComponents.model.getTimer();
         return timer == null || !timer.isRunning();
     }
 }

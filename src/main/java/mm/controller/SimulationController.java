@@ -260,27 +260,38 @@ public class SimulationController {
         
         // Create and use the DragAndDropController
         dragAndDropController = new DragAndDropController(
-            model,
-            view.getSimSpace(),
-            gameObjectToPairMap,
-            this::refreshInventoryDisplay,
-            this::addMoveHandlersToDroppedVisual
+            new DragAndDropController.Params.Builder()
+                .setModel(model)
+                .setSimSpace(view.getSimSpace())
+                .setGameObjectToPairMap(gameObjectToPairMap)
+                .setOnInventoryUpdated(this::refreshInventoryDisplay)
+                .setSetupMoveHandlers(this::addMoveHandlersToDroppedVisual)
+                .build()
         );
         dragAndDropController.setupDragAndDrop();
         
         // Replace all button setup methods with ButtonManager
+        // First create the component groups
+        ButtonManager.UIComponents uiComponents = new ButtonManager.UIComponents(
+            view, primaryStage, originalWidth, originalHeight);
+            
+        ButtonManager.ModelComponents modelComponents = new ButtonManager.ModelComponents(
+            model, gameObjectToPairMap, inventoryManager);
+            
+        ButtonManager.CallbackComponents callbackComponents = new ButtonManager.CallbackComponents(
+            this::updateJsonViewer, this::setupSimulation);
+            
+        ButtonManager.StateComponents stateComponents = new ButtonManager.StateComponents(
+            selectedSkin, params.atPuzzlesEnd);
+        
+        // Then use the component groups with the builder
         ButtonManager buttonManager = new ButtonManager(
-            model,
-            view,
-            primaryStage,
-            originalWidth,
-            originalHeight,
-            gameObjectToPairMap,
-            inventoryManager,
-            this::updateJsonViewer,
-            this::setupSimulation,
-            params.atPuzzlesEnd,
-            selectedSkin
+            new ButtonManager.Params.Builder()
+                .setUIComponents(uiComponents)
+                .setModelComponents(modelComponents)
+                .setCallbackComponents(callbackComponents)
+                .setStateComponents(stateComponents)
+                .build()
         );
         buttonManager.setupAllButtons();
         

@@ -1,5 +1,533 @@
 {
   "levelObjects" : [ {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 100.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 15.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 124.0,
+      "y" : 304.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 20.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 720.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1484.0,
+      "y" : 99.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 100.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 989.99994,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1465.0,
+      "y" : 139.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 80.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 720.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1357.0,
+      "y" : 182.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 80.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 810.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1325.0,
+      "y" : 131.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 40.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 720.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1266.0,
+      "y" : 140.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 60.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 1170.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1225.0,
+      "y" : 139.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 80.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 720.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1247.0,
+      "y" : 180.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 80.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 720.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1246.0,
+      "y" : 98.00001
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 100.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 1009.99994,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1144.0,
+      "y" : 137.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 100.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 1150.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1091.0,
+      "y" : 137.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 40.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 720.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1029.0,
+      "y" : 140.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 80.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 720.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1008.0,
+      "y" : 98.00001
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 60.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 1530.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 988.0,
+      "y" : 139.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 200.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 50.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 191.0,
+      "y" : 398.0
+    }
+  }, {
+    "name" : "winObject",
+    "type" : "Circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 25.0
+    },
+    "angle" : 2845.7434,
+    "sprite" : "madBall.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 0.5,
+      "friction" : 0.75,
+      "restitution" : 0.5,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : true,
+    "position" : {
+      "x" : 1234.5876,
+      "y" : 675.43933
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 200.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 15.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 348.0,
+      "y" : 512.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 200.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 10.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 622.0,
+      "y" : 561.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 80.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 720.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1011.0,
+      "y" : 180.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 80.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 720.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 903.99994,
+      "y" : 179.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 200.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 370.00003,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 899.0,
+      "y" : 582.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 80.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 1170.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 872.0,
+      "y" : 128.0
+    }
+  }, {
+    "name" : "bucket",
+    "type" : "Bucket",
+    "size" : {
+      "width" : 100.0,
+      "height" : 80.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : "0x808080ff",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1184.0,
+      "y" : 669.0
+    }
+  }, {
+    "name" : "winZone",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 80.0,
+      "height" : 40.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : null,
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.0,
+      "restitution" : 0.0,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1194.0,
+      "y" : 699.0
+    }
+  }, {
     "name" : "log",
     "type" : "Circle",
     "size" : {
@@ -18,240 +546,12 @@
     },
     "winning" : false,
     "position" : {
-      "x" : 839.9999,
-      "y" : 386.28574
+      "x" : 578.0,
+      "y" : 656.0
     }
-  }, {
-    "name" : "platform",
-    "type" : "Rectangle",
-    "size" : {
-      "width" : 300.0,
-      "height" : 20.0,
-      "radius" : 0.0
-    },
-    "angle" : 0.0,
-    "sprite" : "madPlatform.png",
-    "colour" : "BLACK",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.4,
-      "restitution" : 0.1,
-      "shape" : "STATIC"
-    },
-    "winning" : false,
-    "position" : {
-      "x" : 692.8572,
-      "y" : 526.5714
-    }
-  }, {
-    "name" : "platform",
-    "type" : "Rectangle",
-    "size" : {
-      "width" : 300.0,
-      "height" : 20.0,
-      "radius" : 0.0
-    },
-    "angle" : 0.0,
-    "sprite" : "madPlatform.png",
-    "colour" : "BLACK",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.4,
-      "restitution" : 0.1,
-      "shape" : "STATIC"
-    },
-    "winning" : false,
-    "position" : {
-      "x" : 380.2857,
-      "y" : 527.1429
-    }
-  }, {
-    "name" : "box1",
-    "type" : "Rectangle",
-    "size" : {
-      "width" : 100.0,
-      "height" : 100.0,
-      "radius" : 0.0
-    },
-    "angle" : 60.0,
-    "sprite" : "madBox.png",
-    "colour" : "BLACK",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.4,
-      "restitution" : 0.1,
-      "shape" : "DYNAMIC"
-    },
-    "winning" : false,
-    "position" : {
-      "x" : 830.5714,
-      "y" : 140.85715
-    }
-  }, {
-    "name" : "winZone",
-    "type" : "Rectangle",
-    "size" : {
-      "width" : 200.0,
-      "height" : 40.0,
-      "radius" : 0.0
-    },
-    "angle" : 0.0,
-    "sprite" : null,
-    "colour" : null,
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.0,
-      "restitution" : 0.0,
-      "shape" : "STATIC"
-    },
-    "winning" : false,
-    "position" : {
-      "x" : 721.7143,
-      "y" : 469.7143
-    }
-  }, {
-    "name" : "winZone",
-    "type" : "Rectangle",
-    "size" : {
-      "width" : 200.0,
-      "height" : 40.0,
-      "radius" : 0.0
-    },
-    "angle" : 0.0,
-    "sprite" : null,
-    "colour" : null,
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.0,
-      "restitution" : 0.0,
-      "shape" : "STATIC"
-    },
-    "winning" : false,
-    "position" : {
-      "x" : 921.71436,
-      "y" : 472.0
-    }
-  }, {
-    "name" : "box1",
-    "type" : "Rectangle",
-    "size" : {
-      "width" : 100.0,
-      "height" : 100.0,
-      "radius" : 0.0
-    },
-    "angle" : 35.0,
-    "sprite" : "madBox.png",
-    "colour" : "BLACK",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.4,
-      "restitution" : 0.1,
-      "shape" : "DYNAMIC"
-    },
-    "winning" : false,
-    "position" : {
-      "x" : 656.8571,
-      "y" : 77.428566
-    }
-  } ],
-  "inventoryObjects" : [ {
-    "name" : "box1",
-    "type" : "rectangle",
-    "size" : {
-      "width" : 100.0,
-      "height" : 100.0,
-      "radius" : 0.0
-    },
-    "angle" : 0.0,
-    "sprite" : "madBox.png",
-    "colour" : "BROWN",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.4,
-      "restitution" : 0.1,
-      "shape" : "DYNAMIC"
-    },
-    "winning" : false,
-    "count" : 13
-  }, {
-    "name" : "Domino",
-    "type" : "rectangle",
-    "size" : {
-      "width" : 25.0,
-      "height" : 100.0,
-      "radius" : 0.0
-    },
-    "angle" : 0.0,
-    "sprite" : "madDomino.png",
-    "colour" : "BROWN",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.4,
-      "restitution" : 0.1,
-      "shape" : "DYNAMIC"
-    },
-    "winning" : false,
-    "count" : 15
-  }, {
-    "name" : "winZone",
-    "type" : "rectangle",
-    "size" : {
-      "width" : 200.0,
-      "height" : 40.0,
-      "radius" : 0.0
-    },
-    "angle" : 0.0,
-    "sprite" : null,
-    "colour" : "WINZONE",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.0,
-      "restitution" : 0.0,
-      "shape" : "STATIC"
-    },
-    "winning" : false,
-    "count" : 13
-  }, {
-    "name" : "winPlat",
-    "type" : "rectangle",
-    "size" : {
-      "width" : 50.0,
-      "height" : 10.0,
-      "radius" : 0.0
-    },
-    "angle" : 0.0,
-    "sprite" : null,
-    "colour" : "RED",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.4,
-      "restitution" : 0.1,
-      "shape" : "STATIC"
-    },
-    "winning" : false,
-    "count" : 15
-  }, {
-    "name" : "platform",
-    "type" : "rectangle",
-    "size" : {
-      "width" : 300.0,
-      "height" : 20.0,
-      "radius" : 0.0
-    },
-    "angle" : 0.0,
-    "sprite" : "madPlatform.png",
-    "colour" : "BLACK",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.4,
-      "restitution" : 0.1,
-      "shape" : "STATIC"
-    },
-    "winning" : false,
-    "count" : 13
   }, {
     "name" : "log",
-    "type" : "circle",
+    "type" : "Circle",
     "size" : {
       "width" : 0.0,
       "height" : 0.0,
@@ -259,7 +559,7 @@
     },
     "angle" : 0.0,
     "sprite" : "madLog.png",
-    "colour" : "GREEN",
+    "colour" : "BLACK",
     "physics" : {
       "density" : 1.0,
       "friction" : 0.4,
@@ -267,18 +567,43 @@
       "shape" : "STATIC"
     },
     "winning" : false,
-    "count" : 14
+    "position" : {
+      "x" : 864.99994,
+      "y" : 684.0
+    }
+  }, {
+    "name" : "box1",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 50.0,
+      "height" : 50.0,
+      "radius" : 0.0
+    },
+    "angle" : 720.0,
+    "sprite" : "madBox.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 943.0,
+      "y" : 128.0
+    }
   }, {
     "name" : "tennisball",
-    "type" : "circle",
+    "type" : "Circle",
     "size" : {
       "width" : 0.0,
       "height" : 0.0,
       "radius" : 10.0
     },
-    "angle" : 0.0,
+    "angle" : 10.290978,
     "sprite" : "madTennis.png",
-    "colour" : "YELLOW",
+    "colour" : "BLACK",
     "physics" : {
       "density" : 0.1,
       "friction" : 0.9,
@@ -286,8 +611,144 @@
       "shape" : "DYNAMIC"
     },
     "winning" : false,
-    "count" : 15
+    "position" : {
+      "x" : 1167.4802,
+      "y" : 160.54973
+    }
   }, {
+    "name" : "tennisball",
+    "type" : "Circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 10.0
+    },
+    "angle" : -70.274,
+    "sprite" : "madTennis.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 0.1,
+      "friction" : 0.9,
+      "restitution" : 0.75,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1175.5663,
+      "y" : 138.48569
+    }
+  }, {
+    "name" : "tennisball",
+    "type" : "Circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 10.0
+    },
+    "angle" : 45.304626,
+    "sprite" : "madTennis.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 0.1,
+      "friction" : 0.9,
+      "restitution" : 0.75,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1157.0122,
+      "y" : 131.82137
+    }
+  }, {
+    "name" : "tennisball",
+    "type" : "Circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 10.0
+    },
+    "angle" : -67.4502,
+    "sprite" : "madTennis.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 0.1,
+      "friction" : 0.9,
+      "restitution" : 0.75,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1182.22,
+      "y" : 119.766685
+    }
+  }, {
+    "name" : "tennisball",
+    "type" : "Circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 10.0
+    },
+    "angle" : -56.944218,
+    "sprite" : "madTennis.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 0.1,
+      "friction" : 0.9,
+      "restitution" : 0.75,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1150.3037,
+      "y" : 113.19542
+    }
+  }, {
+    "name" : "bowlingball",
+    "type" : "Circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 35.0
+    },
+    "angle" : -21.405655,
+    "sprite" : "madBowling.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 0.9,
+      "friction" : 0.5,
+      "restitution" : 0.3,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 587.39264,
+      "y" : 571.66235
+    }
+  }, {
+    "name" : "bowlingball",
+    "type" : "Circle",
+    "size" : {
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 35.0
+    },
+    "angle" : 18.691305,
+    "sprite" : "madBowling.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 0.9,
+      "friction" : 0.5,
+      "restitution" : 0.3,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 866.50543,
+      "y" : 599.24646
+    }
+  } ],
+  "inventoryObjects" : [ {
     "name" : "bowlingball",
     "type" : "circle",
     "size" : {
@@ -305,82 +766,6 @@
       "shape" : "DYNAMIC"
     },
     "winning" : false,
-    "count" : 15
-  }, {
-    "name" : "ball",
-    "type" : "circle",
-    "size" : {
-      "width" : 0.0,
-      "height" : 0.0,
-      "radius" : 25.0
-    },
-    "angle" : 0.0,
-    "sprite" : "madBall.png",
-    "colour" : "BLACK",
-    "physics" : {
-      "density" : 0.5,
-      "friction" : 0.75,
-      "restitution" : 0.5,
-      "shape" : "DYNAMIC"
-    },
-    "winning" : true,
-    "count" : 15
-  }, {
-    "name" : "ballon",
-    "type" : "circle",
-    "size" : {
-      "width" : 0.0,
-      "height" : 0.0,
-      "radius" : 50.0
-    },
-    "angle" : 0.0,
-    "sprite" : "madBalloon.png",
-    "colour" : "#800080",
-    "physics" : {
-      "density" : 0.15,
-      "friction" : 0.9,
-      "restitution" : 0.2,
-      "shape" : "DYNAMIC"
-    },
-    "winning" : false,
-    "count" : 15
-  }, {
-    "name" : "noPlaceZone",
-    "type" : "rectangle",
-    "size" : {
-      "width" : 200.0,
-      "height" : 40.0,
-      "radius" : 0.0
-    },
-    "angle" : 0.0,
-    "sprite" : null,
-    "colour" : "noplaceZone",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 1.0,
-      "restitution" : 0.0,
-      "shape" : "STATIC"
-    },
-    "winning" : false,
-    "count" : 15
-  }, {
-    "name" : "bucket",
-    "type" : "bucket",
-    "size" : {
-      "width" : 100.0,
-      "height" : 80.0,
-      "radius" : 0.0
-    },
-    "angle" : 0.0,
-    "sprite" : null,
-    "colour" : "GREY",
-    "physics" : {
-      "density" : 1.0,
-      "friction" : 0.4,
-      "restitution" : 0.1,
-      "shape" : "STATIC"
-    },
-    "winning" : false,
-    "count" : 15
+    "count" : 0
   } ]
 }
