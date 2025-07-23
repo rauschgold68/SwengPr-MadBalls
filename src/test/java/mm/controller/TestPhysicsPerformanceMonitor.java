@@ -23,6 +23,9 @@ public class TestPhysicsPerformanceMonitor {
     
     @Nested
     @DisplayName("Initial State Tests")
+    /**
+     * Tests for verifying the initial state of the PhysicsPerformanceMonitor.
+     */
     class InitialStateTests {
         
         @Test
@@ -35,6 +38,9 @@ public class TestPhysicsPerformanceMonitor {
     
     @Nested
     @DisplayName("Performance Update Tests")
+    /**
+     * Tests for verifying performance update behavior and timing.
+     */
     class PerformanceUpdateTests {
         
         @Test
@@ -73,6 +79,9 @@ public class TestPhysicsPerformanceMonitor {
     
     @Nested
     @DisplayName("Quality Reduction Tests")
+    /**
+     * Tests for verifying quality reduction functionality under poor performance conditions.
+     */
     class QualityReductionTests {
         
         @Test
@@ -122,6 +131,9 @@ public class TestPhysicsPerformanceMonitor {
     
     @Nested
     @DisplayName("Quality Increase Tests")
+    /**
+     * Tests for verifying quality increase functionality under good performance conditions.
+     */
     class QualityIncreaseTests {
         
         @Test
@@ -179,6 +191,9 @@ public class TestPhysicsPerformanceMonitor {
     
     @Nested
     @DisplayName("Stable Performance Tests")
+    /**
+     * Tests for verifying behavior under stable performance conditions.
+     */
     class StablePerformanceTests {
         
         @Test
@@ -217,6 +232,9 @@ public class TestPhysicsPerformanceMonitor {
     
     @Nested
     @DisplayName("Mixed Performance Tests")
+    /**
+     * Tests for verifying behavior under mixed performance conditions and averaging calculations.
+     */
     class MixedPerformanceTests {
         
         @Test
@@ -263,6 +281,9 @@ public class TestPhysicsPerformanceMonitor {
     
     @Nested
     @DisplayName("Edge Cases Tests")
+    /**
+     * Tests for verifying behavior under edge case scenarios and extreme conditions.
+     */
     class EdgeCasesTests {
         
         @Test
@@ -315,6 +336,9 @@ public class TestPhysicsPerformanceMonitor {
     
     @Nested
     @DisplayName("Boundary Value Tests")
+    /**
+     * Tests for verifying behavior at boundary values and thresholds.
+     */
     class BoundaryValueTests {
         
         @Test
@@ -374,6 +398,9 @@ public class TestPhysicsPerformanceMonitor {
     
     @Nested
     @DisplayName("Reset Counter Tests")
+    /**
+     * Tests for verifying counter reset behavior after quality adjustments.
+     */
     class ResetCounterTests {
         
         @Test

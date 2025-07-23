@@ -31,6 +31,16 @@ import mm.model.Size;
 @DisplayName("ObjectCullingController Tests")
 class TestObjectCullingController {
 
+    // Test constants to avoid duplicate literals
+    private static final String TEST_OBJECT = "testObject";
+    private static final String BALLOON_TYPE = "ballon";
+    private static final String RECTANGLE_TYPE = "rectangle";
+    private static final String CIRCLE_TYPE = "circle";
+    private static final String OBJECT_1 = "object1";
+    private static final String OBJECT_2 = "object2";
+    private static final double BOUNDS_WIDTH = 800.0;
+    private static final double BOUNDS_HEIGHT = 600.0;
+
     @Mock
     private SimulationModel mockModel;
     
@@ -53,6 +63,9 @@ class TestObjectCullingController {
 
     @Nested
     @DisplayName("Constructor Tests")
+    /**
+     * Tests for ObjectCullingController constructor functionality.
+     */
     class ConstructorTests {
         
         @Test
@@ -68,15 +81,18 @@ class TestObjectCullingController {
 
     @Nested
     @DisplayName("Culling Decision Tests")
+    /**
+     * Tests for the shouldCullObject method decision logic.
+     */
     class CullingDecisionTests {
         
         @Test
         @DisplayName("Should cull object when X position is too far left")
         void shouldCullObjectWhenXTooFarLeft() {
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
             
-            boolean result = controller.shouldCullObject(-150.0, 300.0, mockBounds, "testObject");
+            boolean result = controller.shouldCullObject(-150.0, 300.0, mockBounds, TEST_OBJECT);
             
             assertTrue(result, "Object should be culled when X is too far left");
         }
@@ -84,10 +100,10 @@ class TestObjectCullingController {
         @Test
         @DisplayName("Should cull object when X position is too far right")
         void shouldCullObjectWhenXTooFarRight() {
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
             
-            boolean result = controller.shouldCullObject(950.0, 300.0, mockBounds, "testObject");
+            boolean result = controller.shouldCullObject(950.0, 300.0, mockBounds, TEST_OBJECT);
             
             assertTrue(result, "Object should be culled when X is too far right");
         }
@@ -95,10 +111,10 @@ class TestObjectCullingController {
         @Test
         @DisplayName("Should cull object when Y position is too high")
         void shouldCullObjectWhenYTooHigh() {
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
             
-            boolean result = controller.shouldCullObject(400.0, -150.0, mockBounds, "testObject");
+            boolean result = controller.shouldCullObject(400.0, -150.0, mockBounds, TEST_OBJECT);
             
             assertTrue(result, "Object should be culled when Y is too high");
         }
@@ -106,10 +122,10 @@ class TestObjectCullingController {
         @Test
         @DisplayName("Should cull object when Y position is too low")
         void shouldCullObjectWhenYTooLow() {
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
             
-            boolean result = controller.shouldCullObject(400.0, 750.0, mockBounds, "testObject");
+            boolean result = controller.shouldCullObject(400.0, 750.0, mockBounds, TEST_OBJECT);
             
             assertTrue(result, "Object should be culled when Y is too low");
         }
@@ -117,10 +133,10 @@ class TestObjectCullingController {
         @Test
         @DisplayName("Should NOT cull object when position is within bounds")
         void shouldNotCullObjectWhenWithinBounds() {
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
             
-            boolean result = controller.shouldCullObject(400.0, 300.0, mockBounds, "testObject");
+            boolean result = controller.shouldCullObject(400.0, 300.0, mockBounds, TEST_OBJECT);
             
             assertFalse(result, "Object should NOT be culled when within bounds");
         }
@@ -128,11 +144,11 @@ class TestObjectCullingController {
         @Test
         @DisplayName("Should handle edge case at exact boundary")
         void shouldHandleEdgeCaseAtBoundary() {
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
             
             // At boundary + margin + 1 (901px for regular objects should be culled)
-            boolean result = controller.shouldCullObject(901.0, 300.0, mockBounds, "testObject");
+            boolean result = controller.shouldCullObject(901.0, 300.0, mockBounds, TEST_OBJECT);
             
             assertTrue(result, "Object should be culled beyond boundary + margin");
         }
@@ -140,17 +156,20 @@ class TestObjectCullingController {
 
     @Nested
     @DisplayName("Balloon-Specific Culling Tests")
+    /**
+     * Tests for balloon-specific culling behavior with different margins and height restrictions.
+     */
     class BalloonCullingTests {
         
         @Test
         @DisplayName("Balloon should have smaller margin than regular objects")
         void balloonShouldHaveSmallerMargin() {
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
             
             // Position where regular object would be safe but balloon gets culled
-            boolean regularObject = controller.shouldCullObject(-75.0, 300.0, mockBounds, "testObject");
-            boolean balloon = controller.shouldCullObject(-75.0, 300.0, mockBounds, "ballon");
+            boolean regularObject = controller.shouldCullObject(-75.0, 300.0, mockBounds, TEST_OBJECT);
+            boolean balloon = controller.shouldCullObject(-75.0, 300.0, mockBounds, BALLOON_TYPE);
             
             assertFalse(regularObject, "Regular object should be safe at -75px");
             assertTrue(balloon, "Balloon should be culled at -75px (outside 50px margin)");
@@ -159,11 +178,11 @@ class TestObjectCullingController {
         @Test
         @DisplayName("Balloon should be culled when going too high")
         void balloonShouldBeCulledWhenGoingTooHigh() {
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
             
             // Position within normal bounds but too high for balloon (< 10% of height = 60)
-            boolean result = controller.shouldCullObject(400.0, 50.0, mockBounds, "ballon");
+            boolean result = controller.shouldCullObject(400.0, 50.0, mockBounds, BALLOON_TYPE);
             
             assertTrue(result, "Balloon should be culled when going too high");
         }
@@ -171,11 +190,11 @@ class TestObjectCullingController {
         @Test
         @DisplayName("Balloon should NOT be culled at acceptable height")
         void balloonShouldNotBeCulledAtAcceptableHeight() {
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
             
             // Position at acceptable height (> 10% of height = 60)
-            boolean result = controller.shouldCullObject(400.0, 100.0, mockBounds, "ballon");
+            boolean result = controller.shouldCullObject(400.0, 100.0, mockBounds, BALLOON_TYPE);
             
             assertFalse(result, "Balloon should NOT be culled at acceptable height");
         }
@@ -183,8 +202,8 @@ class TestObjectCullingController {
         @Test
         @DisplayName("Should handle case-insensitive balloon detection")
         void shouldHandleCaseInsensitiveBalloonDetection() {
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
             
             boolean upperCase = controller.shouldCullObject(-75.0, 300.0, mockBounds, "BALLON");
             boolean mixedCase = controller.shouldCullObject(-75.0, 300.0, mockBounds, "BaLLoN");
@@ -196,6 +215,9 @@ class TestObjectCullingController {
 
     @Nested
     @DisplayName("Object Culling Operations Tests")
+    /**
+     * Tests for object culling operations and removal list management.
+     */
     class ObjectCullingOperationsTests {
         
         @Test
@@ -203,7 +225,7 @@ class TestObjectCullingController {
         void shouldAddPairToRemovalListWhenCulling() {
             PhysicsVisualPair mockPair = new PhysicsVisualPair(null, mockBody);
             
-            controller.cullObject(mockPair, "testObject");
+            controller.cullObject(mockPair, TEST_OBJECT);
             
             assertTrue(controller.getPairsToRemove().contains(mockPair));
             assertEquals(1, controller.getPairsToRemove().size());
@@ -215,12 +237,12 @@ class TestObjectCullingController {
             // Setup a game object in the dropped objects list
             Position position = new Position(100.0f, 200.0f);
             Size size = new Size(50.0f, 50.0f);
-            GameObject testObject = new GameObject("testObject", "rectangle", position, size);
+            GameObject testObject = new GameObject(TEST_OBJECT, RECTANGLE_TYPE, position, size);
             droppedObjects.add(testObject);
             
             PhysicsVisualPair mockPair = new PhysicsVisualPair(null, mockBody);
             
-            controller.cullObject(mockPair, "testObject");
+            controller.cullObject(mockPair, TEST_OBJECT);
             
             assertTrue(controller.getObjectsToRemove().contains(testObject));
             assertEquals(1, controller.getObjectsToRemove().size());
@@ -241,7 +263,7 @@ class TestObjectCullingController {
         @DisplayName("Should clear all removal lists")
         void shouldClearAllRemovalLists() {
             PhysicsVisualPair mockPair = new PhysicsVisualPair(null, mockBody);
-            controller.cullObject(mockPair, "testObject");
+            controller.cullObject(mockPair, TEST_OBJECT);
             
             // Verify lists have content
             assertFalse(controller.getPairsToRemove().isEmpty());
@@ -256,6 +278,9 @@ class TestObjectCullingController {
 
     @Nested
     @DisplayName("Object Cache Tests")
+    /**
+     * Tests for object caching functionality to improve performance.
+     */
     class ObjectCacheTests {
         
         @Test
@@ -263,18 +288,18 @@ class TestObjectCullingController {
         void shouldCacheFoundObjectsForFasterAccess() {
             Position position = new Position(100.0f, 200.0f);
             Size size = new Size(50.0f, 50.0f);
-            GameObject testObject = new GameObject("testObject", "rectangle", position, size);
+            GameObject testObject = new GameObject(TEST_OBJECT, RECTANGLE_TYPE, position, size);
             droppedObjects.add(testObject);
             
             PhysicsVisualPair mockPair = new PhysicsVisualPair(null, mockBody);
             
             // First call should search and cache
-            controller.cullObject(mockPair, "testObject");
+            controller.cullObject(mockPair, TEST_OBJECT);
             controller.clearRemovalLists();
             
             // Second call should use cache (verify by removing from dropped objects)
             droppedObjects.clear();
-            controller.cullObject(mockPair, "testObject");
+            controller.cullObject(mockPair, TEST_OBJECT);
             
             // Should still find the object because it's cached
             assertTrue(controller.getObjectsToRemove().contains(testObject));
@@ -287,8 +312,8 @@ class TestObjectCullingController {
             Position position2 = new Position(150.0f, 250.0f);
             Size size1 = new Size(50.0f, 50.0f);
             Size size2 = new Size(30.0f, 30.0f);
-            GameObject object1 = new GameObject("object1", "rectangle", position1, size1);
-            GameObject object2 = new GameObject("object2", "circle", position2, size2);
+            GameObject object1 = new GameObject(OBJECT_1, RECTANGLE_TYPE, position1, size1);
+            GameObject object2 = new GameObject(OBJECT_2, CIRCLE_TYPE, position2, size2);
             
             droppedObjects.add(object1);
             droppedObjects.add(object2);
@@ -298,8 +323,8 @@ class TestObjectCullingController {
             PhysicsVisualPair mockPair = new PhysicsVisualPair(null, mockBody);
             
             // Should find both objects after cache update
-            controller.cullObject(mockPair, "object1");
-            controller.cullObject(mockPair, "object2");
+            controller.cullObject(mockPair, OBJECT_1);
+            controller.cullObject(mockPair, OBJECT_2);
             
             assertEquals(2, controller.getObjectsToRemove().size());
             assertTrue(controller.getObjectsToRemove().contains(object1));
@@ -311,12 +336,12 @@ class TestObjectCullingController {
         void shouldClearObjectCache() {
             Position position = new Position(100.0f, 200.0f);
             Size size = new Size(50.0f, 50.0f);
-            GameObject testObject = new GameObject("testObject", "rectangle", position, size);
+            GameObject testObject = new GameObject(TEST_OBJECT, RECTANGLE_TYPE, position, size);
             droppedObjects.add(testObject);
             
             // Cache the object
             PhysicsVisualPair mockPair = new PhysicsVisualPair(null, mockBody);
-            controller.cullObject(mockPair, "testObject");
+            controller.cullObject(mockPair, TEST_OBJECT);
             controller.clearRemovalLists();
             
             // Clear cache and remove from dropped objects
@@ -324,7 +349,7 @@ class TestObjectCullingController {
             droppedObjects.clear();
             
             // Should not find the object anymore
-            controller.cullObject(mockPair, "testObject");
+            controller.cullObject(mockPair, TEST_OBJECT);
             assertEquals(0, controller.getObjectsToRemove().size());
         }
         
@@ -335,25 +360,25 @@ class TestObjectCullingController {
             Position position2 = new Position(150.0f, 250.0f);
             Size size1 = new Size(50.0f, 50.0f);
             Size size2 = new Size(30.0f, 30.0f);
-            GameObject object1 = new GameObject("object1", "rectangle", position1, size1);
-            GameObject object2 = new GameObject("object2", "circle", position2, size2);
+            GameObject object1 = new GameObject(OBJECT_1, RECTANGLE_TYPE, position1, size1);
+            GameObject object2 = new GameObject(OBJECT_2, CIRCLE_TYPE, position2, size2);
             
             droppedObjects.add(object1);
             droppedObjects.add(object2);
             
             // Cache both objects
             PhysicsVisualPair mockPair = new PhysicsVisualPair(null, mockBody);
-            controller.cullObject(mockPair, "object1");
-            controller.cullObject(mockPair, "object2");
+            controller.cullObject(mockPair, OBJECT_1);
+            controller.cullObject(mockPair, OBJECT_2);
             controller.clearRemovalLists();
             
             // Remove object1 from cache and dropped objects
-            controller.removeFromCache("object1");
+            controller.removeFromCache(OBJECT_1);
             droppedObjects.remove(object1);
             
             // Should still find object2 but not object1
-            controller.cullObject(mockPair, "object1");
-            controller.cullObject(mockPair, "object2");
+            controller.cullObject(mockPair, OBJECT_1);
+            controller.cullObject(mockPair, OBJECT_2);
             
             assertEquals(1, controller.getObjectsToRemove().size());
             assertTrue(controller.getObjectsToRemove().contains(object2));
@@ -363,6 +388,9 @@ class TestObjectCullingController {
 
     @Nested
     @DisplayName("Object Restoration Tests")
+    /**
+     * Tests for restoring culled objects to their original positions.
+     */
     class ObjectRestorationTests {
         
         @Test
@@ -370,13 +398,13 @@ class TestObjectCullingController {
         void shouldRestoreCulledObjectsToOriginalPositions() {
             Position originalPosition = new Position(100.0f, 200.0f);
             Size size = new Size(50.0f, 50.0f);
-            GameObject testObject = new GameObject("testObject", "rectangle", originalPosition, size);
+            GameObject testObject = new GameObject(TEST_OBJECT, RECTANGLE_TYPE, originalPosition, size);
             droppedObjects.add(testObject);
             
             PhysicsVisualPair mockPair = new PhysicsVisualPair(null, mockBody);
             
             // Cull the object
-            controller.cullObject(mockPair, "testObject");
+            controller.cullObject(mockPair, TEST_OBJECT);
             
             // Simulate object position change
             testObject.getPosition().setX(500.0f);
@@ -394,7 +422,7 @@ class TestObjectCullingController {
             
             // Verify object was added back to model
             verify(mockModel).addDroppedObject(testObject);
-            verify(mockModel).decrementInventoryCount("testObject");
+            verify(mockModel).decrementInventoryCount(TEST_OBJECT);
         }
         
         @Test
@@ -404,8 +432,8 @@ class TestObjectCullingController {
             Position pos2 = new Position(300.0f, 400.0f);
             Size size1 = new Size(50.0f, 50.0f);
             Size size2 = new Size(30.0f, 30.0f);
-            GameObject object1 = new GameObject("object1", "rectangle", pos1, size1);
-            GameObject object2 = new GameObject("object2", "circle", pos2, size2);
+            GameObject object1 = new GameObject(OBJECT_1, RECTANGLE_TYPE, pos1, size1);
+            GameObject object2 = new GameObject(OBJECT_2, CIRCLE_TYPE, pos2, size2);
             
             droppedObjects.add(object1);
             droppedObjects.add(object2);
@@ -413,8 +441,8 @@ class TestObjectCullingController {
             PhysicsVisualPair mockPair = new PhysicsVisualPair(null, mockBody);
             
             // Cull both objects
-            controller.cullObject(mockPair, "object1");
-            controller.cullObject(mockPair, "object2");
+            controller.cullObject(mockPair, OBJECT_1);
+            controller.cullObject(mockPair, OBJECT_2);
             
             // Restore objects
             controller.restoreAllCulledObjects();
@@ -422,8 +450,8 @@ class TestObjectCullingController {
             // Verify both objects were restored
             verify(mockModel).addDroppedObject(object1);
             verify(mockModel).addDroppedObject(object2);
-            verify(mockModel).decrementInventoryCount("object1");
-            verify(mockModel).decrementInventoryCount("object2");
+            verify(mockModel).decrementInventoryCount(OBJECT_1);
+            verify(mockModel).decrementInventoryCount(OBJECT_2);
             
             assertEquals(100.0f, object1.getPosition().getX(), 0.001f);
             assertEquals(200.0f, object1.getPosition().getY(), 0.001f);
@@ -445,13 +473,16 @@ class TestObjectCullingController {
 
     @Nested
     @DisplayName("Edge Cases and Error Handling Tests")
+    /**
+     * Tests for edge cases and error handling scenarios.
+     */
     class EdgeCasesTests {
         
         @Test
         @DisplayName("Should handle null object name in culling decision")
         void shouldHandleNullObjectNameInCullingDecision() {
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
             
             // Should not throw exception and treat as regular object (not balloon)
             assertDoesNotThrow(() -> {
@@ -463,12 +494,12 @@ class TestObjectCullingController {
         @Test
         @DisplayName("Should handle negative bounds dimensions")
         void shouldHandleNegativeBoundsDimensions() {
-            lenient().when(mockBounds.getWidth()).thenReturn(-800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(-600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(-BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(-BOUNDS_HEIGHT);
             
             // Should not throw exception
             assertDoesNotThrow(() -> {
-                controller.shouldCullObject(0.0, 0.0, mockBounds, "testObject");
+                controller.shouldCullObject(0.0, 0.0, mockBounds, TEST_OBJECT);
             });
         }
         
@@ -478,7 +509,7 @@ class TestObjectCullingController {
             lenient().when(mockBounds.getWidth()).thenReturn(0.0);
             lenient().when(mockBounds.getHeight()).thenReturn(0.0);
             
-            boolean result = controller.shouldCullObject(0.0, 0.0, mockBounds, "testObject");
+            boolean result = controller.shouldCullObject(0.0, 0.0, mockBounds, TEST_OBJECT);
             
             // With 100px margin, anything outside -100 to 100 should be culled
             assertFalse(result, "Object at origin should not be culled with zero bounds");
@@ -489,11 +520,11 @@ class TestObjectCullingController {
         void shouldHandleMultipleCallsToRestoration() {
             Position originalPosition = new Position(100.0f, 200.0f);
             Size size = new Size(50.0f, 50.0f);
-            GameObject testObject = new GameObject("testObject", "rectangle", originalPosition, size);
+            GameObject testObject = new GameObject(TEST_OBJECT, RECTANGLE_TYPE, originalPosition, size);
             droppedObjects.add(testObject);
             
             PhysicsVisualPair mockPair = new PhysicsVisualPair(null, mockBody);
-            controller.cullObject(mockPair, "testObject");
+            controller.cullObject(mockPair, TEST_OBJECT);
             
             // First restoration
             controller.restoreAllCulledObjects();
@@ -503,55 +534,118 @@ class TestObjectCullingController {
             
             // Should only have called model methods once
             verify(mockModel, times(1)).addDroppedObject(testObject);
-            verify(mockModel, times(1)).decrementInventoryCount("testObject");
+            verify(mockModel, times(1)).decrementInventoryCount(TEST_OBJECT);
         }
     }
 
     @Nested
     @DisplayName("Integration-like Tests")
+    /**
+     * Integration tests that verify complete workflows combining multiple operations.
+     */
     class IntegrationTests {
         
         @Test
-        @DisplayName("Should handle complete cull and restore cycle")
-        void shouldHandleCompleteCullAndRestoreCycle() {
+        @DisplayName("Should handle complete cull and restore cycle - setup and culling decisions")
+        void shouldHandleCompleteCullAndRestoreCycleSetupAndDecisions() {
             // Setup multiple objects
             Position pos1 = new Position(100.0f, 200.0f);
             Position pos2 = new Position(300.0f, 400.0f);
             Size size1 = new Size(50.0f, 50.0f);
             Size size2 = new Size(30.0f, 30.0f);
-            GameObject object1 = new GameObject("object1", "rectangle", pos1, size1);
-            GameObject object2 = new GameObject("ballon", "circle", pos2, size2);
+            GameObject object1 = new GameObject(OBJECT_1, RECTANGLE_TYPE, pos1, size1);
+            GameObject object2 = new GameObject(BALLOON_TYPE, CIRCLE_TYPE, pos2, size2);
             
             droppedObjects.add(object1);
             droppedObjects.add(object2);
             
-            lenient().when(mockBounds.getWidth()).thenReturn(800.0);
-            lenient().when(mockBounds.getHeight()).thenReturn(600.0);
+            lenient().when(mockBounds.getWidth()).thenReturn(BOUNDS_WIDTH);
+            lenient().when(mockBounds.getHeight()).thenReturn(BOUNDS_HEIGHT);
+            
+            // Test culling decisions
+            assertTrue(controller.shouldCullObject(-150.0, 300.0, mockBounds, OBJECT_1));
+            assertTrue(controller.shouldCullObject(-75.0, 300.0, mockBounds, BALLOON_TYPE)); // balloon has smaller margin
+        }
+        
+        @Test
+        @DisplayName("Should handle complete cull and restore cycle - culling operations")
+        void shouldHandleCompleteCullAndRestoreCycleCullingOperations() {
+            // Setup multiple objects
+            Position pos1 = new Position(100.0f, 200.0f);
+            Position pos2 = new Position(300.0f, 400.0f);
+            Size size1 = new Size(50.0f, 50.0f);
+            Size size2 = new Size(30.0f, 30.0f);
+            GameObject object1 = new GameObject(OBJECT_1, RECTANGLE_TYPE, pos1, size1);
+            GameObject object2 = new GameObject(BALLOON_TYPE, CIRCLE_TYPE, pos2, size2);
+            
+            droppedObjects.add(object1);
+            droppedObjects.add(object2);
             
             PhysicsVisualPair pair1 = new PhysicsVisualPair(null, mockBody);
             PhysicsVisualPair pair2 = new PhysicsVisualPair(null, mock(Body.class));
             
-            // Test culling decisions
-            assertTrue(controller.shouldCullObject(-150.0, 300.0, mockBounds, "object1"));
-            assertTrue(controller.shouldCullObject(-75.0, 300.0, mockBounds, "ballon")); // balloon has smaller margin
-            
             // Cull objects
-            controller.cullObject(pair1, "object1");
-            controller.cullObject(pair2, "ballon");
+            controller.cullObject(pair1, OBJECT_1);
+            controller.cullObject(pair2, BALLOON_TYPE);
             
             // Verify culling
             assertEquals(2, controller.getPairsToRemove().size());
             assertEquals(2, controller.getObjectsToRemove().size());
+        }
+        
+        @Test
+        @DisplayName("Should handle complete cull and restore cycle - restoration")
+        void shouldHandleCompleteCullAndRestoreCycleRestoration() {
+            // Setup multiple objects
+            Position pos1 = new Position(100.0f, 200.0f);
+            Position pos2 = new Position(300.0f, 400.0f);
+            Size size1 = new Size(50.0f, 50.0f);
+            Size size2 = new Size(30.0f, 30.0f);
+            GameObject object1 = new GameObject(OBJECT_1, RECTANGLE_TYPE, pos1, size1);
+            GameObject object2 = new GameObject(BALLOON_TYPE, CIRCLE_TYPE, pos2, size2);
             
-            // Clear lists and restore
+            droppedObjects.add(object1);
+            droppedObjects.add(object2);
+            
+            PhysicsVisualPair pair1 = new PhysicsVisualPair(null, mockBody);
+            PhysicsVisualPair pair2 = new PhysicsVisualPair(null, mock(Body.class));
+            
+            // Cull objects and clear lists
+            controller.cullObject(pair1, OBJECT_1);
+            controller.cullObject(pair2, BALLOON_TYPE);
             controller.clearRemovalLists();
+            
+            // Restore and verify
             controller.restoreAllCulledObjects();
             
-            // Verify restoration
             verify(mockModel).addDroppedObject(object1);
             verify(mockModel).addDroppedObject(object2);
-            verify(mockModel).decrementInventoryCount("object1");
-            verify(mockModel).decrementInventoryCount("ballon");
+            verify(mockModel).decrementInventoryCount(OBJECT_1);
+            verify(mockModel).decrementInventoryCount(BALLOON_TYPE);
+        }
+        
+        @Test
+        @DisplayName("Should handle complete cull and restore cycle - position verification")
+        void shouldHandleCompleteCullAndRestoreCyclePositionVerification() {
+            // Setup multiple objects
+            Position pos1 = new Position(100.0f, 200.0f);
+            Position pos2 = new Position(300.0f, 400.0f);
+            Size size1 = new Size(50.0f, 50.0f);
+            Size size2 = new Size(30.0f, 30.0f);
+            GameObject object1 = new GameObject(OBJECT_1, RECTANGLE_TYPE, pos1, size1);
+            GameObject object2 = new GameObject(BALLOON_TYPE, CIRCLE_TYPE, pos2, size2);
+            
+            droppedObjects.add(object1);
+            droppedObjects.add(object2);
+            
+            PhysicsVisualPair pair1 = new PhysicsVisualPair(null, mockBody);
+            PhysicsVisualPair pair2 = new PhysicsVisualPair(null, mock(Body.class));
+            
+            // Cull, clear, and restore
+            controller.cullObject(pair1, OBJECT_1);
+            controller.cullObject(pair2, BALLOON_TYPE);
+            controller.clearRemovalLists();
+            controller.restoreAllCulledObjects();
             
             // Verify positions restored
             assertEquals(100.0f, object1.getPosition().getX(), 0.001f);

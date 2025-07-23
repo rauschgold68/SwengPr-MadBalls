@@ -48,6 +48,9 @@ public class TestLevelReadController {
     private static final String EMPTY_JSON = "{}";
 
     @Nested
+    /**
+     * Tests for the LevelReadController constructor with various input scenarios.
+     */
     class ConstructorTests {
         
         @Test
@@ -69,6 +72,9 @@ public class TestLevelReadController {
     }
 
     @Nested
+    /**
+     * Tests for the readFile method with various JSON input scenarios.
+     */
     class ReadFileTests {
         
         @Test
@@ -83,26 +89,56 @@ public class TestLevelReadController {
             assertNotNull(result.getInventoryObjects());
             assertEquals(1, result.getLevelObjects().size());
             assertEquals(1, result.getInventoryObjects().size());
+        }
+
+        @Test
+        void testReadFileGameObjectDetails() {
+            InputStream inputStream = new ByteArrayInputStream(VALID_JSON.getBytes(StandardCharsets.UTF_8));
+            LevelReadController controller = new LevelReadController(inputStream);
             
-            // Verify level object details
+            Level result = controller.readFile();
             GameObject gameObject = result.getLevelObjects().get(0);
+            
             assertEquals("testBall", gameObject.getName());
             assertEquals("circle", gameObject.getType());
             assertEquals(0.0f, gameObject.getAngle());
             assertEquals("ball.png", gameObject.getSprite());
+        }
+
+        @Test
+        void testReadFileGameObjectPosition() {
+            InputStream inputStream = new ByteArrayInputStream(VALID_JSON.getBytes(StandardCharsets.UTF_8));
+            LevelReadController controller = new LevelReadController(inputStream);
             
-            // Verify position
+            Level result = controller.readFile();
+            GameObject gameObject = result.getLevelObjects().get(0);
             Position position = gameObject.getPosition();
+            
             assertEquals(100.0f, position.getX());
             assertEquals(200.0f, position.getY());
+        }
+
+        @Test
+        void testReadFileGameObjectSize() {
+            InputStream inputStream = new ByteArrayInputStream(VALID_JSON.getBytes(StandardCharsets.UTF_8));
+            LevelReadController controller = new LevelReadController(inputStream);
             
-            // Verify size
+            Level result = controller.readFile();
+            GameObject gameObject = result.getLevelObjects().get(0);
             Size size = gameObject.getSize();
+            
             assertEquals(50.0f, size.getWidth());
             assertEquals(50.0f, size.getHeight());
+        }
+
+        @Test
+        void testReadFileInventoryObjectDetails() {
+            InputStream inputStream = new ByteArrayInputStream(VALID_JSON.getBytes(StandardCharsets.UTF_8));
+            LevelReadController controller = new LevelReadController(inputStream);
             
-            // Verify inventory object details
+            Level result = controller.readFile();
             InventoryObject inventoryObject = result.getInventoryObjects().get(0);
+            
             assertEquals("testInventory", inventoryObject.getName());
             assertEquals(5, inventoryObject.getCount());
             assertEquals("inventory.png", inventoryObject.getSprite());
@@ -150,14 +186,22 @@ public class TestLevelReadController {
             assertNull(result);
         }
     }
-    @Test
-    void testGetMapper() {
-        InputStream inputStream = new ByteArrayInputStream(VALID_JSON.getBytes(StandardCharsets.UTF_8));
-        LevelReadController controller = new LevelReadController(inputStream);
+
+    @Nested
+    /**
+     * Tests for the getMapper method functionality.
+     */
+    class GetMapperTests {
         
-        ObjectMapper mapper = controller.getMapper();
-        
-        assertNotNull(mapper);
-        assertTrue(mapper instanceof ObjectMapper);
+        @Test
+        void testGetMapper() {
+            InputStream inputStream = new ByteArrayInputStream(VALID_JSON.getBytes(StandardCharsets.UTF_8));
+            LevelReadController controller = new LevelReadController(inputStream);
+            
+            ObjectMapper mapper = controller.getMapper();
+            
+            assertNotNull(mapper);
+            assertTrue(mapper instanceof ObjectMapper);
+        }
     }
 }

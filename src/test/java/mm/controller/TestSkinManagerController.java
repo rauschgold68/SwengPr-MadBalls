@@ -27,6 +27,13 @@ import mm.model.Physics;
 public class TestSkinManagerController {
 
     private SkinManagerController skinManager;
+    
+    // Constants to avoid duplicate literals
+    private static final String DEFAULT_SKIN = "Default";
+    private static final String LEGACY_SKIN = "Legacy";
+    private static final String RECTANGLE_TYPE = "rectangle";
+    private static final String CIRCLE_TYPE = "circle";
+    private static final String DYNAMIC_PHYSICS = "dynamic";
 
     @BeforeEach
     void setUp() throws Exception {
@@ -46,6 +53,9 @@ public class TestSkinManagerController {
 
     @Nested
     @DisplayName("Singleton Pattern Tests")
+    /**
+     * Tests for verifying singleton pattern implementation and behavior.
+     */
     class SingletonTests {
 
         @Test
@@ -60,7 +70,7 @@ public class TestSkinManagerController {
         @Test
         @DisplayName("Should initialize with default skin")
         void testDefaultSkinInitialization() {
-            assertEquals("Default", skinManager.getSelectedSkin(), 
+            assertEquals(DEFAULT_SKIN, skinManager.getSelectedSkin(), 
                 "Should initialize with Default skin");
             assertFalse(skinManager.isLegacySkin(), 
                 "Should not be legacy skin initially");
@@ -69,14 +79,17 @@ public class TestSkinManagerController {
 
     @Nested
     @DisplayName("Skin Selection Tests")
+    /**
+     * Tests for verifying skin selection functionality and validation.
+     */
     class SkinSelectionTests {
 
         @Test
         @DisplayName("Should accept valid Default skin selection")
         void testSetValidDefaultSkin() {
-            skinManager.setSelectedSkin("Default");
+            skinManager.setSelectedSkin(DEFAULT_SKIN);
             
-            assertEquals("Default", skinManager.getSelectedSkin(), 
+            assertEquals(DEFAULT_SKIN, skinManager.getSelectedSkin(), 
                 "Should set Default skin");
             assertFalse(skinManager.isLegacySkin(), 
                 "Should not be legacy skin");
@@ -85,9 +98,9 @@ public class TestSkinManagerController {
         @Test
         @DisplayName("Should accept valid Legacy skin selection")
         void testSetValidLegacySkin() {
-            skinManager.setSelectedSkin("Legacy");
+            skinManager.setSelectedSkin(LEGACY_SKIN);
             
-            assertEquals("Legacy", skinManager.getSelectedSkin(), 
+            assertEquals(LEGACY_SKIN, skinManager.getSelectedSkin(), 
                 "Should set Legacy skin");
             assertTrue(skinManager.isLegacySkin(), 
                 "Should be legacy skin");
@@ -143,12 +156,15 @@ public class TestSkinManagerController {
 
     @Nested
     @DisplayName("Legacy Skin Detection Tests")
+    /**
+     * Tests for verifying legacy skin detection and state management.
+     */
     class LegacySkinDetectionTests {
 
         @Test
         @DisplayName("Should return false for Default skin")
         void testIsLegacySkinForDefault() {
-            skinManager.setSelectedSkin("Default");
+            skinManager.setSelectedSkin(DEFAULT_SKIN);
             assertFalse(skinManager.isLegacySkin(), 
                 "Default skin should not be legacy");
         }
@@ -156,7 +172,7 @@ public class TestSkinManagerController {
         @Test
         @DisplayName("Should return true for Legacy skin")
         void testIsLegacySkinForLegacy() {
-            skinManager.setSelectedSkin("Legacy");
+            skinManager.setSelectedSkin(LEGACY_SKIN);
             assertTrue(skinManager.isLegacySkin(), 
                 "Legacy skin should be legacy");
         }
@@ -164,14 +180,14 @@ public class TestSkinManagerController {
         @Test
         @DisplayName("Should maintain legacy state across calls")
         void testLegacyStateConsistency() {
-            skinManager.setSelectedSkin("Legacy");
+            skinManager.setSelectedSkin(LEGACY_SKIN);
             
             assertTrue(skinManager.isLegacySkin(), 
                 "Should be legacy after setting");
             assertTrue(skinManager.isLegacySkin(), 
                 "Should remain legacy on second call");
             
-            skinManager.setSelectedSkin("Default");
+            skinManager.setSelectedSkin(DEFAULT_SKIN);
             assertFalse(skinManager.isLegacySkin(), 
                 "Should not be legacy after changing to Default");
         }
@@ -179,27 +195,30 @@ public class TestSkinManagerController {
 
     @Nested
     @DisplayName("Inventory Objects Sprite Update Tests")
+    /**
+     * Tests for verifying inventory object sprite updating functionality.
+     */
     class InventoryObjectsSpriteUpdateTests {
 
         private List<InventoryObject> createTestInventoryObjects() {
             List<InventoryObject> objects = new ArrayList<>();
             
             // Objects with names in DEFAULT_SPRITES map
-            objects.add(createInventoryObject("Domino", "rectangle"));
-            objects.add(createInventoryObject("platform", "rectangle"));
-            objects.add(createInventoryObject("tennisball", "circle"));
-            objects.add(createInventoryObject("ballon", "circle"));
+            objects.add(createInventoryObject("Domino", RECTANGLE_TYPE));
+            objects.add(createInventoryObject("platform", RECTANGLE_TYPE));
+            objects.add(createInventoryObject("tennisball", CIRCLE_TYPE));
+            objects.add(createInventoryObject("ballon", CIRCLE_TYPE));
             
             // Objects not in DEFAULT_SPRITES map
-            objects.add(createInventoryObject("customObject", "rectangle"));
-            objects.add(createInventoryObject("specialItem", "circle"));
+            objects.add(createInventoryObject("customObject", RECTANGLE_TYPE));
+            objects.add(createInventoryObject("specialItem", CIRCLE_TYPE));
             
             return objects;
         }
 
         private InventoryObject createInventoryObject(String name, String type) {
             InventoryObject obj = new InventoryObject(name, type, new Size(30f, 30f));
-            obj.setPhysics(new Physics(1.0f, 0.5f, 0.3f, "dynamic"));
+            obj.setPhysics(new Physics(1.0f, 0.5f, 0.3f, DYNAMIC_PHYSICS));
             obj.setColour("BLACK");
             return obj;
         }
@@ -207,7 +226,7 @@ public class TestSkinManagerController {
         @Test
         @DisplayName("Should update sprites for objects with default mappings - Default skin")
         void testUpdateInventorySpritesDefaultSkin() {
-            skinManager.setSelectedSkin("Default");
+            skinManager.setSelectedSkin(DEFAULT_SKIN);
             List<InventoryObject> objects = createTestInventoryObjects();
             
             skinManager.updateInventorySpritesForSkin(objects);
@@ -226,7 +245,7 @@ public class TestSkinManagerController {
         @Test
         @DisplayName("Should update sprites for objects with default mappings - Legacy skin")
         void testUpdateInventorySpritesLegacySkin() {
-            skinManager.setSelectedSkin("Legacy");
+            skinManager.setSelectedSkin(LEGACY_SKIN);
             List<InventoryObject> objects = createTestInventoryObjects();
             
             skinManager.updateInventorySpritesForSkin(objects);
@@ -269,7 +288,7 @@ public class TestSkinManagerController {
             objects.get(4).setSprite("/objectSkins/Default/customSprite.png");
             objects.get(5).setSprite("simpleSprite.png");
             
-            skinManager.setSelectedSkin("Legacy");
+            skinManager.setSelectedSkin(LEGACY_SKIN);
             skinManager.updateInventorySpritesForSkin(objects);
             
             // Should replace skin folder for full paths
@@ -321,27 +340,30 @@ public class TestSkinManagerController {
 
     @Nested
     @DisplayName("Game Objects Sprite Update Tests")
+    /**
+     * Tests for verifying game object sprite updating functionality.
+     */
     class GameObjectsSpriteUpdateTests {
 
         private List<GameObject> createTestGameObjects() {
             List<GameObject> objects = new ArrayList<>();
             
             // Objects with names in DEFAULT_SPRITES map
-            objects.add(createGameObject("Domino", "rectangle"));
-            objects.add(createGameObject("log", "rectangle"));
-            objects.add(createGameObject("bowlingball", "circle"));
-            objects.add(createGameObject("ball", "circle"));
+            objects.add(createGameObject("Domino", RECTANGLE_TYPE));
+            objects.add(createGameObject("log", RECTANGLE_TYPE));
+            objects.add(createGameObject("bowlingball", CIRCLE_TYPE));
+            objects.add(createGameObject("ball", CIRCLE_TYPE));
             
             // Objects not in DEFAULT_SPRITES map
-            objects.add(createGameObject("customGameObject", "rectangle"));
-            objects.add(createGameObject("specialGameItem", "circle"));
+            objects.add(createGameObject("customGameObject", RECTANGLE_TYPE));
+            objects.add(createGameObject("specialGameItem", CIRCLE_TYPE));
             
             return objects;
         }
 
         private GameObject createGameObject(String name, String type) {
             GameObject obj = new GameObject(name, type, new Position(10f, 20f), new Size(30f, 30f));
-            obj.setPhysics(new Physics(1.0f, 0.5f, 0.3f, "dynamic"));
+            obj.setPhysics(new Physics(1.0f, 0.5f, 0.3f, DYNAMIC_PHYSICS));
             obj.setColour("BLACK");
             return obj;
         }
@@ -349,7 +371,7 @@ public class TestSkinManagerController {
         @Test
         @DisplayName("Should update sprites for game objects with default mappings - Default skin")
         void testUpdateGameObjectSpritesDefaultSkin() {
-            skinManager.setSelectedSkin("Default");
+            skinManager.setSelectedSkin(DEFAULT_SKIN);
             List<GameObject> objects = createTestGameObjects();
             
             skinManager.updateGameObjectSpritesForSkin(objects);
@@ -368,7 +390,7 @@ public class TestSkinManagerController {
         @Test
         @DisplayName("Should update sprites for game objects with default mappings - Legacy skin")
         void testUpdateGameObjectSpritesLegacySkin() {
-            skinManager.setSelectedSkin("Legacy");
+            skinManager.setSelectedSkin(LEGACY_SKIN);
             List<GameObject> objects = createTestGameObjects();
             
             skinManager.updateGameObjectSpritesForSkin(objects);
@@ -393,7 +415,7 @@ public class TestSkinManagerController {
             objects.get(4).setSprite("/objectSkins/Default/customGameSprite.png");
             objects.get(5).setSprite("simpleGameSprite.png");
             
-            skinManager.setSelectedSkin("Legacy");
+            skinManager.setSelectedSkin(LEGACY_SKIN);
             skinManager.updateGameObjectSpritesForSkin(objects);
             
             // Should replace skin folder for full paths
@@ -428,26 +450,29 @@ public class TestSkinManagerController {
 
     @Nested
     @DisplayName("Mixed Object Type Tests")
+    /**
+     * Tests for verifying behavior with mixed inventory and game object types.
+     */
     class MixedObjectTypeTests {
 
         @Test
         @DisplayName("Should handle mixed object types correctly")
         void testMixedObjectTypeUpdates() {
             List<InventoryObject> inventoryObjects = Arrays.asList(
-                createInventoryObject("Domino", "rectangle"),
-                createInventoryObject("customInv", "circle")
+                createInventoryObject("Domino", RECTANGLE_TYPE),
+                createInventoryObject("customInv", CIRCLE_TYPE)
             );
             
             List<GameObject> gameObjects = Arrays.asList(
-                createGameObject("ball", "circle"),
-                createGameObject("customGame", "rectangle")
+                createGameObject("ball", CIRCLE_TYPE),
+                createGameObject("customGame", RECTANGLE_TYPE)
             );
             
             // Set existing sprites for custom objects
             inventoryObjects.get(1).setSprite("/objectSkins/Default/custom.png");
             gameObjects.get(1).setSprite("another.png");
             
-            skinManager.setSelectedSkin("Legacy");
+            skinManager.setSelectedSkin(LEGACY_SKIN);
             
             // Update both types
             skinManager.updateInventorySpritesForSkin(inventoryObjects);
@@ -467,14 +492,14 @@ public class TestSkinManagerController {
 
         private InventoryObject createInventoryObject(String name, String type) {
             InventoryObject obj = new InventoryObject(name, type, new Size(25f, 25f));
-            obj.setPhysics(new Physics(1.0f, 0.5f, 0.3f, "dynamic"));
+            obj.setPhysics(new Physics(1.0f, 0.5f, 0.3f, DYNAMIC_PHYSICS));
             obj.setColour("RED");
             return obj;
         }
 
         private GameObject createGameObject(String name, String type) {
             GameObject obj = new GameObject(name, type, new Position(5f, 15f), new Size(25f, 25f));
-            obj.setPhysics(new Physics(1.0f, 0.5f, 0.3f, "dynamic"));
+            obj.setPhysics(new Physics(1.0f, 0.5f, 0.3f, DYNAMIC_PHYSICS));
             obj.setColour("BLUE");
             return obj;
         }
@@ -482,15 +507,18 @@ public class TestSkinManagerController {
 
     @Nested
     @DisplayName("Edge Cases and Robustness Tests")
+    /**
+     * Tests for verifying behavior under edge cases and robustness scenarios.
+     */
     class EdgeCasesAndRobustnessTests {
 
         @Test
         @DisplayName("Should handle objects with box1 mapping")
         void testBox1Mapping() {
-            InventoryObject box1Obj = new InventoryObject("box1", "rectangle", new Size(20f, 20f));
+            InventoryObject box1Obj = new InventoryObject("box1", RECTANGLE_TYPE, new Size(20f, 20f));
             List<InventoryObject> objects = Arrays.asList(box1Obj);
             
-            skinManager.setSelectedSkin("Default");
+            skinManager.setSelectedSkin(DEFAULT_SKIN);
             skinManager.updateInventorySpritesForSkin(objects);
             
             assertEquals("/objectSkins/Default/madBox.png", 
@@ -500,19 +528,19 @@ public class TestSkinManagerController {
         @Test
         @DisplayName("Should handle multiple skin switches")
         void testMultipleSkinSwitches() {
-            InventoryObject obj = new InventoryObject("platform", "rectangle", new Size(40f, 10f));
+            InventoryObject obj = new InventoryObject("platform", RECTANGLE_TYPE, new Size(40f, 10f));
             List<InventoryObject> objects = Arrays.asList(obj);
             
             // Default -> Legacy -> Default
-            skinManager.setSelectedSkin("Default");
+            skinManager.setSelectedSkin(DEFAULT_SKIN);
             skinManager.updateInventorySpritesForSkin(objects);
             assertEquals("/objectSkins/Default/madPlatform.png", obj.getSprite());
             
-            skinManager.setSelectedSkin("Legacy");
+            skinManager.setSelectedSkin(LEGACY_SKIN);
             skinManager.updateInventorySpritesForSkin(objects);
             assertEquals("/objectSkins/Legacy/madPlatform.png", obj.getSprite());
             
-            skinManager.setSelectedSkin("Default");
+            skinManager.setSelectedSkin(DEFAULT_SKIN);
             skinManager.updateInventorySpritesForSkin(objects);
             assertEquals("/objectSkins/Default/madPlatform.png", obj.getSprite());
         }
@@ -520,11 +548,11 @@ public class TestSkinManagerController {
         @Test
         @DisplayName("Should handle sprite path with multiple skin folder occurrences")
         void testMultipleSkinFolderOccurrences() {
-            InventoryObject obj = new InventoryObject("custom", "rectangle", new Size(20f, 20f));
+            InventoryObject obj = new InventoryObject("custom", RECTANGLE_TYPE, new Size(20f, 20f));
             obj.setSprite("/objectSkins/Default/subfolder/objectSkins/Default/sprite.png");
             List<InventoryObject> objects = Arrays.asList(obj);
             
-            skinManager.setSelectedSkin("Legacy");
+            skinManager.setSelectedSkin(LEGACY_SKIN);
             skinManager.updateInventorySpritesForSkin(objects);
             
             // Should replace the first occurrence
@@ -536,16 +564,16 @@ public class TestSkinManagerController {
         @DisplayName("Should preserve singleton across multiple resets")
         void testSingletonPersistence() throws Exception {
             SkinManagerController first = SkinManagerController.getInstance();
-            first.setSelectedSkin("Legacy");
+            first.setSelectedSkin(LEGACY_SKIN);
             
             SkinManagerController second = SkinManagerController.getInstance();
-            assertEquals("Legacy", second.getSelectedSkin(), 
+            assertEquals(LEGACY_SKIN, second.getSelectedSkin(), 
                 "Singleton should preserve state");
             
             // Reset and verify new instance has default state
             resetSingletonInstance();
             SkinManagerController third = SkinManagerController.getInstance();
-            assertEquals("Default", third.getSelectedSkin(), 
+            assertEquals(DEFAULT_SKIN, third.getSelectedSkin(), 
                 "New singleton should have default state");
         }
 
