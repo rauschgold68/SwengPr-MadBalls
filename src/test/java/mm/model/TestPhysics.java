@@ -50,10 +50,13 @@ public class TestPhysics {
         Physics testPhysics = new Physics();
         assertNotNull(testPhysics);
         assertEquals(Physics.class, testPhysics.getClass());
+        
         float testFloat = 0.123f;
         String testString = "test";
         testPhysics = new Physics(testFloat, testFloat, testFloat, testString);
-        testAssertions(testPhysics, testFloat, testFloat, testFloat, testString);
+        
+        PhysicsTestValues expectedValues = new PhysicsTestValues(testFloat, testFloat, testFloat, testString);
+        testAssertions(testPhysics, expectedValues);
     }
 
     /**
@@ -84,17 +87,75 @@ public class TestPhysics {
         float testFriction = 456.7f;
         float testRestitution = 8.90f;
         String testShape = "DYNAMIC";
+        
         Physics testPhysics = new Physics();
         testPhysics.setDensity(testDensity);
         testPhysics.setFriction(testFriction);
         testPhysics.setRestitution(testRestitution);
         testPhysics.setShape(testShape);
-        testAssertions(testPhysics, testDensity, testFriction, testRestitution, testShape);
+        
+        // Direct assertions to satisfy PMD JUnitTestsShouldIncludeAssert rule
+        assertNotNull(testPhysics);
+        assertEquals(testDensity, testPhysics.getDensity(), 0.00001f);
+        
+        PhysicsTestValues expectedValues = new PhysicsTestValues(testDensity, testFriction, testRestitution, testShape);
+        testAssertions(testPhysics, expectedValues);
     }
-    private void testAssertions(Physics testPhysics, float testDensity, float testFriction, float testRestitution, String testShape) {
-        assertEquals(testDensity, testPhysics.getDensity(),0.00001);
-        assertEquals(testFriction, testPhysics.getFriction(),0.00001);
-        assertEquals(testRestitution, testPhysics.getRestitution(),0.00001);
-        assertEquals(testShape, testPhysics.getShape());
+
+    /**
+     * Helper method to validate all physics properties match expected values.
+     * <p>
+     * This method performs comprehensive validation of all physics properties
+     * to ensure they match the expected values with appropriate floating-point
+     * precision tolerance.
+     * </p>
+     * 
+     * @param physics the Physics object to validate
+     * @param expectedValues container holding all expected physics property values
+     * 
+     * @see Physics#getDensity()
+     * @see Physics#getFriction()
+     * @see Physics#getRestitution()
+     * @see Physics#getShape()
+     */
+    private void testAssertions(Physics physics, PhysicsTestValues expectedValues) {
+        assertEquals(expectedValues.density, physics.getDensity(), 0.00001f);
+        assertEquals(expectedValues.friction, physics.getFriction(), 0.00001f);
+        assertEquals(expectedValues.restitution, physics.getRestitution(), 0.00001f);
+        assertEquals(expectedValues.shape, physics.getShape());
+    }
+
+    /**
+     * Container class for physics test values to reduce parameter count in helper methods.
+     * <p>
+     * This inner class encapsulates all physics property values used in testing,
+     * following the Parameter Object pattern to improve code maintainability
+     * and reduce method parameter lists.
+     * </p>
+     */
+    private static class PhysicsTestValues {
+        /** The density value for physics testing. */
+        final float density;
+        /** The friction value for physics testing. */
+        final float friction;
+        /** The restitution (bounciness) value for physics testing. */
+        final float restitution;
+        /** The shape type string for physics testing. */
+        final String shape;
+
+        /**
+         * Constructs a PhysicsTestValues container with all physics properties.
+         * 
+         * @param density the density value
+         * @param friction the friction value
+         * @param restitution the restitution value
+         * @param shape the shape type string
+         */
+        PhysicsTestValues(float density, float friction, float restitution, String shape) {
+            this.density = density;
+            this.friction = friction;
+            this.restitution = restitution;
+            this.shape = shape;
+        }
     }
 }
