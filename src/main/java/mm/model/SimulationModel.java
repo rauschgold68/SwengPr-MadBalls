@@ -3,12 +3,8 @@ package mm.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jbox2d.callbacks.ContactImpulse;
-import org.jbox2d.callbacks.ContactListener;
-import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.contacts.Contact;
 
 import javafx.scene.layout.Pane;
 import mm.controller.GameObjectController;
@@ -50,6 +46,9 @@ public class SimulationModel {
     private final CollisionDetection collisionService;
     private final GeometricCollisionDetection geometricCollisionService;
     private final JsonStateService jsonService;
+    private final PositionValidationService positionValidationService;
+    private final InventoryManagementService inventoryManagementService;
+    private final ContactEventService contactEventService;
 
     /**
      * Container for physics-related simulation components.
@@ -104,6 +103,9 @@ public class SimulationModel {
         this.collisionService = new CollisionDetection(this);
         this.geometricCollisionService = new GeometricCollisionDetection(this);
         this.jsonService = new JsonStateService();
+        this.positionValidationService = new PositionValidationService(physics, gameObjects);
+        this.inventoryManagementService = new InventoryManagementService(gameObjects);
+        this.contactEventService = new ContactEventService(physics, state);
     }
 
     /**
@@ -319,7 +321,7 @@ public class SimulationModel {
         // Initialize timer without simSpace - will be connected by controller
         physics.timer = new PhysicsAnimationController(physics.world, physics.pairs, this);
 
-        listenContact();
+        contactEventService.setupContactListener();
     }
 
     /**
@@ -375,133 +377,6 @@ public class SimulationModel {
     }
 
     /**
-     * Sets up a contact listener for the physics world to detect collisions.
-     * <p>
-     * This listener checks for win conditions, such as the ball reaching the win
-     * platform or zone.
-     * </p>
-     */
-    private void listenContact() {
-        physics.world.setContactListener(new ContactListener() {
-            @Override
-            public void beginContact(Contact contact) {
-                handleContactBegin(contact);
-
-            }
-
-            @Override
-            public void endContact(Contact contact) {
-            }
-
-            @Override
-            public void preSolve(Contact contact, Manifold oldManifold) {
-            }
-
-            @Override
-            public void postSolve(Contact contact, ContactImpulse impulse) {
-            }
-        });
-    }
-
-    /**
-     * Handles the beginning of a contact between two physics bodies.
-     * <p>
-     * Extracts user data from both fixtures and checks for win conditions.
-     * This method reduces nesting by early returns and delegates win condition
-     * checking to a separate method.
-     * </p>
-     *
-     * @param contact The contact event containing information about the colliding bodies
-     */
-    private void handleContactBegin(Contact contact) {
-        Object userDataA = contact.getFixtureA().getBody().getUserData();
-        Object userDataB = contact.getFixtureB().getBody().getUserData();
-
-        // Early return if either body has no user data
-        if (userDataA == null || userDataB == null) {
-            return;
-        }
-
-        // Check for win condition and trigger if found
-        if (isWinCondition(userDataA, userDataB)) {
-            triggerWinCondition();
-        }
-    }
-
-    /**
-     * Determines if the contact between two objects represents a win condition.
-     * <p>
-     * A win condition occurs when a "winObject" comes into contact with either
-     * a "winPlat" (win platform) or "winZone" (win zone). This method handles
-     * both possible collision orders (A-B and B-A).
-     * </p>
-     *
-     * @param userDataA The user data from the first colliding object
-     * @param userDataB The user data from the second colliding object
-     * @return true if this contact represents a win condition, false otherwise
-     */
-    private boolean isWinCondition(Object userDataA, Object userDataB) {
-        return isWinObjectToTargetContact(userDataA, userDataB) || 
-               isWinObjectToTargetContact(userDataB, userDataA);
-    }
-
-    /**
-     * Checks if the first object is a win object and the second is a valid win target.
-     * <p>
-     * This helper method reduces code duplication by checking one direction of the
-     * win condition (winObject touching winPlat or winZone).
-     * </p>
-     *
-     * @param objectA The user data from the first object
-     * @param objectB The user data from the second object
-     * @return true if objectA is "winObject" and objectB is a win target
-     */
-    private boolean isWinObjectToTargetContact(Object objectA, Object objectB) {
-        return "winObject".equals(objectA) && isWinTarget(objectB);
-    }
-
-    /**
-     * Determines if an object is a valid win target.
-     * <p>
-     * Win targets are objects that, when touched by a win object, trigger
-     * the win condition. Currently includes "winPlat" and "winZone".
-     * </p>
-     *
-     * @param userData The user data from the object to check
-     * @return true if the object is a valid win target
-     */
-    private boolean isWinTarget(Object userData) {
-        return "winPlat".equals(userData) || "winZone".equals(userData);
-    }
-
-    /**
-     * Triggers the win condition by stopping the simulation and notifying listeners.
-     * <p>
-     * This method handles all the actions that occur when a win condition is met:
-     * logging the win, stopping the physics timer, setting the win screen visibility,
-     * and notifying any registered win listeners.
-     * </p>
-     */
-    private void triggerWinCondition() {
-        System.out.println("WIN! ball1 reached the win condition!");
-        
-        // Defensive check - listener should always be set, but handle gracefully if not
-        if (state.winListener == null) {
-            System.err.println("Warning: Win condition triggered but no listener is registered");
-            return;
-        }
-
-        // Stop the physics simulation
-        physics.timer.stop();
-        
-        // Update UI state
-        state.winScreenVisible = true;
-        
-        // Notify the listener
-        state.winListener.onWin();
-    }
-
-    /**
      * Interface for listening to win events in the simulation.
      * <p>
      * Implementations of this interface can receive notifications when the
@@ -538,12 +413,7 @@ public class SimulationModel {
      * @return the InventoryObject with the given name, or null if not found
      */
     public InventoryObject findInventoryObjectByName(String name) {
-        for (InventoryObject obj : gameObjects.inventoryObjects) {
-            if (obj.getName().equals(name)) {
-                return obj;
-            }
-        }
-        return null;
+        return inventoryManagementService.findInventoryObjectByName(name);
     }
 
     /**
@@ -556,28 +426,7 @@ public class SimulationModel {
      * @return a new GameObject instance based on the template and position
      */
     public GameObject createGameObjectFromInventory(InventoryObject template, float x, float y) {
-        // Calculate offset to center the object on the drop position
-        float offsetX = template.getSize().getWidth() / 2;
-        float offsetY = template.getSize().getHeight() / 2;
-
-        // Create new GameObject with adjusted position
-        GameObject gameObject = new GameObject(
-                template.getName(),
-                template.getType(),
-                new Position(x - offsetX, y - offsetY),
-                template.getSize());
-        
-        // Set additional properties using setters
-        gameObject.setPhysics(template.getPhysics());
-        gameObject.setAngle(template.getAngle());
-        gameObject.setColour(template.getColour());
-        gameObject.setSprite(template.getSprite());
-        gameObject.setWinning(template.isWinning());
-
-        // Don't modify inventory count here - let the command handle it
-        // template.setCount(template.getCount() - 1);
-        
-        return gameObject;
+        return inventoryManagementService.createGameObjectFromInventory(template, x, y);
     }
 
     /**
@@ -589,17 +438,7 @@ public class SimulationModel {
      * @return true if the position is inside a no-place zone, false otherwise
      */
     public boolean isInNoPlaceZone(double x, double y) {
-        for (PhysicsVisualPair zone : gameObjects.noPlaceZones) {
-            // Find corresponding geometry pair
-            int index = physics.pairs.indexOf(zone);
-            if (index >= 0 && index < physics.geometryPairs.size()) {
-                PhysicsGeometryPair geometryPair = physics.geometryPairs.get(index);
-                if (geometryPair.getGeometry() != null && geometryPair.getGeometry().containsPoint(x, y)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return positionValidationService.isInNoPlaceZone(x, y);
     }
 
     /**
@@ -611,29 +450,7 @@ public class SimulationModel {
      * @return true if the position is inside a win zone, false otherwise
      */
     public boolean isInWinZone(double x, double y) {
-        for (int i = 0; i < physics.pairs.size(); i++) {
-            PhysicsVisualPair pair = physics.pairs.get(i);
-            if (isWinZonePair(pair)) {
-                if (i < physics.geometryPairs.size()) {
-                    PhysicsGeometryPair geometryPair = physics.geometryPairs.get(i);
-                    if (geometryPair.getGeometry() != null && geometryPair.getGeometry().containsPoint(x, y)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a physics-visual pair represents a win zone.
-     * 
-     * @param pair The pair to check
-     * @return true if the pair is a win zone or win platform
-     */
-    private boolean isWinZonePair(PhysicsVisualPair pair) {
-        Object userData = pair.body.getUserData();
-        return "winZone".equals(userData) || "winPlat".equals(userData);
+        return positionValidationService.isInWinZone(x, y);
     }
 
     /**
@@ -644,12 +461,7 @@ public class SimulationModel {
      * </p>
      */
     public void restoreInventoryCounts() {
-        for (GameObject droppedObj : gameObjects.droppedObjects) {
-            InventoryObject inventoryTemplate = findInventoryObjectByName(droppedObj.getName());
-            if (inventoryTemplate != null) {
-                inventoryTemplate.setCount(inventoryTemplate.getCount() + 1);
-            }
-        }
+        inventoryManagementService.restoreInventoryCounts(gameObjects.droppedObjects);
     }
 
     /**
@@ -664,12 +476,7 @@ public class SimulationModel {
      * Used when undoing object placement.
      */
     public void incrementInventoryCount(String itemName) {
-        for (InventoryObject obj : gameObjects.inventoryObjects) {
-            if (obj.getName().equals(itemName)) {
-                obj.setCount(obj.getCount() + 1);
-                break;
-            }
-        }
+        inventoryManagementService.incrementInventoryCount(itemName);
     }
     
     /**
@@ -677,15 +484,7 @@ public class SimulationModel {
      * Used when redoing object placement.
      */
     public void decrementInventoryCount(String itemName) {
-        for (InventoryObject obj : gameObjects.inventoryObjects) {
-            if (obj.getName().equals(itemName)) {
-                int currentCount = obj.getCount();
-                if (currentCount > 0) {
-                    obj.setCount(currentCount - 1);
-                }
-                break;
-            }
-        }
+        inventoryManagementService.decrementInventoryCount(itemName);
     }
 
     /**
