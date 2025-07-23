@@ -1,25 +1,69 @@
 {
   "levelObjects" : [ {
-    "name" : "box1",
-    "type" : "Rectangle",
+    "name" : "log",
+    "type" : "Circle",
     "size" : {
-      "width" : 100.0,
-      "height" : 100.0,
-      "radius" : 0.0
+      "width" : 0.0,
+      "height" : 0.0,
+      "radius" : 50.0
     },
-    "angle" : 0.0,
-    "sprite" : "madBox.png",
+    "angle" : 50.0,
+    "sprite" : "madLog.png",
     "colour" : "BLACK",
     "physics" : {
       "density" : 1.0,
       "friction" : 0.4,
       "restitution" : 0.1,
-      "shape" : "DYNAMIC"
+      "shape" : "STATIC"
     },
     "winning" : false,
     "position" : {
-      "x" : 971.1429,
-      "y" : 247.71428
+      "x" : 1003.4285,
+      "y" : 324.0
+    }
+  }, {
+    "name" : "platform",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 300.0,
+      "height" : 20.0,
+      "radius" : 0.0
+    },
+    "angle" : 30.0,
+    "sprite" : "madPlatform.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 768.2857,
+      "y" : 431.7143
+    }
+  }, {
+    "name" : "winZone",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 200.0,
+      "height" : 40.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : null,
+    "colour" : null,
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.0,
+      "restitution" : 0.0,
+      "shape" : "STATIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 1124.5714,
+      "y" : 434.85715
     }
   }, {
     "name" : "box1",
@@ -40,8 +84,52 @@
     },
     "winning" : false,
     "position" : {
-      "x" : 1140.8572,
-      "y" : 178.57144
+      "x" : 1144.8572,
+      "y" : 138.57143
+    }
+  }, {
+    "name" : "box1",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 100.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "angle" : 0.0,
+    "sprite" : "madBox.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 762.0,
+      "y" : 66.57143
+    }
+  }, {
+    "name" : "box1",
+    "type" : "Rectangle",
+    "size" : {
+      "width" : 100.0,
+      "height" : 100.0,
+      "radius" : 0.0
+    },
+    "angle" : 55.0,
+    "sprite" : "madBox.png",
+    "colour" : "BLACK",
+    "physics" : {
+      "density" : 1.0,
+      "friction" : 0.4,
+      "restitution" : 0.1,
+      "shape" : "DYNAMIC"
+    },
+    "winning" : false,
+    "position" : {
+      "x" : 995.7143,
+      "y" : 125.42857
     }
   } ],
   "inventoryObjects" : [ {
@@ -62,7 +150,7 @@
       "shape" : "DYNAMIC"
     },
     "winning" : false,
-    "count" : 13
+    "count" : 12
   }, {
     "name" : "Domino",
     "type" : "rectangle",
@@ -100,7 +188,7 @@
       "shape" : "STATIC"
     },
     "winning" : false,
-    "count" : 15
+    "count" : 14
   }, {
     "name" : "winPlat",
     "type" : "rectangle",
@@ -138,7 +226,7 @@
       "shape" : "STATIC"
     },
     "winning" : false,
-    "count" : 15
+    "count" : 14
   }, {
     "name" : "log",
     "type" : "circle",
@@ -157,7 +245,7 @@
       "shape" : "STATIC"
     },
     "winning" : false,
-    "count" : 15
+    "count" : 14
   }, {
     "name" : "tennisball",
     "type" : "circle",
