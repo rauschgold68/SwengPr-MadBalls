@@ -352,7 +352,7 @@ public class TitleScreenView {
      * @return The HBox containing the music volume controls.
      */
     private HBox createMusicVolumeRow() {
-        Label lblMusic = new Label("Musik-Lautstärke:");
+        Label lblMusic = new Label("Music-Volume:");
         lblMusic.setStyle("-fx-text-fill: white;");
         Slider sliderMusic = new Slider(0, 100, 50);
         sliderMusic.setPrefWidth(300);
@@ -367,7 +367,7 @@ public class TitleScreenView {
      * @return The HBox containing the sound volume controls.
      */
     private HBox createSoundVolumeRow() {
-        Label lblSound = new Label("Soundeffekte:");
+        Label lblSound = new Label("Soundeffects:");
         lblSound.setStyle("-fx-text-fill: white;");
         Slider sliderSound = new Slider(0, 100, 50);
         sliderSound.setPrefWidth(300);
