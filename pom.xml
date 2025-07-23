@@ -259,7 +259,14 @@
                         <exclude>mm/controller/FxToGameObjectController.class</exclude>
                         <exclude>mm/controller/JsonViewController.class</exclude>
                         <exclude>mm/controller/VisualUpdateController.class</exclude>
+                        <exclude>mm/controller/SimulationController.class</exclude>
+                        <exclude>mm/controller/ButtonController.class</exclude>
+                        <exclude>mm/controller/InventoryManager.class</exclude>
+                        <exclude>mm/controller/DragAndDropController.class</exclude>
+                        <exclude>mm/controller/GeometryConverter.class</exclude>
+                        <exclude>mm/controller/PositionCalculator.class</exclude>
                         <exclude>mm/model/CollisionDetection.class</exclude>
+                        <exclude>mm/model/CollisonShapeHandler.class</exclude>
 
                         <!-- Lambda functions are compiled to synthetic methods with specific patterns -->
                         <exclude>**/PhysicsAnimationController$lambda$*</exclude>
