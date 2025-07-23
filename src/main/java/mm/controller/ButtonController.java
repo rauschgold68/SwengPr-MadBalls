@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  * It follows the separation of concerns principle by extracting UI interaction logic from
  * the main simulation controller.
  */
-public class ButtonManager {
+public class ButtonController {
     
     /**
      * Contains UI-related components needed by the ButtonManager.
@@ -235,7 +235,7 @@ public class ButtonManager {
      *
      * @param params Parameter object containing all needed values
      */
-    public ButtonManager(Params params) {
+    public ButtonController(Params params) {
         this.uiComponents = params.uiComponents;
         this.modelComponents = params.modelComponents;
         this.callbackComponents = params.callbackComponents;

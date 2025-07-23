@@ -232,6 +232,10 @@ public class SimulationController {
         );
 
         this.model = new SimulationModel(params.levelPath);
+        
+        // Set puzzle mode in the model
+        this.model.setPuzzleMode(params.isPuzzleMode);
+        
         this.view = new SimulationView(params.primaryStage, params.isPuzzleMode, params.atPuzzlesEnd);
         
         // Set win listener
@@ -263,21 +267,21 @@ public class SimulationController {
         
         // Replace all button setup methods with ButtonManager
         // First create the component groups
-        ButtonManager.UIComponents uiComponents = new ButtonManager.UIComponents(
+        ButtonController.UIComponents uiComponents = new ButtonController.UIComponents(
             view, primaryStage, state.getOriginalWidth(), state.getOriginalHeight());
             
-        ButtonManager.ModelComponents modelComponents = new ButtonManager.ModelComponents(
+        ButtonController.ModelComponents modelComponents = new ButtonController.ModelComponents(
             model, state.getGameObjectToPairMap(), inventoryManager);
             
-        ButtonManager.CallbackComponents callbackComponents = new ButtonManager.CallbackComponents(
+        ButtonController.CallbackComponents callbackComponents = new ButtonController.CallbackComponents(
             this::updateJsonViewer, this::setupSimulation);
             
-        ButtonManager.StateComponents stateComponents = new ButtonManager.StateComponents(
+        ButtonController.StateComponents stateComponents = new ButtonController.StateComponents(
             state.getSelectedSkin(), params.atPuzzlesEnd);
         
         // Then use the component groups with the builder
-        ButtonManager buttonManager = new ButtonManager(
-            new ButtonManager.Params.Builder()
+        ButtonController buttonManager = new ButtonController(
+            new ButtonController.Params.Builder()
                 .setUIComponents(uiComponents)
                 .setModelComponents(modelComponents)
                 .setCallbackComponents(callbackComponents)

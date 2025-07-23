@@ -88,6 +88,27 @@ public class SimulationModel {
         public boolean winScreenVisible = false;
         /** Listener for win condition events in the simulation. */
         public WinListener winListener;
+        private boolean puzzleMode = false;
+
+        /**
+         * Gets whether the simulation is running in puzzle mode.
+         * 
+         * @return true if in puzzle mode, false if in sandbox mode
+         */
+        public boolean isPuzzleMode() {
+            return puzzleMode;
+        }
+
+        /**
+         * Sets whether the simulation is running in puzzle mode.
+         * In puzzle mode, level objects cannot be manipulated.
+         * In sandbox mode, level objects can be manipulated like any other object.
+         * 
+         * @param puzzleMode true for puzzle mode, false for sandbox mode
+         */
+        public void setPuzzleMode(boolean puzzleMode) {
+            this.puzzleMode = puzzleMode;
+        }
     }
 
     // Grouped component containers
@@ -116,6 +137,24 @@ public class SimulationModel {
     public World getWorld() {
         return physics.world;
     }
+
+    /**
+     * Sets wether the simulation is running in puzzle mode. 
+     * In puzzle mode, level objects cannot be manipulated.
+     * @param puzzleMode
+     */
+    public void setPuzzleMode(boolean puzzleMode) {
+        state.setPuzzleMode(puzzleMode);
+    }
+
+    /**
+     * Checks if the simulation is running in puzzle mode.
+     * 
+     * @return true if in puzzle mode, false if in sandbox mode
+     */
+    public boolean isPuzzleMode() {
+        return state.isPuzzleMode();
+    }   
 
     /**
      * Returns the list of physics-visual pairs in the simulation.
@@ -300,21 +339,33 @@ public class SimulationModel {
         LevelImportController importer = new LevelImportController(state.levelPath);
         List<GameObject> levelGameObjects = importer.getGameObjects();
 
-        // Add level objects
+        // Clear dropped objects to avoid duplicates when resetting simulation
+        gameObjects.droppedObjects.clear();
+        gameObjects.droppedVisualPairs.clear();
+        
+        // In sandbox mode, add level objects to droppedObjects so they can be manipulated
+        if (!state.isPuzzleMode()) {
+            for (GameObject obj : levelGameObjects) {
+                // Skip adding no-place zones and win zones to droppable objects
+                if (!obj.getName().equals("noPlaceZone") && !obj.getName().equals("winZone")) {
+                    // Create a copy of the object to avoid reference issues
+                    GameObject objCopy = cloneGameObject(obj);
+                    gameObjects.droppedObjects.add(objCopy);
+                }
+            }
+        }
+
+        // Add all level objects to the physics world
         for (GameObject obj : levelGameObjects) {
             PhysicsVisualPair pair = GameObjectController.convert(obj, physics.world);
             addPhysicsVisualPair(pair);
             if (obj.getName().equals("noPlaceZone")) {
                 gameObjects.noPlaceZones.add(pair);
             }
-        }
-
-        // Add dropped objects
-        for (GameObject obj : gameObjects.droppedObjects) {
-            PhysicsVisualPair pair = GameObjectController.convert(obj, physics.world);
-            addPhysicsVisualPair(pair);
-            if (obj.getName().equals("noPlaceZone")) {
-                gameObjects.noPlaceZones.add(pair);
+            
+            // Add to droppedVisualPairs for objects that should be manipulable in sandbox mode
+            if (!state.isPuzzleMode() && !obj.getName().equals("noPlaceZone") && !obj.getName().equals("winZone")) {
+                gameObjects.droppedVisualPairs.add(pair);
             }
         }
 
@@ -322,6 +373,29 @@ public class SimulationModel {
         physics.timer = new PhysicsAnimationController(physics.world, physics.pairs, this);
 
         contactEventService.setupContactListener();
+    }
+
+    /**
+     * Creates a deep copy of a GameObject to avoid reference issues.
+     * 
+     * @param original The original GameObject to clone
+     * @return A new GameObject with the same properties
+     */
+    private GameObject cloneGameObject(GameObject original) {
+        GameObject clone = new GameObject(
+            original.getName(),
+            original.getType(),
+            new Position(original.getPosition().getX(), original.getPosition().getY()),
+            new Size(original.getSize().getWidth(), original.getSize().getHeight())
+        );
+        
+        clone.setAngle(original.getAngle());
+        clone.setColour(original.getColour());
+        clone.setSprite(original.getSprite());
+        clone.setPhysics(original.getPhysics());
+        clone.setWinning(original.isWinning());
+        
+        return clone;
     }
 
     /**
