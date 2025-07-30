@@ -196,6 +196,8 @@ public class OverlayFactory {
             winScreenButtons.btnWinNext = btn;
         } else if ("Export Level".equals(labelText)) {
             winScreenButtons.btnWinExport = btn;
+        } else if ("Resume Editing".equals(labelText)) {
+            winScreenButtons.btnWinResume = btn;
         }
 
         Label label = new Label(labelText);

@@ -187,7 +187,7 @@ public class SimulationView {
     }
 
     /**
-     * Inner class to hold win screen buttons, reducing overall field count.
+     * Inner class to hold win screen buttons.
      * <p>
      * These buttons appear on the level completion screen and provide
      * options for progression and level management.
@@ -202,6 +202,9 @@ public class SimulationView {
 
         /** Button to export the completed level configuration */
         public Button btnWinExport;
+
+        /** Button to keep editing after win */
+        public Button btnWinResume;
     }
 
     /**

@@ -520,7 +520,27 @@ public class ButtonController {
             });
 
         }
-    }
+
+        if (winButtons.btnWinResume != null){
+            winButtons.btnWinResume.setOnAction(e -> {
+                PhysicsAnimationController timer = modelComponents.model.getTimer();
+                if (timer != null && !timer.isRunning()){
+                    timer.stop();
+                    timer.reset();
+
+                    uiComponents.view.getWinScreenOverlay().setVisible(false);;
+
+                    modelComponents.model.getUndoRedoManager().clear();
+                    modelComponents.gameObjectToPairMap.clear();
+                    modelComponents.inventoryManager.setInventoryItemsDisabled(false);
+                    modelComponents.inventoryManager.refreshInventoryDisplay();
+
+                    callbackComponents.setupSimulationCallback.run();
+
+                    }
+                });
+            }
+        }
 
     /**
      * Sets up the next level button on the win screen.
