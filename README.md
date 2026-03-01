@@ -2,7 +2,7 @@
 
 ## Description
 
-This project was developed as part of a university assignment. The goal was to create a low-fidelity clone of *Crazy Machines*, a physics-based puzzle game originally released in 2005.
+This project was developed as part of a university assignment in the module **Software Engineering Internship**. The goal was to create a low-fidelity clone of *Crazy Machines*, a physics-based puzzle game originally released in 2005.
 
 The game focuses on physical reasoning challenges built around Rube Goldberg-style chain reactions.
 
