@@ -1,4 +1,4 @@
-# MB - Mad Balls
+# MadBalls – Game
 
 ## Description
 
@@ -18,11 +18,15 @@ The application was developed specifically for Linux-based university PCs with a
 
 It was not designed for cross-platform compatibility. Running the application on other operating systems or different screen resolutions may result in graphical issues, scaling problems, or unexpected bugs.
 
+## Visuals
+
+https://github.com/user-attachments/assets/51144046-d61c-40eb-a0a4-60742759111e
+
 ## Contributors
 
 - **Luke Berger** – Graphic Designer & Project Coordinator  
 - **Alexander Roskamp** – Lead Developer  
-- **Benedikt Schroeder** – Project Tester
+- **Benedikt Schroeder** – Project Tester & Developer
 
 ## Project status
 
